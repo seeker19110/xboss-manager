@@ -12,28 +12,48 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Repo khung (chưa có app) → bỏ qua các bước build/test để CI vẫn xanh.
+      # Khi dự án thật được tạo (có package.json), toàn bộ hàng rào tự kích hoạt.
+      - name: Kiểm tra đã có ứng dụng chưa
+        id: app
+        run: |
+          if [ -f package.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Chưa có package.json — đây là repo khung (template). Bỏ qua build/test; hàng rào sẽ tự chạy khi có dự án thật."
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.app.outputs.exists == 'true'
         with:
           node-version: 22
           cache: npm
 
       - name: Cài đặt
+        if: steps.app.outputs.exists == 'true'
         run: npm ci
 
       - name: Quét bảo mật phụ thuộc
+        if: steps.app.outputs.exists == 'true'
         run: npm audit --audit-level=high
 
       - name: Lint
+        if: steps.app.outputs.exists == 'true'
         run: npm run lint
 
       - name: Type check
+        if: steps.app.outputs.exists == 'true'
         run: npm run type-check
 
       - name: Kiểm tra format
+        if: steps.app.outputs.exists == 'true'
         run: npm run format:check
 
       - name: Test
+        if: steps.app.outputs.exists == 'true'
         run: npm test
 
       - name: Build
+        if: steps.app.outputs.exists == 'true'
         run: npm run build

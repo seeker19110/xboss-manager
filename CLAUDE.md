@@ -16,6 +16,7 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 - `docs/framework/BO-SUNG-chat-luong-Nhom-2.md` — mobile-first, hiệu năng (Lighthouse/CWV), kiểm thử (E2E + a11y), UI/UX, chống lỗi logic.
 - `docs/framework/BO-SUNG-giao-dien-theme.md` — hệ thống theme (Dark blue mặc định + Light).
 - `docs/framework/BO-SUNG-nang-cao-i18n-PWA-Sentry-SEO.md` — năng lực nâng cao (bật khi cần).
+- `docs/framework/AP-DUNG-vao-du-an-co-san.md` — cách áp khung lên **dự án đã có sẵn** (brownfield, tăng dần).
 - `docs/framework/HUONG-DAN-cau-hinh-precommit-CI.md` — cấu hình hàng rào (ESLint **flat config**, Tailwind v4).
 - `docs/adr/` — các quyết định kỹ thuật (ADR). **Đọc trước khi đề xuất thay đổi kiến trúc lớn.**
 
@@ -41,7 +42,7 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 
 ## 4. Chống "ảo giác" (bắt buộc)
 - Không bịa hàm/thư viện/API — xác nhận tồn tại (đọc tài liệu/mã nguồn) trước khi dùng.
-- Không giả định cấu trúc dự án — đọc file thật để biết tên, kiểu dữ liệu, cấu trúc hiện có.
+- Không giả định cấu trúc dự án — đọc file thật để biết tên, kiểu dữ liệu, cấu trúc hiện có. Với dự án có sẵn, **AI tự xác định stack/phiên bản** bằng cách đọc repo (`package.json`, config, cấu trúc thư mục) — **không hỏi người dùng điều đã có trong code** (xem `AP-DUNG-vao-du-an-co-san.md`).
 - Không đoán kết quả lệnh — thực sự chạy và đọc output.
 
 ## 5. Cổng trước khi COMMIT (chạy và đạt hết)

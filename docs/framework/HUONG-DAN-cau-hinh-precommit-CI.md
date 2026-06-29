@@ -284,6 +284,10 @@ jobs:
 ```
 
 > CI chạy trên máy chủ sạch nên bắt được lỗi kiểu "máy tôi chạy được mà". Mọi pull request sẽ hiển thị xanh/đỏ theo kết quả này.
+>
+> File `ci.yml` kèm theo có một step kiểm tra đầu job: **nếu chưa có `package.json`** (repo mới chỉ có
+> khung) thì các bước build/test được bỏ qua để CI vẫn xanh; **khi dự án thật được tạo**, toàn bộ hàng rào
+> tự kích hoạt. Khi đã có app, có thể xóa step guard này nếu muốn CI luôn chạy đầy đủ.
 
 ---
 
