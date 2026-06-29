@@ -1,0 +1,13 @@
+{
+  "common": {
+    "appName": "[Tên ứng dụng]",
+    "loading": "Đang tải…",
+    "retry": "Thử lại",
+    "save": "Lưu",
+    "cancel": "Hủy"
+  },
+  "home": {
+    "title": "Xin chào",
+    "description": "Đây là nội dung mẫu đa ngôn ngữ."
+  }
+}

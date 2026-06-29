@@ -20,9 +20,12 @@ Nội dung bám theo Definition of Done (KHUNG-1) + cổng commit/merge (KHUNG-2
 
 - [ ] Chạy đúng **tiêu chí chấp nhận** của tính năng (đối chiếu `PROJECT.md`)
 - [ ] `lint` 0 cảnh báo · `type-check` sạch · `format:check` đạt · `build` OK
-- [ ] Có **test** cho logic quan trọng và **toàn bộ test xanh**
+- [ ] Có **test** cho logic quan trọng (gồm **ca biên**) và **toàn bộ test xanh**
 - [ ] Xử lý đủ trạng thái **lỗi / rỗng / đang tải** trên UI
-- [ ] Chạy được trên **điện thoại lẫn máy tính** (responsive)
+- [ ] Chạy được trên **điện thoại lẫn máy tính** (responsive, vùng chạm ≥ 44px)
+- [ ] Đạt **ngân sách hiệu năng** (Lighthouse CI xanh / Core Web Vitals trong ngưỡng)
+- [ ] **Accessibility**: lint `jsx-a11y` sạch, axe không lỗi nghiêm trọng, dùng được bằng bàn phím
+- [ ] Hiển thị đúng ở **cả hai chế độ nền** (Dark blue mặc định + Light)
 - [ ] Không còn **bí mật** hay **code rác** (console.log debug, code chết)
 - [ ] Đã **tự review diff** một lượt (đúng mục tiêu, không sửa nhầm)
 
@@ -30,6 +33,7 @@ Nội dung bám theo Definition of Done (KHUNG-1) + cổng commit/merge (KHUNG-2
 
 - [ ] Mọi đầu vào (người dùng/API) được **validate lúc chạy**
 - [ ] Logic nhạy cảm (kiểm tra quyền, tính toán quan trọng) ở **phía server**
+- [ ] Đã rà **lỗi logic**: ca biên/rỗng, `null` vs 0, async race/idempotency, thời gian UTC, tiền không dùng float (xem Nhóm 2 mục 6)
 - [ ] Nếu đổi schema: có **migration có phiên bản** và **đường rollback**; RLS đã test
 
 ## Ảnh hưởng & rủi ro

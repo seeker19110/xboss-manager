@@ -9,6 +9,16 @@ out
 build
 coverage
 
+# Test/hiệu năng (sinh tự động)
+playwright-report
+test-results
+.lighthouseci
+
+# PWA (Serwist sinh ra)
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+
 # Linh tinh
 *.tsbuildinfo
 next-env.d.ts

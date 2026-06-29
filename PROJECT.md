@@ -16,13 +16,17 @@
 - Won't have (lúc này):
 
 ## 3. Yêu cầu phi chức năng
-- Tốc độ mục tiêu (vd Lighthouse ≥ ...):
+- Tốc độ mục tiêu (Lighthouse ≥ ...; CWV: LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1):
 - Bảo mật (vd RLS, xác thực):
 - Accessibility (vd WCAG AA):
-- Thiết bị/trình duyệt hỗ trợ:
+- Mobile-first & thiết bị/trình duyệt hỗ trợ:
+- Theme: nền **Dark blue mặc định** + chế độ **Light** (mặc định trừ khi nêu khác):
 
 ## 4. Tech stack
+> Điền theo KHUNG 3 (research-first). Mỗi lựa chọn ghi **phiên bản + ngày đã xác minh** và 1 câu lý do
+> (cân bằng độ phổ biến ↔ năng lực). Quyết định lớn → có ADR trong `docs/adr/`.
 - Frontend / Backend / CSDL / Hosting / Khác:
+- Phiên bản chính (đã xác minh ngày ____): Node ___ · framework ___ · CSDL/client ___ · ...
 
 ## 5. Thiết kế dữ liệu
 - Bảng + cột + ràng buộc + quan hệ + index:

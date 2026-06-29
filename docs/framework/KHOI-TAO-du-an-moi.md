@@ -13,19 +13,36 @@ dự-án/
 ├─ PROJECT.md                         ← đặc tả dự án
 ├─ PROGRESS.md                        ← trạng thái dự án (cập nhật liên tục)
 ├─ docs/
-│  ├─ framework/                      ← 2 khung chung + hướng dẫn (tham khảo)
+│  ├─ framework/                      ← khung chung + hướng dẫn (tham khảo)
 │  │  ├─ KHUNG-1-quy-trinh-va-tieu-chuan.md
 │  │  ├─ KHUNG-2-luat-AI-va-mau-du-an.md
+│  │  ├─ KHUNG-3-chon-cong-nghe-va-de-xuat-chu-dong.md
 │  │  ├─ HUONG-DAN-cau-hinh-precommit-CI.md
-│  │  └─ BO-SUNG-chat-luong-Nhom-1.md
+│  │  ├─ BO-SUNG-chat-luong-Nhom-1.md
+│  │  ├─ BO-SUNG-chat-luong-Nhom-2.md
+│  │  ├─ BO-SUNG-giao-dien-theme.md
+│  │  └─ BO-SUNG-nang-cao-i18n-PWA-Sentry-SEO.md
 │  └─ adr/                            ← các quyết định kỹ thuật
 │     └─ 0000-template.md
+├─ eslint.config.mjs                  ← ESLint flat config (Next 16 / ESLint 9-10)
+├─ postcss.config.mjs                 ← Tailwind v4
+├─ .nvmrc · .editorconfig · .env.example
 ├─ lib/env.ts                         ← xác thực biến môi trường
+├─ styles/theme.css                   ← design tokens (Dark blue + Light)
+├─ app/                               ← starter: trang lỗi, robots/sitemap, manifest, sw (PWA)
+├─ i18n/request.ts · messages/*.json  ← đa ngôn ngữ (next-intl)
+├─ e2e/smoke.spec.ts                  ← E2E mẫu (Playwright + axe)
+├─ playwright.config.ts               ← cấu hình E2E (desktop + mobile)
+├─ lighthouserc.json                  ← ngân sách hiệu năng (Lighthouse CI)
+├─ CHANGELOG.md                       ← lịch sử thay đổi
 ├─ supabase/migrations/               ← migration có phiên bản
 └─ .github/
    ├─ pull_request_template.md
+   ├─ ISSUE_TEMPLATE/                  ← mẫu báo lỗi / đề xuất tính năng
    ├─ dependabot.yml
-   └─ workflows/ci.yml
+   └─ workflows/
+      ├─ ci.yml
+      └─ lighthouse-ci.yml
 ```
 
 ---
@@ -39,9 +56,9 @@ dự-án/
 ### Bước 1 — Định nghĩa dự án → tạo `PROJECT.md`
 *(Tương ứng Giai đoạn 0–2 của khung, làm gọn)*
 - [ ] Điền **Mẫu định nghĩa dự án** (Phần B của KHUNG 2): vấn đề, người dùng, MVP (MoSCoW), yêu cầu phi chức năng, stack, schema CSDL, kiến trúc/API, luồng người dùng, DoD, lộ trình, rủi ro.
-- [ ] **AI phản biện & góp ý (bắt buộc)** trước khi chốt: phạm vi MVP có quá lớn không? schema thiếu ràng buộc/index không? rủi ro bảo mật bị bỏ sót? yêu cầu phi chức năng còn thiếu? → đề xuất sửa cụ thể.
-- [ ] Chốt `PROJECT.md` sau khi đồng ý các góp ý.
-- **Tuân thủ:** mỗi tính năng Must có *tiêu chí chấp nhận* đo được; *đóng băng* phạm vi MVP.
+- [ ] **AI chạy KHUNG 3 (research-first):** đề xuất chủ động *mọi mặt* (PHẦN A) + chọn công nghệ với **phiên bản ổn định đã xác minh bằng nguồn sống** (PHẦN B), cân bằng phổ biến ↔ năng lực; ghi ADR.
+- [ ] Chốt `PROJECT.md` sau khi đồng ý các góp ý (tech stack ghi rõ **phiên bản + ngày xác minh**).
+- **Tuân thủ:** mỗi tính năng Must có *tiêu chí chấp nhận* đo được; *đóng băng* phạm vi MVP; **không đoán phiên bản theo trí nhớ**.
 
 ### Bước 2 — Tạo `CLAUDE.md` cho dự án
 - [ ] Điền mọi chỗ `[ĐIỀN: ...]` từ `PROJECT.md`: stack, lệnh (dev/build/test/type-check/format/migration), cấu trúc thư mục, quy ước đặt tên, thư viện chính, giai đoạn hiện tại.
@@ -57,16 +74,20 @@ dự-án/
 *(Theo `HUONG-DAN-cau-hinh-precommit-CI.md`, 14 bước)*
 - [ ] TypeScript `strict` + các cờ nghiêm (`noUncheckedIndexedAccess`...).
 - [ ] ESLint (no-explicit-any, no-floating-promises) + Prettier.
+- [ ] ESLint thêm `jsx-a11y/recommended` (a11y tĩnh).
 - [ ] Husky + lint-staged → **pre-commit hook** (lint + format + type-check).
 - [ ] commitlint → **commit-msg hook** (ép conventional commits).
-- [ ] Vitest cho `npm test`.
-- [ ] CI (GitHub Actions): build + lint + type-check + format:check + test + `npm audit`.
+- [ ] Vitest (`npm test`) + **ngưỡng coverage** (`npm run test:coverage`).
+- [ ] **Playwright** E2E (desktop + mobile) + **axe** (`npm run test:e2e`).
+- [ ] CI (GitHub Actions): build + lint + type-check + format:check + test + `npm audit`; **Lighthouse CI** trên PR (`lighthouse-ci.yml`).
 - [ ] Dependabot.
 - **Tuân thủ:** không bỏ bước nào của hàng rào — đây là tầng chặn lỗi đáng tin cậy nhất.
 
 ### Bước 5 — Thêm file bổ sung chất lượng
 - [ ] `lib/env.ts`: đổi tên biến cho khớp dự án; dùng `clientEnv`/`serverEnv` thay cho `process.env` rải rác.
-- [ ] `.github/pull_request_template.md` đã ở đúng chỗ (checklist DoD tự hiện trên mỗi PR).
+- [ ] `styles/theme.css`: nối tokens vào Tailwind + script no-flash + nút chuyển (theo `BO-SUNG-giao-dien-theme.md`). Mặc định **Dark blue**, có **Light**.
+- [ ] `e2e/smoke.spec.ts`: sửa cho khớp luồng chính thật.
+- [ ] `.github/pull_request_template.md` + `ISSUE_TEMPLATE/` + `CHANGELOG.md` đã ở đúng chỗ.
 - [ ] Thư mục `docs/adr/` sẵn sàng (viết ADR khi có quyết định kỹ thuật lớn).
 
 ### Bước 6 — Bật branch protection (GitHub UI)

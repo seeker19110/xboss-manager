@@ -20,12 +20,14 @@ import { z } from 'zod';
 const clientSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url('NEXT_PUBLIC_SUPABASE_URL phải là URL hợp lệ'),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Thiếu NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+  NEXT_PUBLIC_SITE_URL: z.string().url().default('http://localhost:3000'),
 });
 
 const clientParsed = clientSchema.safeParse({
   // Phải liệt kê tường minh để Next.js inline được:
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
 });
 
 if (!clientParsed.success) {
@@ -41,7 +43,8 @@ export const clientEnv = clientParsed.data;
 // ──────────────────────────────────────────────
 const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Thiếu SUPABASE_SERVICE_ROLE_KEY'),
-  GOOGLE_CLOUD_TTS_API_KEY: z.string().min(1, 'Thiếu GOOGLE_CLOUD_TTS_API_KEY'),
+  // Tùy chọn — thêm các bí mật khác của dự án ở đây (vd khóa API bên thứ ba).
+  SENTRY_DSN: z.string().url().optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 

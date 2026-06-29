@@ -34,7 +34,7 @@ npm install --save-dev vitest @vitejs/plugin-react jsdom \
   @testing-library/react @testing-library/jest-dom
 ```
 
-> Next.js đã đi kèm ESLint, nên không cần cài riêng. Nếu dự án chưa có ESLint, chạy `npx next lint` một lần để khởi tạo.
+> `create-next-app` đã kèm ESLint + `eslint.config.mjs` (flat config). Next 16 đã bỏ `next lint` — chạy `eslint` trực tiếp.
 
 ---
 
@@ -48,18 +48,22 @@ Thêm/đảm bảo các script sau trong `package.json`:
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings=0",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "prepare": "husky"
   }
 }
 ```
 
-> `--max-warnings=0` biến cảnh báo thành lỗi → ép "0 cảnh báo" như tiêu chuẩn yêu cầu.
+> `--max-warnings 0` biến cảnh báo thành lỗi → ép "0 cảnh báo" như tiêu chuẩn yêu cầu.
+> **Next 16 đã bỏ lệnh `next lint`** — chạy ESLint trực tiếp như trên (ESLint 9/10 + flat config).
 
 ---
 
@@ -92,23 +96,43 @@ coverage
 
 ---
 
-## Bước 4 — ESLint nghiêm hơn
+## Bước 4 — ESLint nghiêm hơn (flat config)
 
-Tạo/sửa file `.eslintrc.json`:
+ESLint 9/10 và Next 16 dùng **flat config** (`eslint.config.mjs`) — không còn `.eslintrc.json`.
+File `eslint.config.mjs` đã kèm sẵn ở gốc repo:
 
-```json
-{
-  "extends": ["next/core-web-vitals", "next/typescript"],
-  "rules": {
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
-    "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-floating-promises": "error"
-  }
-}
+```js
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { FlatCompat } from '@eslint/eslintrc';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const compat = new FlatCompat({ baseDirectory: __dirname });
+
+const eslintConfig = [
+  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: __dirname } },
+    rules: {
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-floating-promises': 'error',
+      'jsx-a11y/no-autofocus': 'warn',
+      'jsx-a11y/label-has-associated-control': 'warn',
+    },
+  },
+  { ignores: ['.next/**', 'coverage/**', 'playwright-report/**', 'public/sw.js', 'next-env.d.ts'] },
+];
+
+export default eslintConfig;
 ```
 
-> Nếu phiên bản Next của bạn chưa có config `next/typescript`, bỏ dòng đó ra và chỉ giữ `next/core-web-vitals`. Quy tắc `no-explicit-any` ép bỏ `any`; `no-floating-promises` bắt các promise quên `await`.
+> `eslint-config-next` đã gồm React/Hooks và bộ rule **jsx-a11y** cốt lõi. `no-explicit-any` ép bỏ `any`;
+> `no-floating-promises` (cần `projectService` để lint theo kiểu) bắt promise quên `await`.
+> **Tailwind v4:** cần `postcss.config.mjs` (đã kèm) với plugin `@tailwindcss/postcss`; trong `globals.css`
+> chỉ cần `@import "tailwindcss";` (không còn `@tailwind base/components/utilities` như v3).
 
 ---
 

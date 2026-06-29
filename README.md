@@ -13,11 +13,23 @@ phải tuân thủ gì. Đó là kim chỉ nam chính.
 - `PROJECT.md` — mẫu đặc tả dự án (điền trước khi code).
 - `PROGRESS.md` — mẫu theo dõi trạng thái.
 - `lib/env.ts` — xác thực biến môi trường (đổi tên biến cho khớp dự án).
-- `.prettierrc`, `.prettierignore`, `.eslintrc.json`, `commitlint.config.js`,
+- `styles/theme.css` — design tokens: nền **Dark blue** mặc định + chế độ **Light**.
+- `playwright.config.ts`, `e2e/smoke.spec.ts` — E2E (desktop + mobile) + quét a11y axe.
+- `lighthouserc.json` — ngân sách hiệu năng (Lighthouse CI).
+- `CHANGELOG.md` — lịch sử thay đổi (Keep a Changelog).
+- `eslint.config.mjs` — ESLint **flat config** (ESLint 9/10, Next 16; thay `.eslintrc.json` cũ).
+- `postcss.config.mjs` — Tailwind v4 (`@tailwindcss/postcss`).
+- `.nvmrc` (Node 22), `.editorconfig`, `.env.example` — đồng bộ môi trường/biến.
+- `app/` — starter: `not-found.tsx`, `error.tsx`, `global-error.tsx` (trang lỗi), `robots.ts`,
+  `sitemap.ts` (SEO), `manifest.ts` + `sw.ts` (PWA).
+- `i18n/request.ts`, `messages/{vi,en}.json` — đa ngôn ngữ (next-intl).
+- `.prettierrc`, `.prettierignore`, `commitlint.config.js`,
   `.lintstagedrc.json`, `vitest.config.ts`, `vitest.setup.ts`, `.gitignore`
 - `.husky/pre-commit`, `.husky/commit-msg` — hook (cần chạy `npx husky init` trước, xem dưới).
-- `.github/pull_request_template.md`, `.github/dependabot.yml`, `.github/workflows/ci.yml`
-- `docs/framework/` — 5 tài liệu khung (quy trình, luật AI, mẫu dự án, cấu hình, runbook).
+- `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/`, `.github/dependabot.yml`,
+  `.github/workflows/ci.yml`, `.github/workflows/lighthouse-ci.yml`
+- `docs/framework/` — 8 tài liệu khung (quy trình, luật AI, **chọn công nghệ research-first**,
+  cấu hình, runbook, bổ sung chất lượng Nhóm 1 & 2, theme, **nâng cao i18n/PWA/Sentry/SEO**).
 - `docs/adr/0000-template.md` — mẫu ghi quyết định kỹ thuật.
 
 ## 2 việc phải làm tay
@@ -29,6 +41,6 @@ phải tuân thủ gì. Đó là kim chỉ nam chính.
 > **kiểm chứng hàng rào** (thử commit sai phải bị chặn) trước khi code tính năng.
 
 ## Lưu ý
-- `.eslintrc.json` dùng cấu hình kiểu cũ. Nếu dự án của bạn dùng ESLint flat config
-  (`eslint.config.mjs`), hãy chuyển các `rules` tương ứng sang đó.
+- ESLint dùng **flat config** (`eslint.config.mjs`) cho ESLint 9/10 + Next 16. Nếu phiên bản Next/ESLint
+  của bạn khác, đối chiếu lại cách `eslint-config-next` xuất config (FlatCompat vs flat gốc).
 - Hai file MERGE và README này KHÔNG cần commit — xóa sau khi setup xong nếu muốn.

@@ -1,0 +1,31 @@
+name: Lighthouse CI
+
+# Cổng hiệu năng: build app rồi đo Lighthouse trên mỗi PR.
+# Fail nếu dưới ngưỡng trong lighthouserc.json (performance budget).
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cài đặt
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # Đặt biến môi trường cần cho build qua GitHub Secrets, không hard-code.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Chạy Lighthouse CI
+        run: npx @lhci/cli autorun

@@ -53,6 +53,7 @@
 - [ ] Phân tích đối thủ có dẫn chứng: họ thiếu gì, mình khác ở đâu.
 - [ ] Trò chuyện với 3–5 người thuộc nhóm mục tiêu (hỏi vấn đề, đừng bán ý tưởng).
 - [ ] Lập **sổ rủi ro**: các giả định nguy hiểm nhất + cách kiểm chứng.
+- [ ] **AI chạy PHẦN A của KHUNG 3** — đề xuất chủ động về mọi mặt (bảo mật, pháp lý, hiệu năng, quy mô...) ngay từ ý tưởng.
 
 **Cổng:** Nêu được tên một người cụ thể sẽ dùng và lý do họ dùng. Nếu không, chưa qua.
 
@@ -70,7 +71,7 @@
 - [ ] Viết user story: *"Là [ai], tôi muốn [làm gì] để [mục đích gì]."*
 - [ ] Vẽ luồng người dùng chính (user flow).
 - [ ] Liệt kê **yêu cầu phi chức năng**: tốc độ mục tiêu, mức bảo mật, accessibility, thiết bị hỗ trợ.
-- [ ] Chốt tech stack.
+- [ ] Chốt tech stack **theo KHUNG 3** (nghiên cứu, cân bằng phổ biến ↔ năng lực, **phiên bản ổn định đã xác minh**, ghi ADR).
 - [ ] **Đóng băng phạm vi MVP** — ý tưởng mới đi vào danh sách chờ.
 
 **Định nghĩa "Done" (DoD) — một tính năng chỉ XONG khi:**
@@ -107,8 +108,9 @@
 
 **Giao diện:**
 - [ ] Design tokens nhất quán (màu, khoảng cách, font) — không "màu tùy hứng".
-- [ ] Mobile-first; responsive.
-- [ ] Tương phản màu đạt WCAG AA.
+- [ ] **Theme: nền Dark blue mặc định + chế độ Light** (xem `BO-SUNG-giao-dien-theme.md`).
+- [ ] Mobile-first; responsive (checklist cụ thể: `BO-SUNG-chat-luong-Nhom-2.md` mục 1).
+- [ ] Tương phản màu đạt WCAG AA **ở cả hai chế độ nền**.
 
 **Cổng:** Schema + kiến trúc + API contract được phản biện và duyệt.
 
@@ -173,8 +175,9 @@
 **Loại kiểm thử bắt buộc:**
 - [ ] Trường hợp biên: ô trống, dữ liệu cực dài, số âm, ký tự lạ, nhấn nút liên tục, mất mạng giữa chừng.
 - [ ] Bảo mật cơ bản: thử truy cập dữ liệu người khác, thử vượt kiểm tra phía client.
-- [ ] Accessibility: điều hướng bằng bàn phím, trình đọc màn hình, tương phản.
-- [ ] Hiệu năng: đo Lighthouse, thử với dữ liệu lớn.
+- [ ] Accessibility: điều hướng bằng bàn phím, trình đọc màn hình, tương phản; **tự động** bằng `jsx-a11y` + axe (Nhóm 2 mục 3).
+- [ ] **E2E luồng chính bằng Playwright** trên cả viewport desktop lẫn mobile (Nhóm 2 mục 4).
+- [ ] Hiệu năng: đo Lighthouse (đặt **performance budget**, xem Nhóm 2 mục 2), thử với dữ liệu lớn.
 - [ ] Đa nền tảng: nhiều trình duyệt, nhiều kích thước màn hình.
 - [ ] Người thật: quan sát 2–3 người dùng, không hướng dẫn.
 
@@ -189,8 +192,8 @@
 **Mục tiêu:** Đưa lên production an toàn.
 
 **Cổng chất lượng CI/CD (phải đạt trước khi lên production):**
-- [ ] Toàn bộ test xanh, build OK, không lỗi type/lint.
-- [ ] Lighthouse đạt ngưỡng (ví dụ ≥ 90 Performance & Accessibility) — đặt performance budget.
+- [ ] Toàn bộ test xanh (gồm **E2E Playwright**), build OK, không lỗi type/lint.
+- [ ] **Lighthouse CI xanh** — ngân sách hiệu năng (Performance/A11y/Best-Practices/SEO ≥ 90; CWV trong ngưỡng) là **cổng tự động** trên PR (xem `lighthouserc.json` + Nhóm 2 mục 2).
 - [ ] Audit bảo mật: không còn lỗ hổng nghiêm trọng.
 
 **Vận hành:**
