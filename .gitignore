@@ -1,0 +1,15 @@
+# Biến môi trường
+.env
+.env*.local
+
+# Phụ thuộc & build
+node_modules
+.next
+out
+build
+coverage
+
+# Linh tinh
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
