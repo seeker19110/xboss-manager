@@ -21,13 +21,37 @@
 
 ## PHẦN A — Trình tự áp dụng (4 bước)
 
-### Bước 0 — Hiểu & ghi lại hiện trạng (reverse-engineer)
-- [ ] Khảo sát thật: đọc `package.json` (stack + **phiên bản**), cấu trúc thư mục, lệnh build/test hiện có, điểm đau.
-- [ ] **Viết `PROJECT.md` ngược:** mô tả cái *đã có* (vấn đề, người dùng, tính năng đã làm, schema hiện tại, kiến trúc).
-      Đánh dấu **nợ kỹ thuật** và chỗ "làm tạm".
+### Bước 0 — Hiểu & ghi lại hiện trạng (AI TỰ XÁC ĐỊNH bằng cách đọc repo)
+
+> **Quy tắc:** AI **không hỏi người dùng** những gì có thể đọc ra từ repo. Tự dò bằng cách **đọc file thật**
+> (đúng luật chống "ảo giác"). Chỉ hỏi phần **không suy ra được từ code** (bối cảnh nghiệp vụ — xem cuối bước).
+
+**Tự dò stack — đọc gì → suy ra gì:**
+
+| Đọc gì (file/dấu hiệu thật) | Suy ra |
+|------------------------------|--------|
+| `package.json` (deps + scripts) + lockfile | framework, thư viện chính, **phiên bản**, lệnh dev/build/test/lint |
+| `next.config.*` / `vite.config.*` / `svelte.config.*` / `astro.config.*` | framework + bundler + plugin đang dùng |
+| Thư mục `app/` vs `pages/` | Next App Router hay Pages Router |
+| `tsconfig.json` | có dùng TS không, đã `strict` chưa, thiếu cờ nào |
+| `tailwind.config.*` / `postcss.config.*` / `@import "tailwindcss"` | cách làm CSS + phiên bản Tailwind |
+| `.eslintrc*` (cũ) vs `eslint.config.*` (flat) / không có | ESLint legacy / flat / chưa có |
+| deps `next-intl`·`react-i18next`·`i18next` + thư mục `messages/`·`locales/`·`i18n/` | **giải pháp đa ngôn ngữ hiện có** (giữ hay đổi) |
+| `supabase/` · `prisma/` · `drizzle*` · deps CSDL | CSDL/ORM + có migration chưa |
+| deps `vitest`·`jest`·`playwright`·`cypress` + config | bộ kiểm thử hiện có (đơn vị/E2E) |
+| `.github/workflows/` | CI hiện có (hay chưa) |
+| `.husky/` · `lint-staged` · `commitlint*` | hook/quy ước commit hiện có |
+| `process.env.*` rải rác · `.env*` · `.gitignore` | biến môi trường: có validate chưa, có lộ bí mật không |
+
+- [ ] **AI tổng hợp "Hồ sơ dự án"**: stack + phiên bản + cấu trúc + những gì *đã có* vs *còn thiếu* so với khung
+      (bảng gap). Trình bày để người dùng xác nhận, **không bắt người dùng tự khai stack**.
+- [ ] **Viết `PROJECT.md` ngược** từ những gì đọc được: tính năng đã làm, schema hiện tại, kiến trúc, **nợ kỹ thuật**.
 - [ ] Viết `PROGRESS.md`: dự án đang ở giai đoạn nào (thường GĐ 4–5 nếu chưa xong, hoặc GĐ 8 nếu đã ra mắt).
-- [ ] Tạo `CLAUDE.md` điền **đúng stack/lệnh thật** của dự án (mục 10) — không để `[ĐIỀN]`.
+- [ ] Tạo `CLAUDE.md` điền **đúng stack/lệnh thật vừa dò được** (mục 10) — không để `[ĐIỀN]`.
 - [ ] Cài Git hygiene nếu thiếu: `.gitignore` chặn `.env`, nhánh riêng cho mỗi thay đổi.
+
+> **Chỉ hỏi người dùng** thứ KHÔNG nằm trong code: bối cảnh nghiệp vụ (ai là người dùng thật, mục tiêu sản phẩm),
+> ưu tiên/đánh đổi, điểm đau lớn nhất, và xác nhận các giả định AI suy ra khi không chắc.
 
 ### Bước 1 — Dựng hàng rào lên code có sẵn (an toàn, không đổi hành vi)
 Thứ tự tăng dần để không bị "ngộp lỗi":
