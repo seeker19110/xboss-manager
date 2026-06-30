@@ -1,0 +1,9 @@
+# Chuẩn hóa line-ending khi commit/checkout.
+# Mặc định để Git tự nhận diện file văn bản và chuẩn hóa LF khi lưu.
+* text=auto
+
+# Script shell PHẢI giữ LF khi checkout — kể cả trên Windows/Git-for-Windows.
+# Nếu bị đổi sang CRLF, bash báo lỗi: `set: pipefail: invalid option name`
+# (ký tự \r dính vào cuối dòng `set -euo pipefail`).
+*.sh        text eol=lf
+.husky/*    text eol=lf
