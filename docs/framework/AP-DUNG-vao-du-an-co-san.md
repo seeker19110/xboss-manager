@@ -84,12 +84,13 @@ Thứ tự tăng dần để không bị "ngộp lỗi":
 - [ ] **Accessibility:** chạy axe, lập danh sách vi phạm, sửa theo mức nghiêm trọng (Nhóm 2 mục 3).
 - [ ] **Theme/mobile:** nếu đã có UI, **retrofit dần** sang design tokens (`styles/theme.css`) — không viết lại giao diện.
 - [ ] **Observability (Sentry):** thêm sớm để **thấy lỗi production thật** (`BO-SUNG-chat-luong.md` PHẦN 4).
+- [ ] **Tối ưu mã nguồn:** đo baseline rác/trùng lặp/dependency thừa/bundle (knip · depcheck · ESLint `complexity` · bundle-analyzer), rồi **hạ dần** theo "đụng đâu dọn đó" — không dọn cả repo một lần; refactor không đổi hành vi, có test bảo vệ (Nhóm 2 mục 9).
 - [ ] **Migration:** nếu áp kỷ luật migration lên CSDL đang chạy → **baseline schema hiện tại thành migration đầu tiên**
       (dump schema), rồi mọi thay đổi sau đi qua migration có phiên bản.
 
 ### Bước 3 — Vận hành theo khung từ đây
 - [ ] Mọi tính năng mới / sửa lỗi: qua **DoR** (đủ rõ mới làm) → cổng commit → **DoD** → cổng merge → báo cáo xác thực.
-- [ ] Code cũ: dọn dần theo "đụng đâu dọn đó"; ghi mọi "làm tạm" vào `PROGRESS.md` (nợ kỹ thuật).
+- [ ] Code cũ: **tối ưu dần theo "đụng đâu dọn đó"** (gỡ dead code, trùng lặp, dep thừa — Nhóm 2 mục 9); ghi mọi "làm tạm" vào `PROGRESS.md` (nợ kỹ thuật).
 - [ ] Đổi/thêm công nghệ lớn: chạy **KHUNG 3** (research-first, phiên bản đã xác minh) + ghi **ADR**.
 
 ---

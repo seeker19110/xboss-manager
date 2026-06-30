@@ -147,6 +147,7 @@ dự-án/
 ### Chất lượng
 - Một tính năng chỉ **XONG** khi đạt **Definition of Done** (đối chiếu checklist PR).
 - Một task chỉ **BẮT ĐẦU** khi đạt **Definition of Ready** (có tiêu chí chấp nhận rõ, không còn câu hỏi mở, phạm vi gói trong một PR).
+- **Tối ưu mã nguồn** trước khi đóng mỗi mảng/tính năng: gỡ dead code, giảm trùng lặp & độ phức tạp, tỉa dependency thừa, thu nhỏ bundle — refactor **không đổi hành vi**, có test bảo vệ (playbook: `BO-SUNG-chat-luong.md` Nhóm 2 mục 9).
 
 ### Hành vi AI
 - **Không bịa** hàm/thư viện/API — xác minh tồn tại.

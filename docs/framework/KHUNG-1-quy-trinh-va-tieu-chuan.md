@@ -241,6 +241,7 @@
 - [ ] Giám sát liên tục: lỗi, tốc độ, thời gian phản hồi.
 - [ ] Cập nhật phụ thuộc đều đặn (Dependabot) — vá bảo mật kịp thời.
 - [ ] Theo dõi nợ kỹ thuật: ghi lại chỗ "làm tạm" để quay lại dọn.
+- [ ] **Tối ưu mã nguồn định kỳ:** rà & hạ dần dead code, trùng lặp/độ phức tạp, dependency thừa, bundle (Nhóm 2 mục 9) — "đụng đâu dọn đó", refactor không đổi hành vi, có test bảo vệ.
 - [ ] Mọi cải tiến lại đi qua đúng quy trình: kế hoạch → code → test → cổng chất lượng → ra mắt.
 
 **Đầu ra:** Một sản phẩm sống, cải tiến không ngừng.

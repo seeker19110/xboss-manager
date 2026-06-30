@@ -444,8 +444,12 @@ gỡ rác, giảm trùng lặp & độ phức tạp, tỉa phụ thuộc, thu nh
 - Vùng code rủi ro cao mà chưa có test bảo vệ và chưa kịp viết.
 - **Tối ưu non** (premature optimization): tối ưu hiệu năng cho chỗ chưa chứng minh là điểm nghẽn — đo trước (mục 2), đừng đoán.
 
-→ **Gắn vào khung:** chạy checklist này **cuối GĐ 4** (trước khi coi một mảng là xong) và như một bước trong **GĐ 5 / review**.
-Refactor lớn nên có DoR rõ (Nhóm 1 mục 7) và đi qua **PR riêng** tách khỏi feature.
+→ **Gắn vào khung (bắt buộc khi triển khai — `CLAUDE.md §3` nguyên tắc 10):**
+> - **Dự án mới:** chạy checklist **cuối GĐ 4** (trước khi coi một mảng là xong) + một bước trong **GĐ 5 / review**; là quy tắc chất lượng bất biến khi phát triển (`KHOI-TAO` Phần B — Chất lượng). Cổng MERGE (`CLAUDE.md §6`) yêu cầu đã rà mục này.
+> - **Dự án có sẵn (brownfield):** đo **baseline** rồi **hạ dần** theo "đụng đâu dọn đó" — không dọn cả repo một lần (`AP-DUNG` Bước 2 & 3).
+> - **Dự án đang chạy:** tối ưu định kỳ ở **GĐ 8 (Cải tiến)**.
+>
+> Refactor lớn nên có DoR rõ (Nhóm 1 mục 7) và đi qua **PR riêng** tách khỏi feature.
 
 
 ===============================================================================

@@ -38,6 +38,7 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 7. **Mobile-first & hiệu năng:** thiết kế cho màn nhỏ trước, vùng chạm ≥ 44px; đạt ngân sách Core Web Vitals (LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1) — Lighthouse CI là cổng.
 8. **Theme:** nền **Dark blue mặc định** + chế độ **Light**; dùng design tokens (`styles/theme.css`), không hard-code màu; AA ở cả hai chế độ.
 9. **Chống lỗi logic:** type-checker không bắt lỗi nghiệp vụ — rà ca biên/rỗng, `null` vs 0, async race/idempotency, thời gian UTC, tiền không dùng float; mỗi nhánh logic phức tạp có ≥ 1 test ca biên (xem Nhóm 2 mục 6).
+10. **Tối ưu mã nguồn (bắt buộc khi triển khai):** trước khi đóng một mảng/tính năng — và khi áp khung lên dự án có sẵn — rà tối ưu: gỡ dead code, giảm trùng lặp & độ phức tạp, tỉa dependency thừa, thu nhỏ bundle. Refactor **không đổi hành vi**, có test bảo vệ, đo trước–sau, đi PR riêng (playbook & checklist: Nhóm 2 mục 9).
 
 ## 4. Chống "ảo giác" (bắt buộc)
 - Không bịa hàm/thư viện/API — xác nhận tồn tại (đọc tài liệu/mã nguồn) trước khi dùng.
@@ -48,7 +49,7 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 Build `[ĐIỀN: npm run build]` · Type check `[ĐIỀN: npm run type-check]` · Lint 0 cảnh báo `[ĐIỀN: npm run lint]` · Format `[ĐIỀN: npm run format]` · Test liên quan `[ĐIỀN: npm test]`. Ngoài ra: tự đọc lại diff (đúng mục tiêu, không sửa nhầm); xóa console.log debug/code chết; không bí mật trong code; mọi input đã validate; mọi thao tác có thể lỗi đã xử lý; commit message theo **conventional commits**.
 
 ## 6. Cổng trước khi MERGE (thêm)
-Đạt toàn bộ cổng commit · chạy TOÀN BỘ test (tất cả xanh) · nhánh đã cập nhật với nhánh chính, không xung đột · đối chiếu đủ tiêu chí chấp nhận (trong `PROJECT.md`) + Definition of Done · tự chạy smoke test luồng chính (thật) · rà soát bảo mật (quyền server, không lộ dữ liệu) · không phá vỡ tính năng khác (ghi rõ nếu có breaking change) · nếu đổi schema: có migration có phiên bản, rollback được · liệt kê phần hệ thống bị ảnh hưởng.
+Đạt toàn bộ cổng commit · chạy TOÀN BỘ test (tất cả xanh) · nhánh đã cập nhật với nhánh chính, không xung đột · đối chiếu đủ tiêu chí chấp nhận (trong `PROJECT.md`) + Definition of Done · tự chạy smoke test luồng chính (thật) · rà soát bảo mật (quyền server, không lộ dữ liệu) · không phá vỡ tính năng khác (ghi rõ nếu có breaking change) · nếu đổi schema: có migration có phiên bản, rollback được · **đã rà tối ưu mã nguồn cho mảng vừa xong** (gỡ rác/trùng lặp/dep thừa — Nhóm 2 mục 9) · liệt kê phần hệ thống bị ảnh hưởng.
 
 ## 7. Báo cáo xác thực (xuất trước mỗi commit/merge)
 ```
