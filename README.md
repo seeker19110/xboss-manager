@@ -37,6 +37,7 @@ phải tuân thủ gì. Đó là kim chỉ nam chính.
   cấu hình, runbook dự án mới, **áp vào dự án có sẵn**, bổ sung chất lượng Nhóm 1 & 2, theme,
   **nâng cao i18n/PWA/Sentry/SEO**).
 - `docs/ops/` — vận hành GĐ 8: runbook **xử lý sự cố** + mẫu **post-mortem**.
+- `docs/framework/CHECKLIST-trien-khai-du-an-that.md` — **ghi chú** mọi việc cần làm khi triển khai trên dự án thật.
 - `docs/adr/0000-template.md` — mẫu ghi quyết định kỹ thuật.
 
 ## Mang khung sang một dự án khác

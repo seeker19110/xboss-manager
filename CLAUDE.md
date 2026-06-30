@@ -18,6 +18,7 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 - `docs/framework/BO-SUNG-nang-cao-i18n-PWA-Sentry-SEO.md` — năng lực nâng cao (bật khi cần).
 - `docs/framework/AP-DUNG-vao-du-an-co-san.md` — cách áp khung lên **dự án đã có sẵn** (brownfield, tăng dần).
 - `docs/framework/HUONG-DAN-cau-hinh-precommit-CI.md` — cấu hình hàng rào (ESLint **flat config**, Tailwind v4).
+- `docs/framework/CHECKLIST-trien-khai-du-an-that.md` — **việc chỉ làm được trên dự án thật** (tạo app, repo settings, secrets, Supabase/Vercel, analytics). Đọc khi áp khung vào dự án thật.
 - `docs/ops/` — vận hành GĐ 8: **xử lý sự cố** (incident-response) + mẫu **post-mortem**. Đọc khi có sự cố production.
 - `docs/adr/` — các quyết định kỹ thuật (ADR). **Đọc trước khi đề xuất thay đổi kiến trúc lớn.**
 

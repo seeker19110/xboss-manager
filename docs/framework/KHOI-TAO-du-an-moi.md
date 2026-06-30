@@ -179,4 +179,6 @@ Chỉ bắt đầu phát triển tính năng khi **tất cả** đã đạt:
 - [ ] Backup CSDL đã bật.
 
 > Đạt đủ = ba tầng phòng thủ đã sẵn sàng (AI có kỷ luật + hook cục bộ + CI tập trung). Giờ mới bắt đầu code tính năng theo Giai đoạn 4.
-EOF
+
+> **Danh mục đầy đủ** các việc chỉ làm được trên dự án thật (tạo app, repo settings, Code scanning,
+> secrets, Supabase/Vercel, analytics, release): xem `CHECKLIST-trien-khai-du-an-that.md`.

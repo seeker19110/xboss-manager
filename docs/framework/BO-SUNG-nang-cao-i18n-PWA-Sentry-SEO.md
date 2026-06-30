@@ -11,6 +11,7 @@
 | Theo dõi lỗi | `@sentry/nextjs` 10.x | (tạo bằng wizard) |
 | SEO | (Next có sẵn) | `app/sitemap.ts`, `app/robots.ts` |
 | Trang lỗi thân thiện | (Next có sẵn) | `app/not-found.tsx`, `app/error.tsx`, `app/global-error.tsx` |
+| Analytics | (chọn theo nhu cầu — mục 7) | (đặt khóa qua env) |
 
 ---
 
@@ -137,6 +138,42 @@ export default withSentryConfig(withSerwist(withNextIntl(nextConfig)), {
 ```
 
 > Nếu chỉ dùng một phần (vd chỉ i18n), chỉ bọc lớp đó: `export default withNextIntl(nextConfig);`.
+
+---
+
+## 7. Analytics (GĐ 7 — đo hành vi người dùng thật)
+
+Khung yêu cầu "Analytics đã cài" trước khi ra mắt nhưng để mở **nhà cung cấp** — vì lựa chọn phụ thuộc
+nhu cầu (quyền riêng tư, ngân sách, độ sâu phân tích). Chọn theo **research-first** (KHUNG 3 PHẦN A mục 14).
+
+**Ứng viên (cân nhắc theo nhu cầu — xác minh lại lúc dùng):**
+
+| Lựa chọn | Hợp khi | Lưu ý |
+|----------|---------|-------|
+| **Vercel Web Analytics** (`@vercel/analytics`) | đã deploy Vercel, cần nhanh & nhẹ | tích hợp 1 dòng; không cookie; số liệu cơ bản |
+| **Plausible / Umami** | ưu tiên **quyền riêng tư**, không cookie, GDPR nhẹ | nhẹ; Umami tự host được |
+| **PostHog** | cần **product analytics** sâu (funnel, session, feature flag) | nặng hơn; cẩn thận PII |
+| **GA4** | cần hệ sinh thái Google/quảng cáo | cần cookie consent; phức tạp về quyền riêng tư |
+
+**Nguyên tắc bất biến khi gắn analytics:**
+- [ ] Đặt khóa/ID qua **biến môi trường** (vd `NEXT_PUBLIC_ANALYTICS_ID`) — không hard-code; thêm vào `lib/env.ts` + `.env.example`.
+- [ ] **Quyền riêng tư:** nếu thu thập dữ liệu cá nhân/cookie → cần **consent banner** + cập nhật privacy policy
+      (KHUNG 3 PHẦN A mục 6: GDPR / Nghị định 13 VN).
+- [ ] **Không gửi PII** (email, token) vào sự kiện analytics.
+- [ ] Tôn trọng `Do Not Track` / lựa chọn từ chối của người dùng nếu khả thi.
+
+**Ví dụ nhanh (Vercel Analytics):**
+```bash
+npm install @vercel/analytics
+```
+```tsx
+// app/layout.tsx
+import { Analytics } from '@vercel/analytics/next';
+// ... <body>{children}<Analytics /></body>
+```
+
+> Phân biệt với **observability** (Sentry, mục 3): Sentry = "có lỗi gì"; analytics = "người dùng làm gì".
+> Cả hai đều cần trước/ngay khi ra mắt để không "mù" trên production.
 
 ---
 
