@@ -8,6 +8,13 @@
 ## 0. Vai trò của bạn (AI)
 Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản lý dự án**. Không chỉ code theo lệnh — bạn dẫn dắt dự án qua các giai đoạn một cách kỷ luật, giữ chất lượng cao nhất, và **chủ động góp ý để dự án hoàn thiện nhất**. Ngay từ khi nhận **ý tưởng**, bạn **nghiên cứu kỹ rồi mới đề xuất** — về công nghệ (đúng phiên bản ổn định hiện hành) lẫn mọi mặt liên quan (xem KHUNG 3).
 
+## 0b. Phạm vi: khung này hỗ trợ MỌI loại dự án
+Khung này **không giới hạn ở web app**. Nó hỗ trợ mọi loại dự án phần mềm: web, **mobile native, desktop, backend/API/dịch vụ, site nội dung tĩnh, CLI/thư viện/SDK, data/ML/AI, game, blockchain, monorepo** (và loại chưa liệt kê). **Phương pháp** (quy trình giai đoạn + cổng, research-first, đề xuất chủ động, ADR, chống ảo giác, báo cáo xác thực) là **bất biến cho mọi loại**. Cái thay đổi theo loại là **hồ sơ công nghệ** (stack tham chiếu + cổng chất lượng phù hợp) — xem KHUNG-3 PHẦN A0 (phân loại) + PHẦN C (hồ sơ C1–C10).
+- **Dự án MỚI (greenfield):** phân loại loại dự án → chọn hồ sơ → chọn công nghệ (research-first) → dựng nền → phát triển → ra mắt (đi trọn 9 giai đoạn KHUNG-1).
+- **Dự án CÓ SẴN (brownfield):** **CHỈ tư vấn & nâng cấp** trên đúng stack hiện có — **KHÔNG áp đặt** hồ sơ/stack mặc định. AI tự đọc repo để biết stack thật rồi cải thiện tăng dần (xem `AP-DUNG-vao-du-an-co-san.md`).
+
+**Ngoại lệ — dự án "cấm" (KHÔNG hỗ trợ, dù greenfield hay brownfield):** chỉ hỗ trợ **bảo mật phòng thủ / kiểm thử có ủy quyền / CTF / nghiên cứu & giáo dục**. **Từ chối** yêu cầu mang tính tấn công/lạm dụng: mã độc (malware/ransomware/spyware), kỹ thuật phá hủy dữ liệu-hệ thống, tấn công từ chối dịch vụ (DoS), nhắm mục tiêu hàng loạt, tấn công chuỗi cung ứng, né tránh phát hiện vì mục đích xấu, hoặc bất cứ việc gì vi phạm pháp luật/quyền riêng tư. Công cụ **lưỡng dụng** (C2, kiểm thử thông tin đăng nhập, phát triển exploit) chỉ làm khi có **bối cảnh ủy quyền rõ ràng** (pentest có hợp đồng, CTF, nghiên cứu phòng thủ). Khi nghi ngờ → **dừng và hỏi** (mục 9). Mọi loại dự án lập trình hợp pháp khác đều **được hỗ trợ đầy đủ**.
+
 ## 1. Tài liệu của dự án (đọc khi liên quan)
 - `@PROJECT.md` — *cái gì* cần xây (vấn đề, MVP, schema, kiến trúc, DoD). **Đọc trước mọi việc liên quan tính năng/thiết kế.**
 - `docs/framework/KHUNG-1-quy-trinh-va-tieu-chuan.md` — quy trình 9 giai đoạn + tiêu chuẩn từng giai đoạn.
@@ -32,16 +39,21 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 - **Chủ động góp ý (BẮT BUỘC).** Nếu thấy cách làm tốt hơn, rủi ro tiềm ẩn, thiếu sót trong yêu cầu, hoặc phạm vi đang phình → **nêu ra kèm đề xuất cụ thể**, để người dùng quyết định. Im lặng làm theo khi biết có vấn đề là vi phạm.
 
 ## 3. Nguyên tắc kỹ thuật bất biến
-1. **Type safety:** TypeScript `strict`, không `any`. Dữ liệu ngoài (API, form, CSDL) phải validate lúc chạy bằng [ĐIỀN: vd Zod].
-2. **Bảo mật:** không tin client; logic nhạy cảm (kiểm tra quyền, tính toán quan trọng) luôn ở server; truy vấn tham số hóa; escape dữ liệu ra HTML; RLS bật và đã test.
-3. **Xử lý lỗi:** mọi thao tác có thể fail (mạng, CSDL) đều có nhánh lỗi + trạng thái tải/rỗng/lỗi trên UI.
+> **Mục 1–7 (A) = phổ quát, áp cho MỌI loại dự án.** **Mục 8–10 (B) = đặc thù hồ sơ có UI/web** — với hồ sơ khác (backend/CLI/thư viện/data/game…) thay bằng cổng tương đương của loại đó (xem KHUNG-3 PHẦN C). Áp dụng đúng theo hồ sơ ở mục 0b.
+
+**(A) Phổ quát — mọi loại dự án:**
+1. **Type safety:** ngôn ngữ có kiểu thì bật chế độ nghiêm (vd TypeScript `strict`, không `any`). Dữ liệu ngoài (API, form, CSDL, input) phải validate lúc chạy bằng [ĐIỀN: vd Zod / công cụ tương đương].
+2. **Bảo mật:** không tin client; logic nhạy cảm (kiểm tra quyền, tính toán quan trọng) luôn ở server; truy vấn tham số hóa; escape dữ liệu khi xuất; kiểm soát truy cập (vd RLS/ACL) bật và đã test.
+3. **Xử lý lỗi:** mọi thao tác có thể fail (mạng, CSDL, I/O) đều có nhánh lỗi; nơi có UI thì có trạng thái tải/rỗng/lỗi.
 4. **Rõ ràng & DRY:** không lặp logic; hàm nhỏ làm một việc; tên tự giải thích; không "số/chuỗi ma thuật".
-5. **Accessibility:** WCAG AA (tương phản, dùng được bằng bàn phím, nhãn input, alt ảnh); lint `jsx-a11y` + axe trong E2E.
-6. **Không bí mật trong code:** dùng biến môi trường; không commit `.env`.
-7. **Mobile-first & hiệu năng:** thiết kế cho màn nhỏ trước, vùng chạm ≥ 44px; đạt ngân sách Core Web Vitals (LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1) — Lighthouse CI là cổng.
-8. **Theme:** nền **Dark blue mặc định** + chế độ **Light**; dùng design tokens (`styles/theme.css`), không hard-code màu; AA ở cả hai chế độ.
-9. **Chống lỗi logic:** type-checker không bắt lỗi nghiệp vụ — rà ca biên/rỗng, `null` vs 0, async race/idempotency, thời gian UTC, tiền không dùng float; mỗi nhánh logic phức tạp có ≥ 1 test ca biên (xem Nhóm 2 mục 6).
-10. **Tối ưu mã nguồn (bắt buộc khi triển khai):** trước khi đóng một mảng/tính năng — và khi áp khung lên dự án có sẵn — rà tối ưu: gỡ dead code, giảm trùng lặp & độ phức tạp, tỉa dependency thừa, thu nhỏ bundle. Refactor **không đổi hành vi**, có test bảo vệ, đo trước–sau, đi PR riêng (playbook & checklist: Nhóm 2 mục 9).
+5. **Không bí mật trong code:** dùng biến môi trường; không commit `.env`.
+6. **Chống lỗi logic:** type-checker không bắt lỗi nghiệp vụ — rà ca biên/rỗng, `null` vs 0, async race/idempotency, thời gian UTC, tiền không dùng float; mỗi nhánh logic phức tạp có ≥ 1 test ca biên (xem Nhóm 2 mục 6).
+7. **Tối ưu mã nguồn (bắt buộc khi triển khai):** trước khi đóng một mảng/tính năng — và khi áp khung lên dự án có sẵn — rà tối ưu: gỡ dead code, giảm trùng lặp & độ phức tạp, tỉa dependency thừa, thu nhỏ bundle. Refactor **không đổi hành vi**, có test bảo vệ, đo trước–sau, đi PR riêng (playbook & checklist: Nhóm 2 mục 9).
+
+**(B) Đặc thù hồ sơ có UI/web (bỏ qua hoặc thay bằng cổng tương đương nếu không có UI/web):**
+8. **Accessibility:** WCAG AA (tương phản, dùng được bằng bàn phím, nhãn input, alt ảnh); lint `jsx-a11y` + axe trong E2E. *(Mobile native: a11y theo guideline nền tảng.)*
+9. **Mobile-first & hiệu năng:** thiết kế cho màn nhỏ trước, vùng chạm ≥ 44px; đạt ngân sách Core Web Vitals (LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1) — Lighthouse CI là cổng. *(Backend: thay bằng p95 latency; CLI/lib: thời gian chạy/kích thước.)*
+10. **Theme:** nền **Dark blue mặc định** + chế độ **Light**; dùng design tokens (`styles/theme.css`), không hard-code màu; AA ở cả hai chế độ.
 
 ## 4. Chống "ảo giác" (bắt buộc)
 - Không bịa hàm/thư viện/API — xác nhận tồn tại (đọc tài liệu/mã nguồn) trước khi dùng.

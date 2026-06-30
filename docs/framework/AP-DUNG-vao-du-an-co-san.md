@@ -4,6 +4,10 @@
 > **dự án đã phát triển** — cách "đắp" khung lên code có sẵn một cách an toàn, **tăng dần, không làm lại từ đầu**.
 
 ## Nguyên tắc cốt lõi
+0. **CHỈ tư vấn & nâng cấp — KHÔNG áp đặt stack.** Với dự án có sẵn, khung **không** thay/ép stack mặc định
+   (Next/Supabase/Vercel) hay "hồ sơ" nào. AI **đọc repo để biết stack thật**, rồi **tư vấn và nâng cấp tăng dần
+   trên chính stack đó** — chỉ đề xuất đổi/thêm công nghệ khi có lý do rõ và được người dùng chốt. Giá trị mang lại
+   là **Lớp 1 (quy trình + cổng + chống lỗi)**, áp cho mọi stack; **Lớp 2 (file cấu hình)** chỉ dùng phần khớp.
 1. **Không "big bang".** Đừng dừng dự án để viết lại. Áp khung theo từng lớp, ưu tiên **giá trị cao / rủi ro thấp** trước.
 2. **Đo trước, sửa sau.** Lập "đường cơ sở" (baseline) hiện trạng rồi cải thiện dần, không đặt ngưỡng tuyệt đối ngay.
 3. **Quy tắc hướng đạo sinh.** Code cũ dọn dần — "đụng đâu dọn đó", không cố dọn cả repo một lần.

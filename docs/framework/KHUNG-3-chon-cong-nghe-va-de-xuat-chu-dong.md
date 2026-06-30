@@ -1,8 +1,15 @@
 # KHUNG 3 — Chọn công nghệ & Đề xuất chủ động (research-first)
 
-> **File khung chung (master), tái sử dụng cho MỌI dự án.**
+> **File khung chung (master), tái sử dụng cho MỌI dự án — MỌI loại dự án.**
 > Trả lời câu hỏi: *từ một ý tưởng, AI phải nghiên cứu và đề xuất gì — về công nghệ và về mọi mặt khác — TRƯỚC khi chốt và viết code.*
 > Cặp đôi với KHUNG 1 (quy trình) và KHUNG 2 (luật AI). Chạy ở **Giai đoạn 0 → 1 → 2**.
+
+> **Phạm vi khung (đọc trước):** Khung này hỗ trợ **mọi loại dự án phần mềm** — không chỉ web app.
+> Phương pháp (research-first, đề xuất chủ động, cổng giữa các giai đoạn, ADR, chống ảo giác) là **bất biến cho mọi loại**.
+> Cái thay đổi theo loại dự án là **hồ sơ công nghệ (profile)**: stack tham chiếu + bộ cổng chất lượng phù hợp.
+> - **Dự án MỚI (greenfield):** chọn **hồ sơ loại dự án** ở PHẦN A0 → áp stack tham chiếu của hồ sơ đó (PHẦN C).
+> - **Dự án CÓ SẴN (brownfield):** **KHÔNG áp đặt** hồ sơ/stack mặc định. AI đọc repo, **tư vấn & nâng cấp tăng dần**
+>   trên đúng stack hiện có (xem `AP-DUNG-vao-du-an-co-san.md`).
 
 ---
 
@@ -19,6 +26,38 @@ có ngày cắt (knowledge cutoff) và **sẽ lỗi thời**. Mọi đề xuất
 3. **Không bịa** khả năng/API của thư viện — đọc tài liệu thật trước khi khẳng định "X làm được Y".
 
 > Đây là phần mở rộng của luật chống "ảo giác" (KHUNG 2) áp riêng cho khâu chọn công nghệ.
+
+---
+
+# PHẦN A0 — Phân loại loại dự án & chọn hồ sơ (chạy ĐẦU TIÊN cho dự án mới)
+
+Trước khi đề xuất chủ động (PHẦN A) hay chọn công nghệ (PHẦN B), AI **phân loại ý tưởng** vào một loại dự án để
+biết áp **hồ sơ công nghệ** nào (stack tham chiếu + cổng chất lượng ở PHẦN C). Một dự án có thể gồm **nhiều thành
+phần** loại khác nhau (vd web app + mobile + API) → mỗi thành phần một hồ sơ; nêu rõ và chọn cho từng phần.
+
+| # | Loại dự án | Dấu hiệu nhận biết | Hồ sơ áp dụng (PHẦN C) |
+|---|------------|--------------------|------------------------|
+| 1 | **Web app** | Có giao diện chạy trên trình duyệt, CRUD + auth, SEO/realtime | C1 (mặc định) |
+| 2 | **Mobile native** | App cài trên iOS/Android, dùng API thiết bị (camera, push, offline sâu) | C2 |
+| 3 | **Desktop app** | Chạy trên Windows/macOS/Linux, truy cập hệ thống tệp/phần cứng | C3 |
+| 4 | **Backend / API / dịch vụ** | Không UI (hoặc UI tối thiểu); REST/GraphQL/gRPC, job nền, microservice | C4 |
+| 5 | **Site nội dung tĩnh / SEO nặng** | Blog/docs/landing nhiều trang, ít tương tác, ưu tiên tốc độ & SEO | C5 |
+| 6 | **CLI / Thư viện / SDK** | Công cụ dòng lệnh hoặc gói tái sử dụng, không có UI người dùng cuối | C6 |
+| 7 | **Data / ML / AI** | Pipeline dữ liệu, huấn luyện/triển khai mô hình, notebook, batch | C7 |
+| 8 | **Game** | Vòng lặp game, đồ họa/vật lý, engine | C8 |
+| 9 | **Blockchain / Web3** | Smart contract, ví, on-chain | C9 |
+| 10 | **Monorepo đa thành phần** | Nhiều app/loại trong một repo (web + mobile + API + packages) | C10 (tổ hợp C1–C9) |
+
+> **Cách dùng:** xác định loại → mở hồ sơ tương ứng ở PHẦN C để biết **stack tham chiếu** và **cổng nào áp dụng**
+> (vd cổng "theme Dark blue + Light", "Core Web Vitals", "a11y WCAG" chỉ bắt buộc cho hồ sơ **có UI web**; CLI/thư
+> viện/backend dùng cổng tương đương của loại đó). Sau đó vẫn chạy PHẦN A (đề xuất chủ động) + PHẦN B (chọn công nghệ,
+> **xác minh phiên bản**). **Không có loại nào nằm ngoài khung** — nếu một loại chưa có hồ sơ sẵn, AI áp phương pháp
+> (PHẦN A–B) để dựng stack tham chiếu mới rồi ghi ADR.
+
+> **Ngoại lệ — dự án "cấm" (từ chối, không tư vấn/không xây):** mã độc, phá hủy dữ liệu-hệ thống, DoS, nhắm mục tiêu
+> hàng loạt, tấn công chuỗi cung ứng, né tránh phát hiện vì mục đích xấu, hoặc việc vi phạm pháp luật/quyền riêng tư.
+> Bảo mật **phòng thủ**, kiểm thử **có ủy quyền**, CTF, nghiên cứu & giáo dục thì hỗ trợ; công cụ lưỡng dụng cần
+> **bối cảnh ủy quyền rõ ràng**. Nghi ngờ → dừng & hỏi (CLAUDE.md §0b, §9).
 
 ---
 
@@ -106,12 +145,17 @@ Cho mỗi lựa chọn (framework, CSDL, hosting, thư viện lõi), chấm theo
 
 ---
 
-# PHẦN C — Stack tham chiếu mặc định (đã xác minh 2026-06-29)
+# PHẦN C — Hồ sơ công nghệ theo loại dự án (stack tham chiếu)
 
-> Đây là **mặc định hợp lý cho web app điển hình** (CRUD + auth + realtime nhẹ), cũng là stack mà
-> các file cấu hình trong bộ khung này (CI, hook, env, theme) đang giả định.
+> Mỗi hồ sơ dưới đây là **điểm khởi đầu hợp lý** cho một loại dự án (PHẦN A0), KHÔNG phải lựa chọn bắt buộc.
 > **Không dùng máy móc:** với mỗi ý tưởng, AI phải đối chiếu PHẦN B và *biện minh lại* (hoặc đề xuất khác).
-> **Phiên bản bên dưới là ảnh chụp ngày 2026-06-29 — XÁC MINH LẠI tại thời điểm khởi tạo dự án.**
+> **Mọi phiên bản bên dưới là ảnh chụp ngày 2026-06-29 — XÁC MINH LẠI tại thời điểm khởi tạo dự án** (Nguyên tắc số 1).
+> Cột "Cổng chất lượng đặc thù" cho biết hồ sơ đó thay/bổ sung gì so với các cổng web trong KHUNG 1.
+
+## C1 — Hồ sơ Web app (MẶC ĐỊNH)
+
+> Mặc định cho **web app điển hình** (CRUD + auth + realtime nhẹ). Đây cũng là stack mà các file cấu hình trong
+> bộ khung này (CI, hook, `lib/env.ts`, `styles/theme.css`, Lighthouse, Playwright) đang giả định.
 
 | Vai trò | Lựa chọn | Phiên bản (xác minh 2026-06-29) | Vì sao (cân bằng phổ biến ↔ năng lực) |
 |---------|----------|-------------------------------|----------------------------------------|
@@ -130,8 +174,110 @@ Cho mỗi lựa chọn (framework, CSDL, hosting, thư viện lõi), chấm theo
 > **Lưu ý quan trọng:** đây là các *major* tương đối mới (Next 16, React 19, Tailwind 4, TS 6, Zod 4).
 > Một số cấu hình "mẫu" trong khung viết cho thế hệ trước — khi khởi tạo, **đọc tài liệu nâng cấp**
 > của từng gói (vd Tailwind 4 cấu hình theme bằng CSS, ESLint dùng flat config) và điều chỉnh cho khớp.
-> Khi nào nên đổi stack mặc định: cần mobile native → React Native/Expo; nặng SEO tĩnh/nội dung →
-> Astro; realtime/đồng tác nặng → cân nhắc thêm; cực ít logic server → có thể bỏ bớt.
+
+## C2 — Hồ sơ Mobile native
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Khung đa nền tảng | **React Native + Expo** (TS strict) | Một codebase iOS+Android; hệ sinh thái JS lớn; tái dùng kỹ năng web |
+| Thay thế | Flutter (Dart) · native thuần (Swift/Kotlin) | Chọn khi cần hiệu năng/đồ họa cao hoặc tích hợp sâu nền tảng |
+| State/data | TanStack Query + storage bảo mật (SecureStore/Keychain) | Đồng bộ + cache offline |
+| Test | Jest/Vitest (unit) + **Maestro/Detox** (E2E thiết bị) | Thay Playwright web bằng E2E thiết bị |
+| Phát hành | EAS Build/Submit + OTA update | CI build cho store |
+
+> **Cổng chất lượng đặc thù:** thay "Lighthouse/CWV web" bằng **hiệu năng khởi động + kích thước app + 60fps**;
+> a11y theo guideline nền tảng (TalkBack/VoiceOver); thay "theme web tokens" bằng design system của RN.
+
+## C3 — Hồ sơ Desktop app
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Khung | **Tauri** (Rust + web UI) hoặc **Electron** (Node + web UI) | Tauri nhẹ/an toàn hơn; Electron trưởng thành, nhiều ví dụ |
+| UI | React/Svelte + TS strict | Tái dùng kỹ năng web |
+| Native/khác | .NET MAUI · Qt · Swift/WinUI | Khi cần tích hợp hệ điều hành sâu |
+| Test | Vitest (unit) + WebDriver/Playwright (UI) | + kiểm thử cập nhật tự động |
+
+> **Cổng đặc thù:** ký số (code signing) + auto-update an toàn; quyền truy cập hệ thống tệp/phần cứng tối thiểu.
+
+## C4 — Hồ sơ Backend / API / dịch vụ
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Runtime/ngôn ngữ | **Node.js (TS) · Go · Python · Rust** | Chọn theo bài toán & năng lực đội; proven cho phần lõi |
+| Khung API | NestJS/Fastify/Hono (TS) · FastAPI (Py) · Gin/Echo (Go) · Axum (Rust) | REST/GraphQL/gRPC theo nhu cầu |
+| CSDL | Postgres (mặc định) + ORM (Prisma/Drizzle/SQLAlchemy/sqlc) | Migration có phiên bản, rollback được |
+| Test | Unit + **integration (HTTP/DB thật qua testcontainers)** + contract test | Thay E2E trình duyệt bằng contract/integration |
+| Vận hành | Docker + healthcheck + OpenAPI/Swagger | Observability: log có cấu trúc + metrics + tracing |
+
+> **Cổng đặc thù:** thay "a11y/CWV/theme" bằng **contract API ổn định, p95 latency, rate limit, idempotency,
+> bảo mật xác thực/phân quyền**; tài liệu OpenAPI là một phần DoD.
+
+## C5 — Hồ sơ Site nội dung tĩnh / SEO nặng
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Khung | **Astro** (mặc định) · Next.js (SSG) · Hugo/Eleventy | Astro: ít JS, tốc độ & SEO tốt cho nội dung |
+| Nội dung | Markdown/MDX + content collections · CMS headless (nếu cần biên tập) | |
+| Cổng | **CWV + SEO (sitemap/OG/structured data)** giữ nguyên như web | Lighthouse CI áp được trực tiếp |
+
+> **Cổng đặc thù:** giữ Lighthouse/CWV + SEO; bỏ bớt phần "auth/RLS/realtime" nếu là site thuần đọc.
+
+## C6 — Hồ sơ CLI / Thư viện / SDK
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Ngôn ngữ | TS (Node) · Go · Rust · Python | Theo nơi người dùng cuối chạy |
+| Đóng gói | tsup/unbuild (TS) · goreleaser (Go) · cargo (Rust) | Xuất bản npm/crates/PyPI/binary |
+| API công khai | **SemVer nghiêm + CHANGELOG** | Phá vỡ API = major; giữ tương thích ngược |
+| Test | Unit + **snapshot/CLI golden test** + ma trận đa phiên bản runtime | |
+
+> **Cổng đặc thù:** thay "UI/theme/a11y/CWV" bằng **API ổn định + SemVer + tài liệu dùng (README/typedoc) +
+> không phụ thuộc thừa**; DX của người tích hợp là tiêu chí chính.
+
+## C7 — Hồ sơ Data / ML / AI
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Ngôn ngữ | **Python** (chuẩn ngành) | TS cho phần app/serving nếu cần |
+| Xử lý/ML | pandas/Polars · scikit-learn/PyTorch · orchestration (Airflow/Dagster/Prefect) | |
+| Theo dõi | MLflow/W&B (experiment) + DVC (dữ liệu/model versioning) | Tái lập được kết quả |
+| Serving | FastAPI/BentoML (model API) · batch jobs | Nếu xây ứng dụng LLM, **dùng model Claude mới nhất** (xem skill `claude-api`) |
+| Test | Unit + **data validation (Great Expectations/pandera)** + test tái lập | |
+
+> **Cổng đặc thù:** thay "a11y/CWV/theme" bằng **tái lập được (seed/version dữ liệu+model), chất lượng dữ liệu,
+> đánh giá mô hình (metrics/eval set), giám sát trôi dữ liệu (drift)**.
+
+## C8 — Hồ sơ Game
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Engine | **Godot** (mã nguồn mở) · Unity (C#) · Unreal (C++) · web: PixiJS/Phaser/Three.js | Chọn theo 2D/3D & nền tảng |
+| Test | Unit cho logic game + playtest | Tự động hóa giới hạn — chú trọng profiling |
+
+> **Cổng đặc thù:** **frame budget (60fps), thời gian tải, kích thước build**; thay E2E web bằng playtest có kịch bản.
+
+## C9 — Hồ sơ Blockchain / Web3
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Hợp đồng | Solidity + **Foundry/Hardhat** (EVM) · Rust/Anchor (Solana) | |
+| Bảo mật | **Audit + test bao phủ cao + fuzzing (slither/echidna)** | Lỗi không sửa được sau deploy → bảo mật là số 1 |
+| Frontend | Web app (C1) + thư viện ví (wagmi/viem) | |
+
+> **Cổng đặc thù:** audit bảo mật bắt buộc trước mainnet; bất biến sau deploy → test/fuzz/coverage là cổng cứng.
+
+## C10 — Hồ sơ Monorepo đa thành phần
+
+| Vai trò | Lựa chọn tham chiếu | Ghi chú |
+|---------|---------------------|---------|
+| Quản lý | **pnpm/npm workspaces + Turborepo/Nx** (JS) · Cargo workspaces · Go modules | |
+| Cấu trúc | `apps/*` (mỗi app theo hồ sơ C1–C9) + `packages/*` (chia sẻ, theo C6) | Mỗi thành phần áp cổng của hồ sơ tương ứng |
+| CI | Build/test **theo phần thay đổi** (affected) + cache | |
+
+> **Cổng đặc thù:** mỗi app/package áp đúng cổng hồ sơ của nó; thêm ràng buộc biên (không import vòng/lệch tầng).
+
+> **Khi một loại chưa có hồ sơ sẵn (vd embedded/IoT, AR/VR):** không coi là "ngoài khả năng" — AI áp **phương pháp**
+> PHẦN A–B (research-first, cân bằng phổ biến↔năng lực, xác minh phiên bản) để dựng stack tham chiếu mới + ghi **ADR**.
 
 ---
 
@@ -145,7 +291,7 @@ Sau PHẦN A–C, AI sản xuất:
 3. **Danh sách góp ý chủ động** (từ bảng PHẦN A): các mặt người dùng nên quyết trước khi code.
 
 **Thứ tự chạy trong quy trình KHUNG 1:**
-- **GĐ 0 (Ý tưởng):** chạy PHẦN A để làm rõ vấn đề & lộ rủi ro sớm.
+- **GĐ 0 (Ý tưởng):** chạy **PHẦN A0** (phân loại loại dự án → chọn hồ sơ) rồi **PHẦN A** để làm rõ vấn đề & lộ rủi ro sớm.
 - **GĐ 1 (Kế hoạch):** chốt phạm vi + yêu cầu phi chức năng → đầu vào cho chọn công nghệ.
 - **GĐ 2 (Thiết kế):** chạy PHẦN B → chốt stack + phiên bản (đã xác minh) → ghi ADR → điền `PROJECT.md` mục 4.
 

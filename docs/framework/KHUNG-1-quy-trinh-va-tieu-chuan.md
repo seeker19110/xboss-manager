@@ -1,8 +1,16 @@
 # KHUNG 1 — Quy trình & Tiêu chuẩn phát triển phần mềm
 
-> **File khung chung (master), tái sử dụng cho MỌI dự án.**
+> **File khung chung (master), tái sử dụng cho MỌI dự án — MỌI loại dự án.**
 > Đây là "cuốn sổ tay" định nghĩa: làm gì, theo trình tự nào, và đạt tiêu chuẩn gì ở mỗi giai đoạn.
 > Cặp đôi với **KHUNG 2** (luật AI + mẫu định nghĩa dự án). Từ hai khung này + yêu cầu một dự án cụ thể, ta sinh ra `PROJECT.md` và `CLAUDE.md` riêng cho dự án đó.
+
+> **Đọc trước — quy trình phổ quát, cổng theo hồ sơ:** 9 giai đoạn + cổng dưới đây áp cho **mọi loại dự án**
+> (web, mobile, desktop, backend/API, site tĩnh, CLI/thư viện, data/ML, game, blockchain, monorepo). Một số tiêu
+> chuẩn viết theo **hồ sơ Web app (mặc định)** — như **theme Dark blue + Light, Core Web Vitals/Lighthouse, RLS
+> Supabase, E2E Playwright trình duyệt, SEO/OG, PWA**. Với hồ sơ khác, **thay bằng cổng tương đương** của loại đó
+> (vd backend: contract API + p95 latency + integration test; CLI/thư viện: SemVer + golden test; data/ML: tái lập
+> + đánh giá mô hình). Bảng hồ sơ & cổng tương đương: **KHUNG-3 PHẦN A0 + PHẦN C**. **Dự án có sẵn (brownfield):**
+> chỉ tư vấn & nâng cấp trên stack hiện có — xem `AP-DUNG-vao-du-an-co-san.md`.
 
 ---
 

@@ -2,6 +2,13 @@
 
 > Đặc tả dự án — nguồn sự thật về *cái gì cần xây*. Điền đầy đủ trước khi code.
 > Mẫu lấy từ docs/framework/KHUNG-2 (Phần B). Nhờ AI phản biện trước khi chốt.
+> **Mẫu này mặc định theo hồ sơ Web app.** Các mục đặc thù web (Lighthouse/CWV, RLS, theme, endpoint) **chỉ điền nếu
+> đúng hồ sơ**; hồ sơ khác thay bằng tiêu chí tương đương (xem KHUNG-3 PHẦN C).
+
+## 0. Loại dự án & Hồ sơ
+- Loại dự án (web / mobile / desktop / backend-API / site tĩnh / CLI-thư viện / data-ML / game / blockchain / monorepo / khác):
+- Hồ sơ áp dụng (KHUNG-3 C1–C10): ___ — nếu nhiều thành phần, liệt kê hồ sơ cho từng phần.
+- Cổng chất lượng đặc thù của hồ sơ (thay/bổ sung cho cổng web):
 
 ## 1. Vấn đề & Người dùng
 - Vấn đề (1–2 câu):

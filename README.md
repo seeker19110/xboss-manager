@@ -1,8 +1,26 @@
 # Bộ khung phát triển dự án (drop-in)
 
-Giải nén bộ này vào **gốc repo** của một dự án Next.js mới (đã tạo bằng
-`create-next-app` với TypeScript + Tailwind + ESLint). Phần lớn file đã ở đúng chỗ;
-phần cài gói + sửa `package.json`/`tsconfig` làm theo runbook (Phần D).
+## Phạm vi: hỗ trợ MỌI loại dự án lập trình (trừ dự án "cấm")
+
+Khung này hỗ trợ **phát triển mọi loại dự án phần mềm từ ý tưởng đến ra mắt** — không chỉ web app:
+**web, mobile native, desktop, backend/API/dịch vụ, site nội dung tĩnh, CLI/thư viện/SDK, data/ML/AI, game,
+blockchain, monorepo** (và loại chưa liệt kê). Cách hoạt động:
+
+- **Phương pháp là phổ quát:** quy trình 9 giai đoạn + cổng, research-first, đề xuất chủ động mọi mặt, ADR,
+  chống ảo giác, báo cáo xác thực — áp cho **mọi loại dự án, mọi ngôn ngữ/stack** (`docs/framework/KHUNG-1/2/3`).
+- **Công nghệ chọn theo "hồ sơ loại dự án":** từ ý tưởng, AI **phân loại → chọn hồ sơ → chọn stack** (research-first,
+  phiên bản đã xác minh). Bảng hồ sơ C1–C10 + cổng tương đương: `KHUNG-3 PHẦN A0 + PHẦN C`.
+- **Các file cấu hình kèm theo là hồ sơ Web app (mặc định)** — Next.js + TS + Tailwind + Supabase + Vercel. Với loại
+  khác, giữ phương pháp + thay công cụ tương đương (test/đóng gói/CI của loại đó).
+- **Dự án có sẵn (brownfield):** khung **chỉ tư vấn & nâng cấp** trên stack hiện có, **không áp đặt** stack mặc định
+  (`docs/framework/AP-DUNG-vao-du-an-co-san.md`).
+- **Ngoại lệ — dự án "cấm" (không hỗ trợ):** mã độc, phá hoại, DoS, nhắm mục tiêu hàng loạt, tấn công chuỗi cung ứng,
+  né tránh phát hiện vì mục đích xấu, hay việc phạm pháp/xâm phạm quyền riêng tư. Bảo mật **phòng thủ** / kiểm thử
+  **có ủy quyền** / CTF / nghiên cứu thì hỗ trợ (xem `CLAUDE.md` §0b).
+
+> **Hồ sơ Web app — drop-in nhanh:** giải nén bộ này vào **gốc repo** của một dự án Next.js mới (đã tạo bằng
+> `create-next-app` với TypeScript + Tailwind + ESLint). Phần lớn file đã ở đúng chỗ;
+> phần cài gói + sửa `package.json`/`tsconfig` làm theo runbook (Phần D).
 
 ## Bắt đầu từ đâu
 Đọc **`docs/framework/KHOI-TAO-du-an-moi.md`** — runbook chỉ rõ làm gì theo thứ tự và

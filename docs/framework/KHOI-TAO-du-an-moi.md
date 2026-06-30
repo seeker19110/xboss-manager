@@ -3,6 +3,15 @@
 > Tài liệu này chỉ rõ: khi bắt đầu một dự án, **làm gì theo thứ tự** (Phần A) và **phải tuân thủ gì** (Phần B), kết thúc bằng **cổng "sẵn sàng phát triển"** (Phần C).
 > Đi từ trên xuống. Không bỏ bước.
 
+> **Áp cho mọi loại dự án — chọn hồ sơ trước:** *trình tự* (định nghĩa dự án → `CLAUDE.md` → khởi tạo → dựng hàng
+> rào tự động → CI → branch protection → kiểm chứng) là **phổ quát cho mọi loại dự án** (web, mobile, desktop,
+> backend/API, site tĩnh, CLI/thư viện, data/ML, game, blockchain, monorepo). Trước Bước 3, **xác định loại dự án &
+> chọn hồ sơ** theo **KHUNG-3 PHẦN A0 + PHẦN C**. **Phần 0 và Phần D dưới đây là cấu hình cụ thể của hồ sơ Web app
+> (Next.js + Supabase + Vercel)** — với hồ sơ khác, giữ nguyên trình tự nhưng **thay công cụ tương đương** (vd init
+> dự án, hệ test, đóng gói, CI của loại đó); nguyên tắc hàng rào (pre-commit + commit-msg + CI + branch protection)
+> không đổi. **Dự án có sẵn:** dùng `AP-DUNG-vao-du-an-co-san.md` (chỉ tư vấn & nâng cấp), không chạy runbook này.
+> **Không xây dự án "cấm"** (mã độc/phá hoại/DoS… — xem CLAUDE.md §0b).
+
 ---
 
 ## Phần 0 — Cấu trúc repo chuẩn (đặt file vào đâu)

@@ -19,13 +19,17 @@ Bạn vào vai **chuyên gia tư vấn phát triển phần mềm ứng dụng**
 
 ## Bước 0 — Xác định bối cảnh trước khi tư vấn
 
+> **Phạm vi:** khung hỗ trợ **mọi loại dự án lập trình** (web, mobile, desktop, backend/API, site tĩnh, CLI/thư viện, data/ML, game, blockchain, monorepo…) — **trừ dự án "cấm"** (mã độc/phá hoại/DoS/nhắm mục tiêu hàng loạt/né tránh phát hiện vì mục đích xấu/phạm pháp). Gặp yêu cầu cấm → **từ chối lịch sự, không tư vấn/không xây** (CLAUDE.md §0b). Bảo mật phòng thủ / kiểm thử có ủy quyền / CTF / nghiên cứu thì hỗ trợ.
+
 ### A) Dự án MỚI (greenfield) — người dùng mô tả ý tưởng/yêu cầu
+0. **PHẦN A0 (KHUNG-3):** **phân loại loại dự án → chọn hồ sơ** (C1–C10). Hồ sơ quyết định stack tham chiếu + cổng chất lượng nào áp dụng (cổng web như theme/CWV/a11y chỉ cho hồ sơ có UI web; loại khác dùng cổng tương đương). Dự án nhiều thành phần → mỗi phần một hồ sơ.
 1. **PHẦN A (KHUNG-3):** làm rõ vấn đề thật, người dùng cụ thể, phạm vi **MVP** (cảnh báo phình phạm vi), và các yêu cầu phi chức năng (SEO/realtime/offline/quy mô) — đây là đầu vào để chọn công nghệ.
 2. **PHẦN B (KHUNG-3):** với mỗi quyết định lớn (framework, CSDL, hosting, thư viện lõi) đưa ra **2–3 ứng viên**, lập **ma trận chấm điểm** theo tiêu chí §B2, chọn phương án thắng. **Xác minh phiên bản** theo Nguyên tắc 1.
 3. **PHẦN C (KHUNG-3):** đối chiếu stack tham chiếu mặc định nhưng **KHÔNG dùng máy móc** — biện minh lại (hoặc đề xuất khác) cho đúng ý tưởng này.
 4. **Đầu ra (PHẦN D):** (a) bản đề xuất công nghệ cho `PROJECT.md` mục 4 (mỗi lựa chọn + phiên bản + ngày xác minh + 1 câu lý do); (b) **ADR** cho mỗi quyết định lớn (`docs/adr/000X-…`, theo mẫu `0000-template.md`, tham khảo `0001-chon-stack.md`); (c) danh sách góp ý chủ động. **DỪNG, chờ người dùng chốt** trước khi dựng hàng rào/viết code.
 
 ### B) Dự án CÓ SẴN (brownfield) — áp repo/khung này lên codebase đang chạy
+> **Chỉ tư vấn & nâng cấp — KHÔNG áp đặt stack mặc định.** Cải thiện tăng dần trên đúng stack hiện có; chỉ đổi/thêm công nghệ khi có lý do rõ và người dùng chốt (`AP-DUNG` Nguyên tắc 0).
 1. Làm theo `docs/framework/AP-DUNG-vao-du-an-co-san.md` (Bước 0 → 4), **tăng dần, không "big bang"**.
 2. **AI TỰ XÁC ĐỊNH stack/phiên bản hiện có** bằng cách đọc repo (`package.json` + lockfile, `next.config.*`/`vite.config.*`, `tsconfig.json`, config CSS/CSDL/test, `.github/workflows/`…) — **không hỏi điều đã có trong code**. Tổng hợp "Hồ sơ dự án" + bảng *đã có vs còn thiếu*.
 3. Chỉ đề xuất **thay/thêm công nghệ khi có lý do rõ**; ưu tiên giá trị cao / rủi ro thấp; cô lập rủi ro; mỗi thay đổi đi **ADR + PR riêng**; giữ hành vi không đổi khi dựng hàng rào.
