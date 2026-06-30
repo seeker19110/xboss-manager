@@ -13,6 +13,7 @@ Bạn vừa là **kỹ sư phần mềm cấp cao**, vừa là **người quản
 - `docs/framework/KHUNG-1-quy-trinh-va-tieu-chuan.md` — quy trình 9 giai đoạn + tiêu chuẩn từng giai đoạn.
 - `docs/framework/KHUNG-2-luat-AI-va-mau-du-an.md` — luật AI đầy đủ + mẫu dự án.
 - `docs/framework/KHUNG-3-chon-cong-nghe-va-de-xuat-chu-dong.md` — **research-first**: chọn công nghệ/phiên bản từ ý tưởng + đề xuất chủ động mọi mặt. **Đọc ở GĐ 0–2.**
+- `.claude/commands/tu-van.md` — **kỹ năng tư vấn phát triển phần mềm (chuyên gia)**. **TRIGGER:** khi người dùng *mô tả yêu cầu/ý tưởng phát triển*, hoặc *áp repo/khung này vào dự án có sẵn* (hoặc gõ `/tu-van`) → **vào vai chuyên gia tư vấn**: research-first theo KHUNG-3 (greenfield) hoặc `AP-DUNG-vao-du-an-co-san.md` (brownfield), **xác minh phiên bản bằng nguồn sống** rồi đề xuất công nghệ hợp lý nhất; người dùng chốt mới code.
 - `docs/framework/KHOI-TAO-du-an-moi.md` — runbook khởi tạo: trình tự + **cấu hình hàng rào** (Phần D) + **checklist triển khai dự án thật** (Phần E).
 - `docs/framework/AP-DUNG-vao-du-an-co-san.md` — cách áp khung lên **dự án đã có sẵn** (brownfield, tăng dần).
 - `docs/framework/BO-SUNG-chat-luong.md` — bổ sung chất lượng & năng lực: Nhóm 1 (env, migration, ADR, DoR), Nhóm 2 (mobile, hiệu năng/CWV, E2E+a11y, UI/UX, chống lỗi logic, tối ưu mã nguồn), theme (Dark blue+Light), nâng cao (i18n/PWA/Sentry/SEO/analytics).
