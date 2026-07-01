@@ -181,7 +181,9 @@ Repo đã có sẵn cấu hình để tự tối ưu chi phí — ai mở repo b
 - **`.claude/agents/tra-cuu.md`** → subagent `model: haiku`, **chỉ nhận việc Haiku 4.5 xuất sắc** (tìm file, grep symbol, định vị định nghĩa/tham chiếu, trích dữ kiện cụ thể — read-only). Không giao review/kiến trúc/sửa file cho subagent này.
 - **`.claude/agents/kiem-tra-phien-ban.md`** → subagent `model: haiku`, **xác minh phiên bản bằng nguồn sống** cho bước research-first (KHUNG-3): trả về số/dữ kiện thô + nguồn + ngày kiểm tra; không chọn/đề xuất công nghệ.
 
-> Muốn đổi mặc định về Sonnet 5 thuần (không dùng opusplan): sửa `"model"` trong `.claude/settings.json`. Muốn tắt subagent Haiku: xóa file tương ứng trong `.claude/agents/`. Cá nhân override tạm thời bằng `/model` mà không cần đổi file.
+- **Quyền cho chế độ tự động** (`.claude/settings.json` → `permissions`): **allow-list an toàn** — tự cho phép việc auto-mode cần (Edit/Write/Read, `git` an toàn, `scripts/dev-task.sh`, chạy test/format/build của npm/pnpm/pytest/go/cargo…), nhưng **`deny` chặn thao tác nguy hiểm** (deny thắng allow): `rm -rf`, `git push --force`/`-f`, `git reset --hard`, `git clean`, `sudo`, `chmod 777`, `dd`, đọc `.env`/`secrets/**`. Việc **không** trong danh sách vẫn **hỏi** như thường. Đây là "toàn bộ quyền cho auto mode" ở mức an toàn cho template (không mở toang, không lan rủi ro sang dự án nhân bản).
+
+> Muốn đổi mặc định về Sonnet 5 thuần (không dùng opusplan): sửa `"model"` trong `.claude/settings.json`. Muốn tắt subagent Haiku: xóa file tương ứng trong `.claude/agents/`. Cá nhân override tạm thời bằng `/model` mà không cần đổi file. Muốn tự động **nhiều hơn nữa** (bỏ mọi xác nhận): chạy phiên ở chế độ bypass permissions — cân nhắc rủi ro trước.
 
 ### Tối đa hóa tự động — checklist opt-in THEO TỪNG DỰ ÁN
 Các mục dưới **cố ý KHÔNG bake sẵn** vào template (vì khung hỗ trợ **mọi loại dự án** — bake lệnh `npm` vào đây sẽ sai với mobile/backend/CLI/data…). Bật chúng **sau khi đã chọn stack** ở GĐ 0–2:
