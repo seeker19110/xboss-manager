@@ -33,6 +33,7 @@ Kích hoạt: gõ **`/tu-dong`** khi mô tả dự án MỚI hoặc bắt đầu
      • git commit→ PreToolUse   → pre-commit-gate.sh→ dev-task.sh gate (đỏ = CHẶN)
      • hết lượt  → Stop         → usage-guard.sh    → usage-estimate.sh (≥70% → nhắc wind-down)
      • mở phiên  → SessionStart → session-resume.sh → nạp PROGRESS.md + git ("tiếp tục")
+                                └ session-guide.sh  → HIỆN gợi ý "làm gì tiếp theo" cho người dùng
                                   │
               Chỉ DỪNG ở: cổng giai đoạn · các mốc §9 · wind-down gần hết quota
 ```
@@ -59,7 +60,8 @@ Kích hoạt: gõ **`/tu-dong`** khi mô tả dự án MỚI hoặc bắt đầu
 ### Hook — `.claude/hooks/`
 | Hook | Sự kiện | Làm gì |
 |---|---|---|
-| `session-resume.sh` | SessionStart | Nạp PROGRESS.md + git vào ngữ cảnh → "tiếp tục" nối lại; xóa marker wind-down |
+| `session-resume.sh` | SessionStart | Nạp PROGRESS.md + git vào ngữ cảnh (model) → "tiếp tục" nối lại; xóa marker wind-down |
+| `session-guide.sh` | SessionStart | **Hiện cho người dùng** (`systemMessage`) gợi ý "nên làm gì tiếp theo" tùy trạng thái (chưa có tiến độ → bắt đầu; đang làm → tiếp tục) |
 | `pre-commit-gate.sh` | PreToolUse(Bash) | `git commit` → chạy cổng; **đỏ = chặn** (bỏ qua: `--no-verify`) |
 | `auto-format.sh` | PostToolUse(Edit\|Write) | Tự format đúng file vừa sửa |
 | `usage-guard.sh` | Stop | Ước tính % quota 5h; ≥ ngưỡng → nhắc wind-down (1 lần/phiên) |
