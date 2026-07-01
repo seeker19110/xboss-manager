@@ -23,6 +23,19 @@ Sau khi duyệt, chạy **tự động** theo kế hoạch, không hỏi lại t
 - **Tự động chất lượng đã bật:** auto-format khi sửa file, **cổng chặn `git commit` khi đỏ** (`.claude/hooks/`), qua `scripts/dev-task.sh`. Điền `.claude/project-commands.sh` (copy từ `.example.sh`) nếu dự án có lệnh riêng.
 - Cập nhật `PROGRESS.md` sau mỗi mốc; commit theo conventional commits.
 
+## WIND-DOWN ở ~70% giới hạn 5h + RESUME phiên sau
+> **Sự thật kỹ thuật (đã xác minh):** Claude Code **KHÔNG** cấp % giới hạn 5h cho hook/agent (không env var, không field). Nên **không có cổng máy móc** đọc đúng "70% của 5h". Thực thi bằng **hành vi wind-down + hạ tầng resume** dưới đây.
+
+**Khi ước lượng đã dùng ~70% cửa sổ 5h** (dựa vào cảnh báo limit của CLI `/usage`, hoặc phán đoán theo khối lượng đã chạy):
+1. **KHÔNG bắt đầu** đơn vị công việc mới cần commit/merge; **hoàn tất gọn** đơn vị đang dở.
+2. **Commit** phần đã xong (qua cổng — không commit code đỏ). Đây là "dừng commit/merge" hiểu đúng: **ngừng khởi động chu kỳ mới**, không phải chặn lệnh commit (near-limit thì càng phải commit để không mất việc).
+3. **Cập nhật `PROGRESS.md`** — nhất là mục **"Bàn giao phiên"**: việc vừa xong, việc DỞ ở đâu, **bước kế tiếp cụ thể**.
+4. **Dừng phiên sạch sẽ**, báo người dùng: "đã wind-down, phiên sau nhắn *tiếp tục*".
+
+**Phiên sau — người dùng chỉ cần nhắn "tiếp tục":**
+- SessionStart hook (`.claude/hooks/session-resume.sh`) đã **tự nạp** PROGRESS.md + git state vào ngữ cảnh.
+- Đọc mục **"Đang làm" / "Tiếp theo" / "Bàn giao phiên"** → **nối tiếp đúng chỗ dở**, không lập lại kế hoạch từ đầu (kế hoạch tổng đã duyệt vẫn hiệu lực).
+
 ## Ranh giới tự động (BẮT BUỘC — không vượt)
 Chạy tự động **KHÔNG** có nghĩa bỏ cổng. **Vẫn dừng và hỏi** khi (CLAUDE.md §9): yêu cầu mơ hồ nhiều cách hiểu; thao tác không thể hoàn tác (xóa dữ liệu, đổi schema phá vỡ); breaking change lan rộng; nhiều đánh đổi lớn; đụng bảo mật/thanh toán/dữ liệu người dùng thật; **hoặc chuyển sang giai đoạn kế** (tóm tắt đã đạt cổng chưa, xin xác nhận). Ngoài các mốc đó → chạy liền mạch.
 

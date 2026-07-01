@@ -3,6 +3,16 @@
   "model": "opusplan",
   "fallbackModel": ["claude-sonnet-5", "claude-haiku-4-5"],
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-resume.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
