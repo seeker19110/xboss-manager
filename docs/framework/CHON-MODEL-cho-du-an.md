@@ -51,6 +51,36 @@ Khung CLAUDE.md đòi model đảm nhiệm nhiều vai cùng lúc. Bảng dướ
 
 ---
 
+## 2b. Đánh giá chất lượng từng model theo từng khung/kỹ năng
+
+Bảng dưới chấm mức phù hợp của mỗi model cho **từng tài liệu khung và từng kỹ năng** trong repo. Dùng để chọn model **đúng đầu việc**, không phải chọn một model cho cả dự án.
+
+**Thang điểm:** ✅✅ xuất sắc, nên ưu tiên · ✅ đủ tốt, dùng thoải mái · 🟡 làm được nhưng nên soát kỹ / cân nhắc nâng cấp ở ca khó · ❌ không nên giao.
+
+| Khung / Kỹ năng | Trọng tâm công việc | Haiku 4.5 | Sonnet 5 | Opus 4.8 | Fable 5 |
+|---|---|:--:|:--:|:--:|:--:|
+| **KHUNG‑1** — quy trình 9 giai đoạn + tiêu chuẩn | Kỷ luật giai đoạn, cổng, DoD, theo dõi trạng thái | 🟡 | ✅ | ✅✅ | ✅✅ |
+| **KHUNG‑2** — luật AI + chống ảo giác + mẫu dự án | Tuân luật, không bịa API, đọc file thật | 🟡 | ✅ | ✅✅ | ✅✅ |
+| **KHUNG‑3** — chọn công nghệ (research-first) + đề xuất chủ động | Xác minh phiên bản bằng nguồn sống, trade-off, đề xuất | ❌ | 🟡 | ✅ | ✅✅ |
+| **`/tu-van`** — tư vấn phát triển (chuyên gia) | Bóc yêu cầu mơ hồ, đề xuất giải pháp, đánh đổi | 🟡 | ✅ | ✅✅ | ✅✅ |
+| **`/khoi-tao`** — khởi tạo dự án mới | Dựng nền, cấu hình hàng rào, checklist triển khai | 🟡 | ✅ | ✅ | ✅ |
+| **`/ui-ux`** — thiết kế UI/UX | Design tokens, mobile-first, WCAG AA Dark+Light, 4 trạng thái | 🟡 | ✅✅ | ✅✅ | ✅✅ |
+| **`/cong`** — cổng commit/merge + báo cáo xác thực | Chạy build/lint/test, đọc diff, rà rác/bí mật | ✅ | ✅✅ | ✅✅ | ✅✅ |
+| **`/adr`** — quyết định kiến trúc | So sánh phương án, ghi lý do, hệ quả dài hạn | ❌ | 🟡 | ✅✅ | ✅✅ |
+| **`/audit-toi-uu`** — audit & tối ưu mã nguồn | Đo baseline, gỡ dead code, refactor không đổi hành vi | 🟡 | ✅ | ✅✅ | ✅✅ |
+| **`/su-co`** — xử lý sự cố production | Giảm thiệt hại, chẩn đoán nhanh, post-mortem | ❌ | 🟡 | ✅✅ | ✅✅ |
+| **BO-SUNG-chat-luong** — env/migration/DoR, hiệu năng/CWV, E2E+a11y, chống lỗi logic | Chi tiết chất lượng, ca biên, race/idempotency | 🟡 | 🟡 | ✅✅ | ✅✅ |
+| **AP-DUNG (brownfield)** — áp khung lên dự án có sẵn | Đọc repo, suy ra stack thật, nâng cấp tăng dần | 🟡 | ✅ | ✅✅ | ✅✅ |
+
+### Đọc bảng theo nhóm
+
+- **Việc code/UI/cổng thường ngày** (KHUNG‑1 vận hành, `/ui-ux`, `/cong`, `/khoi-tao`): **Sonnet 5 là đủ tốt → xuất sắc**, chi phí thấp — dùng làm ngựa thồ.
+- **Việc lý luận sâu / rủi ro cao** (KHUNG‑3 chọn công nghệ, `/adr`, `/su-co`, chống lỗi logic trong BO-SUNG, audit lớn): **Opus 4.8 xuất sắc; Sonnet 5 chỉ 🟡** → nên nâng Opus 4.8, hoặc Fable 5 ở ca khó nhất.
+- **Việc đơn giản, đơn lẻ** (chạy cổng, chỉnh nhỏ): Haiku 4.5 gánh được phần cổng/kiểm tra máy móc; **không** giao phần lý luận (❌ ở KHUNG‑3, `/adr`, `/su-co`).
+- **Fable 5** hầu như luôn ✅✅ nhưng **chênh lệch đáng giá tiền** chỉ ở nhóm lý luận sâu; ở việc thường ngày nó không hơn Sonnet 5/Opus 4.8 đủ để bù chi phí gấp 2–3 lần.
+
+---
+
 ## 3. Các bước quyết định (chạy theo thứ tự)
 
 ### Bước 1 — Xác định quy mô & loại dự án
