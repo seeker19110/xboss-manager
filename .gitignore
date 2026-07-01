@@ -23,3 +23,10 @@ public/swe-worker-*.js
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# Khai bao lenh dev dac thu du an (copy tu .claude/project-commands.example.sh)
+.claude/project-commands.sh
+
+# Ước tính usage (tự hiệu chỉnh) + marker
+.claude/usage-budget.sh
+.claude/.winddown-nudged
