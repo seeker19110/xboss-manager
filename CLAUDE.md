@@ -30,6 +30,7 @@ Khung này **không giới hạn ở web app**. Nó hỗ trợ mọi loại dự
 - `docs/adr/` — các quyết định kỹ thuật (ADR). **Đọc trước khi đề xuất thay đổi kiến trúc lớn.** **TRIGGER:** khi *chốt một quyết định kiến trúc/công nghệ lớn* (hoặc gõ `/adr`) → tạo ADR mới từ `0000-template.md` theo phương pháp KHUNG-3 §B3 (đánh số tăng dần, **không sửa ADR cũ**).
 - `docs/framework/CHON-MODEL-cho-du-an.md` — **hướng dẫn chọn model Claude để chạy khung** (Sonnet 5 / Opus 4.8 / Fable 5) theo quy mô & rủi ro dự án, kèm các bước quyết định, chiến lược lai và **cấu hình tự-động-tối-ưu-chi-phí đã kích hoạt** (opusplan + subagent Haiku + hooks qua `scripts/dev-task.sh`). Đọc khi *bắt đầu/đổi quy mô dự án* hoặc *cân nhắc chi phí–chất lượng model*.
 - `.claude/commands/tu-dong.md` — **kỹ năng "chạy tự động"**. **TRIGGER:** khi người dùng *mô tả dự án MỚI* hoặc *bắt đầu làm trên dự án CÓ SẴN* (hoặc gõ `/tu-dong`) → **Opus lên kế hoạch TOÀN BỘ** (plan mode, research-first) → trình **một cổng phê duyệt** → sau khi duyệt **tự động điều phối tới hoàn thành** (Sonnet code + subagent Haiku việc phụ), qua auto-format + cổng chặn commit đỏ; chỉ dừng ở các cổng giai đoạn/§9.
+- `docs/framework/TU-DONG-tong-quan.md` — **bản đồ toàn bộ chế độ chạy tự động** (một trang): sơ đồ luồng, bản kê thành phần (settings/subagent/hook/script), 2 file cấu hình tự điền, cách bật nhanh, ranh giới trung thực. Đọc khi *bàn giao / muốn hiểu nhanh hệ thống tự động*.
 
 > Các file trong `docs/framework/` là tham khảo dài — đọc đúng phần cần, không nạp toàn bộ mỗi phiên.
 
