@@ -106,10 +106,39 @@ run_task() { # $1=task -> chạy; 0 nếu ok hoặc no-op, khác 0 nếu lệnh 
   ( cd "$ROOT" && bash -c "$cmd" )
 }
 
+# --- format-file: format ĐÚNG file vừa sửa (dùng cho auto-format hook) --------
+declared_format_file() {
+  [ -f "$DECL" ] || return 0
+  ( set +u; . "$DECL" >/dev/null 2>&1; eval "printf '%s' \"\${format_file:-}\"" )
+}
+resolve_format_file() { # $1=path -> in lệnh format 1 file, rỗng nếu không có per-file formatter
+  local p="$1" tmpl ext
+  tmpl="$(declared_format_file)"
+  if [ -n "$tmpl" ]; then printf '%s' "${tmpl//\{\}/$p}"; return 0; fi
+  ext="${p##*.}"
+  case "$ext" in
+    js|jsx|ts|tsx|mjs|cjs|json|css|scss|md|mdx|html|yaml|yml)
+      if command -v npx >/dev/null 2>&1 && [ -f "$ROOT/package.json" ]; then
+        echo "npx --no-install prettier --write \"$p\""; return 0; fi ;;
+    py)
+      command -v ruff  >/dev/null 2>&1 && { echo "ruff format \"$p\""; return 0; }
+      command -v black >/dev/null 2>&1 && { echo "black \"$p\"";       return 0; } ;;
+    go)  command -v gofmt   >/dev/null 2>&1 && { echo "gofmt -w \"$p\""; return 0; } ;;
+    rs)  command -v rustfmt >/dev/null 2>&1 && { echo "rustfmt \"$p\"";  return 0; } ;;
+  esac
+  return 0
+}
+
 # --- Điều phối ---------------------------------------------------------------
 case "$TASK" in
   format|lint|typecheck|test|build)
     run_task "$TASK"; exit $? ;;
+  format-file)
+    P="${2:-}"; [ -n "$P" ] || { log "format-file: thiếu path"; exit 0; }
+    C="$(resolve_format_file "$P")"
+    [ -n "$C" ] || { log "skip format-file: không có per-file formatter cho '$P'"; exit 0; }
+    log "format-file: $C"; ( cd "$ROOT" && bash -c "$C" ) || true
+    exit 0 ;;
   gate)
     rc=0
     for t in build typecheck lint test; do
