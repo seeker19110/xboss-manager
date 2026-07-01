@@ -129,11 +129,21 @@ Copy-IfAbsent ".nvmrc"
 Copy-IfAbsent ".env.example"
 # LICENSE KHÔNG copy: mỗi dự án tự chọn giấy phép + chủ sở hữu riêng.
 
-# ── LỚP 2 — File cấu hình/stack: đưa vào _framework-dropins/ để tự merge ──
+# ── Cấu hình Claude Code: copy thẳng ──
 Write-Host ""
-Write-Host "[2/3] File cấu hình (Lớp 2 — KHÔNG đè; để bạn tự merge cái khớp stack):"
+Write-Host "[2/3] Cấu hình Claude Code (Fable 5 nếu có, fallback Opus 4.8):"
+$claudeDir = Join-Path $Target '.claude'
+New-Item -ItemType Directory -Force -Path $claudeDir | Out-Null
+Copy-Tree -SrcFull (Join-Path $Src '.claude/settings-shared-opusplan.json') -DestFull (Join-Path $claudeDir 'settings.json')
+Copy-Tree -SrcFull (Join-Path $Src '.claude/hooks') -DestFull (Join-Path $claudeDir 'hooks')
+Copy-Tree -SrcFull (Join-Path $Src '.claude/agents') -DestFull (Join-Path $claudeDir 'agents')
+Write-Host "  → .claude/settings.json (Fable 5 / Opus 4.8 fallback)"
+Write-Host "  → .claude/hooks"
+Write-Host "  → .claude/agents"
+
+Write-Host ""
+Write-Host "[3/3] File cấu hình khác (Lớp 2 — KHÔNG đè; để bạn tự merge cái khớp stack):"
 $dropins = @(
-  '.claude/settings-shared-opusplan.json', '.claude/hooks', '.claude/agents',
   'eslint.config.mjs', 'postcss.config.mjs',
   '.prettierrc', '.prettierignore', '.lintstagedrc.json', 'commitlint.config.cjs',
   'vitest.config.ts', 'vitest.setup.ts', 'playwright.config.ts', 'lighthouserc.json',
@@ -147,17 +157,22 @@ $dropins = @(
 foreach ($f in $dropins) { Add-Dropin $f }
 
 Write-Host ""
-Write-Host "[3/3] Xong. 3 bước tiếp theo trong dự án đích:"
+Write-Host "[4/4] Xong. Tiếp theo trong dự án đích:"
 Write-Host @'
 
-  1) Mở phiên Claude Code NGAY TRONG dự án đích.
-     → AI tự đọc CLAUDE.md, rồi chạy Bước 0 của docs/framework/AP-DUNG-vao-du-an-co-san.md
+  1) Cấu hình Claude Code đã sẵn sàng: .claude/settings.json dùng Fable 5 (fallback Opus 4.8).
+     ✅ Nếu bạn muốn đổi model (vd Sonnet 5 để tiết kiệm), chỉnh field "model" trong .claude/settings.json.
+
+  2) Mở phiên Claude Code NGAY TRONG dự án đích.
+     → AI tự đọc CLAUDE.md + .claude/settings.json (Fable 5 / Opus 4.8 sẵn).
+     → Chạy Bước 0 của docs/framework/AP-DUNG-vao-du-an-co-san.md
        (tự dò stack bằng cách đọc package.json/config — không cần bạn khai stack).
 
-  2) Soát thư mục _framework-dropins/ : merge file cấu hình KHỚP stack vào dự án
-     (đừng đè cấu hình đang chạy). Xong thì có thể xóa _framework-dropins/.
+  3) Soát thư mục _framework-dropins/ : merge file cấu hình KHỚP stack vào dự án
+     (các file lớp 2 khác: eslint, prettier, playwright, github workflows, etc.).
+     Xong thì có thể xóa _framework-dropins/.
 
-  3) Commit, rồi áp khung tăng dần theo AP-DUNG-vao-du-an-co-san.md
+  4) Commit, rồi áp khung tăng dần theo AP-DUNG-vao-du-an-co-san.md
      (Prettier → ESLint → TS strict → hook → CI → lấp lỗ hổng test/a11y/hiệu năng).
 
   (Tùy chọn) Muốn luật áp cho MỌI dự án trên máy: chép CLAUDE.md vào ~/.claude/CLAUDE.md.
