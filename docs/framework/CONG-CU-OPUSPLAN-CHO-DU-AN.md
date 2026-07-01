@@ -1,105 +1,87 @@
-# Cấu hình Fable 5 + Opus 4.8 dùng chung cho mọi dự án
+# Cấu hình opusplan dùng chung cho mọi dự án (tối ưu token)
 
-> **Mục đích:** Cung cấp cấu hình Claude Code tiêu chuẩn sử dụng **Fable 5** (mạnh nhất, nếu có) → fallback **Opus 4.8** cho bất kỳ dự án nào khi áp dụng bộ khung CLAUDE.md.
-> **Khi nào:** Được áp dụng **mặc định** khi tích hợp khung vào dự án (mới hoặc có sẵn). Nếu muốn đổi sang Sonnet 5 (rẻ hơn), chỉ cần sửa `.claude/settings.json`.
+> **Mục đích:** Cung cấp cấu hình Claude Code tiêu chuẩn dùng **opusplan** — cơ chế tự chọn model rẻ-nhất-đủ-dùng cho từng đầu việc, cho bất kỳ dự án nào áp dụng khung CLAUDE.md.
+> **Khi nào:** Áp dụng **mặc định** khi tích hợp khung vào dự án (mới hoặc có sẵn). Muốn rẻ hơn nữa (Sonnet 5) hay mạnh hơn (Fable 5) → sửa 1 dòng trong `.claude/settings.json`.
 
 ---
 
 ## 0. TL;DR — Dùng ngay
-
-Khi áp dụng khung vào dự án của bạn bằng `copy-framework.sh` hoặc `copy-framework.ps1`:
 
 ```bash
 # Từ repo khung, chạy:
 bash copy-framework.sh /đường-dẫn/tới/dự-án-của-bạn
 ```
 
-✅ **Xong!** Script sẽ tự động:
-- Copy cấu hình Fable 5 vào `.claude/settings.json` 
-- Copy hooks & agents vào `.claude/`
-- Copy các file cấu hình khác (eslint, prettier, etc.) vào `_framework-dropins/`
+✅ **Xong!** Script tự động:
+- Copy `.claude/settings.json` (opusplan) **thẳng** vào dự án
+- Copy `.claude/hooks` và `.claude/agents` (gồm subagent Haiku: `tra-cuu`, `kiem-tra-phien-ban`)
+- Copy các file cấu hình khác (eslint, prettier, playwright…) vào `_framework-dropins/` để tự merge
 
-**Kết quả:** 
-- ✅ Model mặc định: **Fable 5** (mạnh nhất)
-- ✅ Fallback: **Opus 4.8** (nếu Fable 5 không có)
-- ✅ Mở phiên Claude Code lần đầu → AI tự dùng Fable 5 / Opus 4.8 để chạy khung 🚀
-
-**Nếu muốn đổi model** (vd Sonnet 5 để tiết kiệm):
-```bash
-# Chỉnh file .claude/settings.json:
-#   "model": "claude-sonnet-5"
-```
+**Kết quả:** Mở phiên Claude Code lần đầu → AI chạy khung ở chế độ **opusplan**, tự dùng model rẻ-nhất-đủ-dùng.
 
 ---
 
-## 1. File cấu hình tiêu chuẩn là gì?
+## 1. Vì sao opusplan = tối ưu token (không "dao mổ trâu")
 
-**`.claude/settings.json`** — file cấu hình Claude Code mặc định (tự động copy từ `.claude/settings-shared-opusplan.json`):
+**opusplan** không phải một model — nó là **chế độ** để Claude Code tự phân vai model theo từng đầu việc:
 
-### Model (chính)
-- **`"model": "claude-fable-5"`** — Dùng Fable 5 (mạnh nhất):
-  - ✅ Đủ mạnh cho mọi task: lập kế hoạch, code, research-first, quyết định kiến trúc
-  - ✅ **Chi phí**: gấp ~1.5× Opus 4.8, gấp ~3.3× Sonnet 5
-  - ✅ **Thích hợp**: dự án có rủi ro cao, phức tạp, yêu cầu chất lượng cao
+| Đầu việc | Model | Giá /1M input | Tần suất |
+|---|---|---|---|
+| **Lập kế hoạch / quyết định kiến trúc** (plan mode) | Opus 4.8 | $5 | ~20–30% |
+| **Code, sửa file hằng ngày** | Sonnet 5 | $3 | phần lớn |
+| **Tìm kiếm, đọc file, xác minh phiên bản** (subagent) | Haiku 4.5 | $1 | việc cơ học |
 
-### Fallback model
-- **`"fallbackModel": ["claude-opus-4-8", "claude-sonnet-5", "claude-haiku-4-5"]`** — Nếu Fable 5 không khả dụng:
-  1. Thử Opus 4.8 trước (mạnh, rẻ hơn Fable 5)
-  2. Thử Sonnet 5 (cân bằng, phổ biến)
-  3. Thử Haiku 4.5 (rẻ nhất, cho việc đơn giản)
+→ Opus **chỉ** tốn tiền lúc thực sự cần suy nghĩ; còn lại chạy Sonnet/Haiku.
 
-### Permissions (quyền hạn)
-Cho phép các công cụ cần thiết:
+**So với dùng một model mạnh cho tất cả:**
+- **Fable 5 thuần** ($10/1M): mọi token — kể cả đọc file, format, tìm kiếm — đều tính giá cao nhất → **lãng phí ~60–70%**.
+- **Opus 4.8 thuần** ($5/1M): tốt hơn Fable thuần, nhưng vẫn trả giá Opus cho cả việc cơ học Haiku làm được.
+- **opusplan**: chỉ trả giá cao ở pha lập kế hoạch → **rẻ hơn Opus thuần, rẻ hơn nhiều so với Fable thuần**, mà vẫn giữ chất lượng ở đúng chỗ cần.
+
+> Nguyên tắc vàng (CLAUDE.md / CHON-MODEL): dùng model **rẻ nhất vẫn đạt chất lượng** cho phần lớn công việc; **nâng cấp có chọn lọc** đúng mốc rủi ro cao.
+
+---
+
+## 2. File cấu hình tiêu chuẩn là gì?
+
+**`.claude/settings.json`** (copy từ `.claude/settings-shared-opusplan.json`):
+
+### Model
+- **`"model": "opusplan"`** — Opus lập kế hoạch, Sonnet code, Haiku (subagent) việc phụ.
+- **`"fallbackModel": ["claude-sonnet-5", "claude-haiku-4-5"]`** — nếu opusplan không khả dụng, hạ dần Sonnet → Haiku.
+
+### Permissions
 - **Read/Edit/Write:** chỉnh sửa file
-- **Bash git:** quản lý git (add, commit, push, fetch)
-- **Bash build/test:** chạy lệnh dev của dự án (npm/pnpm/yarn/pytest/go/cargo/…)
-- **Deny:** chặn các thao tác nguy hiểm (rm -rf, force push, sudo, xem .env)
+- **Bash git:** add, commit, push, fetch…
+- **Bash build/test:** npm/pnpm/yarn/pytest/go/cargo… (qua `scripts/dev-task.sh`)
+- **Deny:** chặn thao tác nguy hiểm (rm -rf, force push, sudo, đọc `.env`)
 
-### Hooks (tự động chạy)
-- **SessionStart:** Kiểm tra nạp file PROGRESS.md, hướng dẫn phiên
-- **PreToolUse (Bash):** Cổng pre-commit trước mỗi thao tác Bash (chặn công việc bẩn)
-- **PostToolUse (Edit/Write):** Auto-format file vừa sửa
-- **Stop:** Guard sử dụng (cảnh báo nếu dùng quá nhiều token)
+### Hooks
+- **SessionStart:** nạp PROGRESS.md + hướng dẫn phiên
+- **PreToolUse (Bash):** cổng pre-commit
+- **PostToolUse (Edit/Write):** auto-format file vừa sửa
+- **Stop:** guard cảnh báo dùng nhiều token
+
+### Subagent Haiku (mấu chốt tối ưu token)
+`.claude/agents/` có 2 subagent chạy **Haiku 4.5** cho việc cơ học:
+- `tra-cuu` — tìm file, grep symbol, đọc trích dữ kiện
+- `kiem-tra-phien-ban` — xác minh phiên bản gói bằng nguồn sống
+
+→ Giao việc cơ học cho Haiku = giữ Opus/Sonnet cho việc cần suy nghĩ.
 
 ---
 
-## 2. Khi nào dùng Fable 5?
+## 3. Chọn model theo quy mô dự án
 
-| Tiêu chí | Dùng Fable 5? | Nếu muốn tiết kiệm → dùng |
+**Mặc định là opusplan** — cân bằng tốt cho đa số dự án. Chỉ đổi khi có lý do:
+
+| Quy mô dự án | Nên dùng | Cách đặt |
 |---|---|---|
-| **Dự án nhỏ** (script, landing, prototype, <5k LOC) | ❌ (quá mạnh) | ↓ Sonnet 5 |
-| **Dự án tầm trung** (web+API, 10–50k LOC) | ✅ **CÓ (mặc định)** | Opus 4.8 (rẻ hơn) |
-| **Dự án lớn/phức tạp** (nhiều dịch vụ, realtime, >50k LOC) | ✅ **CÓ (mặc định)** | Opus 4.8 (cân bằng) |
-| **Yêu cầu mơ hồ, nhiều đánh đổi kiến trúc** | ✅ **CÓ (tốt nhất)** | Opus 4.8 |
-| **Kiến trúc nhạy cảm, breaking change, migration** | ✅ **CÓ (tốt nhất)** | Opus 4.8 |
+| **Nhỏ** (script, landing, <5k LOC) | **Sonnet 5** | `"model": "claude-sonnet-5"` |
+| **Tầm trung → lớn** (10–50k+ LOC) | **opusplan** (mặc định) | *(không đổi gì)* |
+| **Rất phức tạp / rủi ro cực cao** | opusplan + nâng riêng lúc cần | `/model claude-fable-5` khi gặp trade-off khó nhất |
 
-**Chiến lược:**
-- **Mặc định: Fable 5** (mạnh nhất, không lo chất lượng)
-- **Tiết kiệm: Sonnet 5** (rẻ ~60%, đủ tốt cho dự án nhỏ→tầm trung)
-- **Hybrid: Opus 4.8** (mạnh/rẻ balanced, fallback tốt)
-
----
-
-## 3. Cách chọn model cho dự án của bạn
-
-**Mặc định đã là Fable 5** — cấu hình tự động copy khi áp dụng khung. Không cần chọn!
-
-**Nếu muốn thay đổi:**
-
-### Tùy chọn A — Giữ Fable 5 (mặc định, khuyến nghị)
-✅ Không cần làm gì, file `.claude/settings.json` đã cấu hình sẵn.
-
-### Tùy chọn B — Dùng Opus 4.8 (mạnh + rẻ hơn Fable)
-Sửa file `.claude/settings.json`:
-```json
-{
-  "model": "claude-opus-4-8",
-  "fallbackModel": ["claude-sonnet-5", "claude-haiku-4-5"]
-}
-```
-
-### Tùy chọn C — Dùng Sonnet 5 (tiết kiệm chi phí, ~60% rẻ hơn Fable)
-Sửa file `.claude/settings.json`:
+### Đổi sang Sonnet 5 (dự án nhỏ, tiết kiệm nhất)
 ```json
 {
   "model": "claude-sonnet-5",
@@ -107,90 +89,48 @@ Sửa file `.claude/settings.json`:
 }
 ```
 
-### Tùy chọn D — Hybrid (Sonnet 5 mặc định, Fable khi cần)
-1. Cấu hình `.claude/settings.json` dùng `"model": "claude-sonnet-5"`
-2. Khi cần Fable (KHUNG-3 trade-off, `/adr`, `/su-co`), chạy:
-   ```bash
-   /model claude-fable-5
-   ```
+### Nâng riêng lên Opus/Fable lúc cần (không đổi file)
+```bash
+/model claude-opus-4-8   # hoặc claude-fable-5 cho ca kiến trúc khó nhất
+```
+Dùng khi đang ở KHUNG-3 (chọn công nghệ), `/adr`, `/su-co`, hay rà lỗi logic tinh vi — xong quay lại opusplan.
 
 ---
 
-## 4. Áp dụng cấu hình cho dự án của bạn
+## 4. Áp dụng cấu hình cho dự án (mới hoặc có sẵn)
 
-### Tất cả dự án (mới hoặc có sẵn)
-
-**Quá trình tự động:**
-
-1. Clone repo khung (hoặc đã ở trong repo khung):
-   ```bash
-   cd /đường-dẫn/tới/repo-khung
-   ```
-
-2. Copy khung sang dự án của bạn:
+1. Từ repo khung, copy sang dự án:
    ```bash
    bash copy-framework.sh /đường-dẫn/tới/dự-án
    ```
+   ✅ Script copy `.claude/settings.json` (opusplan) + hooks + agents thẳng vào dự án; các file lớp 2 khác vào `_framework-dropins/`.
 
-   ✅ Script tự động:
-   - Copy `.claude/settings.json` (Fable 5 / Opus 4.8 fallback) thẳng vào dự án
-   - Copy `.claude/hooks` và `.claude/agents`
-   - Copy các file cấu hình khác (eslint, prettier, etc.) vào `_framework-dropins/`
+2. Vào dự án, (tùy chọn) soát `_framework-dropins/`:
+   - Merge config khớp stack (eslint, prettier, playwright…), hoặc `rm -rf _framework-dropins/` nếu không cần.
 
-3. Vào dự án:
+3. Commit:
    ```bash
-   cd /đường-dẫn/tới/dự-án
+   git add .claude/ && git commit -m "chore: apply framework config (opusplan)"
    ```
 
-4. **(Tùy chọn)** Soát thư mục `_framework-dropins/`:
-   - Nếu dự án của bạn dùng các công cụ giống khung (eslint, prettier, playwright), hãy merge config từ đó
-   - Hoặc xóa nếu không cần:
-     ```bash
-     rm -rf _framework-dropins/
-     ```
-
-5. Commit tất cả thay đổi:
-   ```bash
-   git add .claude/ && git commit -m "chore: apply framework config (Fable 5 / Opus 4.8)"
-   ```
-
-6. Mở phiên Claude Code lần đầu → AI tự nạp `.claude/settings.json` và chạy khung với Fable 5 / Opus 4.8 🎉
+4. Mở phiên Claude Code → AI nạp `.claude/settings.json` và chạy khung ở chế độ opusplan 🎉
 
 ---
 
-## 5. Tuỳ chỉnh cấu hình cho dự án đặc thù
+## 5. Tuỳ chỉnh cho dự án đặc thù
 
-### Thêm permission tùy chỉnh
-Nếu dự án dùng công cụ khác (vd `make`, `docker`, `kubectl`):
-
+### Thêm permission (vd make/docker/kubectl)
 ```json
-{
-  "permissions": {
-    "allow": [
-      ...cũ...,
-      "Bash(make *)",
-      "Bash(docker *)",
-      "Bash(kubectl *)"
-    ]
-  }
-}
+{ "permissions": { "allow": [ "Bash(make *)", "Bash(docker *)", "Bash(kubectl *)" ] } }
 ```
 
-### Loại bỏ hook không cần
-Nếu không dùng pre-commit gate (vd dự án backend không cần auto-format):
-
+### Bỏ hook không cần
 ```json
-{
-  "hooks": {
-    "SessionStart": [...],
-    "Stop": [...]
-    // Bỏ "PreToolUse" và "PostToolUse" nếu không cần
-  }
-}
+{ "hooks": { "SessionStart": [...], "Stop": [...] } }
+// Bỏ PreToolUse/PostToolUse nếu dự án không cần cổng/auto-format
 ```
 
-### Thêm hook mới (tuỳ chọn)
-Xem `CLAUDE.md` mục "update-config" để thêm hook tùy chỉnh (vd chạy vitest tự động).
+Xem skill `update-config` (trong CLAUDE.md) để thêm hook tùy chỉnh.
 
 ---
 
@@ -198,82 +138,55 @@ Xem `CLAUDE.md` mục "update-config" để thêm hook tùy chỉnh (vd chạy v
 
 Khi mở phiên Claude Code lần đầu:
 
-✅ **Kiểm tra:**
-1. Dòng trạng thái Claude Code hiển thị **"Fable 5"** hoặc **"Opus 4.8"** (fallback)
-2. Phiên khởi động gọi hook `session-resume.sh` (xem PROGRESS.md)
-3. Có thông báo chế độ chạy (từ hook `session-guide.sh`) với model được cấu hình
-4. Mỗi lần Edit/Write, file tự format (hook `auto-format.sh`)
+✅ **Đúng khi:**
+1. Dòng trạng thái hiển thị **"opusplan"** (hoặc Sonnet/Haiku nếu fallback)
+2. Hook `session-resume.sh` chạy (đọc PROGRESS.md)
+3. Hook `session-guide.sh` in thông báo chế độ chạy
+4. Mỗi lần Edit/Write, file tự format (`auto-format.sh`)
 
-❌ **Nếu không thấy:**
-- Kiểm tra file `.claude/settings.json` có tồn tại không: `ls -la .claude/settings.json`
-- Kiểm tra model được cấu hình: `grep '"model"' .claude/settings.json`
-- Đóng/mở phiên Claude Code lại (reload cấu hình)
-- Nếu vẫn sai, kiểm tra `.claude/hooks/` có tồn tại không
+❌ **Nếu sai:**
+- `ls -la .claude/settings.json` — file có tồn tại?
+- `grep '"model"' .claude/settings.json` — model đúng chưa?
+- Đóng/mở lại phiên (reload cấu hình); kiểm tra `.claude/hooks/` có mặt
 
 ---
 
 ## 7. Q&A
 
-### Q: Tôi muốn dùng Sonnet 5 thay vì Fable 5, phải làm gì?
-**A:** Sửa `.claude/settings.json`:
-```bash
-jq '.model = "claude-sonnet-5"' .claude/settings.json > /tmp/settings.json && mv /tmp/settings.json .claude/settings.json
-```
-Hoặc mở file text, thay `"claude-fable-5"` → `"claude-sonnet-5"`.
+### Q: opusplan có phải là model không?
+**A:** Không — là **chế độ** để Claude Code tự phân vai Opus (plan) / Sonnet (code) / Haiku (subagent phụ). Đây là lý do nó tối ưu token: không dùng một model đắt cho mọi việc.
 
-### Q: Tôi có thể tạo nhiều file cấu hình cho nhiều dự án khác nhau không?
-**A:** Có! Tạo các file:
-- `.claude/settings-sonnet.json` — cho dự án nhỏ
-- `.claude/settings-opus.json` — cho dự án lớn
-- `.claude/settings.json` — file hiện tại (cái mà Claude Code nạp)
+### Q: Tại sao không để Fable 5 làm mặc định cho chắc?
+**A:** Vì đó là "dao mổ trâu thịt gà". Fable 5 tính $10/1M **mọi token** — kể cả đọc file, format, tìm kiếm (việc Haiku $1 làm được). Lãng phí ~60–70% mà đa số việc không cần tới sức mạnh đó. Nâng Fable **có chọn lọc** (`/model claude-fable-5`) đúng ca kiến trúc khó nhất mới đáng tiền.
 
-Sau đó copy cái cần: `cp .claude/settings-sonnet.json .claude/settings.json`
+### Q: Dự án nhỏ có nên dùng opusplan?
+**A:** Không bắt buộc. Script, landing, prototype (<5k LOC) → **Sonnet 5** đủ tốt và rẻ hơn. Đổi `"model": "claude-sonnet-5"`.
 
-### Q: File này có tương thích với mọi loại dự án không?
-**A:** **Có, nhưng...** 
-- ✅ Permissions tổng quát cho Node/Python/Go/Rust/Makefile
-- ✅ Hooks không phụ thuộc stack
-- ⚠️ Một vài hook (vd `auto-format`) cần `scripts/dev-task.sh` — nếu dự án không có, hook sẽ no-op (không lỗi)
-- Nếu dự án dùng công cụ độc lạ, thêm permissions tùy chỉnh (xem mục 5)
+### Q: File này có tương thích mọi loại dự án không?
+**A:** Có. Permissions phủ Node/Python/Go/Rust/Makefile; hooks không phụ thuộc stack. Hook cần `scripts/dev-task.sh`; thiếu thì no-op (không lỗi). Web / mobile / backend / desktop / CLI / data-ML / game / blockchain / monorepo đều chạy được.
 
-### Q: Cấu hình Fable 5 + Opus 4.8 có hỗ trợ các dự án mobile, desktop, backend không?
-**A:** **Có!** Đây là cấu hình **Claude Code chạy khung CLAUDE.md**, không giới hạn loại dự án.
-- ✅ Web (Next, Remix, Svelte, Astro, Vue)
-- ✅ Mobile (React Native, Flutter — qua CLI/backend)
-- ✅ Backend (Python FastAPI, Node Express, Go, Rust)
-- ✅ Desktop (Electron, Tauri)
-- ✅ CLI / SDK / Library
-- ✅ Data / ML / AI
-- ✅ Game, Blockchain, Monorepo
-- Nó áp dụng **quy trình CLAUDE.md** (9 giai đoạn, cổng, research-first) cho bất kỳ stack nào.
+### Q: Chi phí các model?
+**A:** Giá tham khảo (2026-07):
 
-### Q: Chi phí các model bao nhiêu?
-**A:** Giá hiện tại (2026-07, intro pricing):
-- **Sonnet 5:** $2 input / $10 output (intro) → $3/$15 (normal)
-- **Opus 4.8:** $5 input / $25 output
-- **Fable 5:** $10 input / $50 output
-- **Haiku 4.5:** $1 input / $5 output
-
-**So sánh (per 1M input token):**
-| Model | Giá | So với Sonnet 5 |
+| Model | Giá /1M (in/out) | So Sonnet 5 |
 |---|---|---|
-| Sonnet 5 | $3 | ✅ (baseline) |
-| Opus 4.8 | $5 | 1.67× đắt |
-| Fable 5 | $10 | 3.3× đắt |
-| Haiku 4.5 | $1 | 0.33× (rẻ) |
+| Haiku 4.5 | $1 / $5 | 0.33× (rẻ) |
+| Sonnet 5 | $3 / $15 | 1× (baseline) |
+| Opus 4.8 | $5 / $25 | 1.67× |
+| Fable 5 | $10 / $50 | 3.3× |
 
-**Mặc định Fable 5:** Bạn trả gấp ~3.3× Sonnet 5, nhưng được mạnh nhất (không bao giờ chất lượng kém).
+opusplan trộn 3 model đầu → **chi phí thực tế thường thấp hơn Opus thuần**, vì Opus chỉ dùng ở pha lập kế hoạch.
+
+### Q: Nhiều dự án nhiều cấu hình khác nhau — làm sao?
+**A:** Để nhiều file cạnh nhau rồi copy cái cần:
+- `.claude/settings-sonnet.json` (nhỏ) · `.claude/settings-shared-opusplan.json` (tầm trung+)
+- `cp .claude/settings-sonnet.json .claude/settings.json` khi muốn đổi.
 
 ---
 
 ## 8. Tiếp theo
 
-Sau khi áp dụng cấu hình:
-1. ✅ Commit file `.claude/settings.json` vào git
+1. ✅ Commit `.claude/settings.json` vào git
 2. ✅ Mở phiên Claude Code, mô tả dự án → AI tự chạy khung
-3. ✅ Đọc `AP-DUNG-vao-du-an-co-san.md` nếu dự án cũ (brownfield)
-4. ✅ Đọc `KHOI-TAO-du-an-moi.md` nếu dự án mới (greenfield)
-
----
-
-**Happy building! 🚀**
+3. ✅ Brownfield: đọc `AP-DUNG-vao-du-an-co-san.md` · Greenfield: đọc `KHOI-TAO-du-an-moi.md`
+4. ✅ Cân nhắc model theo quy mô: `CHON-MODEL-cho-du-an.md`

@@ -10,11 +10,10 @@
 - ✅ Cập nhật `copy-framework.sh` để copy cấu hình Opusplan vào `_framework-dropins/`
 - ✅ Cập nhật `copy-framework.ps1` tương tự cho Windows
 - ✅ Viết hướng dẫn chi tiết (`CONG-CU-OPUSPLAN-CHO-DU-AN.md`) về cách sử dụng & tuỳ chỉnh cấu hình
-- ✅ **Nâng cấp:** Dùng **Fable 5** (+ fallback Opus 4.8) làm mặc định
 - ✅ **Copy thẳng:** Cấu hình tự động copy vào `.claude/settings.json` (không cần chọn merge)
-- ✅ Commit (2 lần): 4ac7514, 01819b7
-- ✅ Push lên nhánh `claude/opusplan-shared-config-rm5ru6`
-- ✅ Tạo/update PR #19
+- ✅ **Chốt chiến lược tối ưu token:** giữ **opusplan** (Opus lập kế hoạch, Sonnet code, Haiku phụ)
+      — KHÔNG dùng Fable 5 thuần (đắt, "dao mổ trâu"); Fable/Opus chỉ nâng có chọn lọc lúc cần
+- ✅ Push lên nhánh `claude/opusplan-shared-config-rm5ru6`, PR #19
 
 ## Đang làm
 - (xong)

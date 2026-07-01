@@ -86,14 +86,14 @@ copy_if_absent ".env.example"
 
 # ── Cấu hình Claude Code: copy thẳng ──
 echo ""
-echo "[2/3] Cấu hình Claude Code (Fable 5 nếu có, fallback Opus 4.8):"
+echo "[2/3] Cấu hình Claude Code (opusplan — tối ưu token: Opus lập kế hoạch, Sonnet code, Haiku phụ):"
 mkdir -p "$TARGET/.claude"
 cp -R "$SRC/.claude/settings-shared-opusplan.json" "$TARGET/.claude/settings.json"
 cp -R "$SRC/.claude/hooks" "$TARGET/.claude/hooks" 2>/dev/null || true
 cp -R "$SRC/.claude/agents" "$TARGET/.claude/agents" 2>/dev/null || true
-echo "  → .claude/settings.json (Fable 5 / Opus 4.8 fallback)"
+echo "  → .claude/settings.json (opusplan; fallback Sonnet 5 → Haiku 4.5)"
 echo "  → .claude/hooks"
-echo "  → .claude/agents"
+echo "  → .claude/agents (subagent Haiku: tra-cuu, kiem-tra-phien-ban)"
 
 echo ""
 echo "[3/3] File cấu hình khác (Lớp 2 — KHÔNG đè; để bạn tự merge cái khớp stack):"
@@ -115,11 +115,13 @@ echo ""
 echo "[4/4] Xong. Tiếp theo trong dự án đích:"
 cat <<'NEXT'
 
-  1) Cấu hình Claude Code đã sẵn sàng: .claude/settings.json dùng Fable 5 (fallback Opus 4.8).
-     ✅ Nếu bạn muốn đổi model (vd Sonnet 5 để tiết kiệm), chỉnh field "model" trong .claude/settings.json.
+  1) Cấu hình Claude Code đã sẵn sàng: .claude/settings.json dùng opusplan (tối ưu token).
+     → Opus lập kế hoạch, Sonnet code, Haiku (subagent) việc phụ — chỉ trả giá Opus khi thực sự cần.
+     ✅ Dự án nhỏ muốn rẻ hơn nữa: đổi "model" thành "claude-sonnet-5".
+     ✅ Dự án rất phức tạp: nâng riêng lúc cần bằng /model claude-opus-4-8 (hoặc claude-fable-5).
 
   2) Mở phiên Claude Code NGAY TRONG dự án đích.
-     → AI tự đọc CLAUDE.md + .claude/settings.json (Fable 5 / Opus 4.8 sẵn).
+     → AI tự đọc CLAUDE.md + .claude/settings.json (opusplan sẵn sàng).
      → Chạy Bước 0 của docs/framework/AP-DUNG-vao-du-an-co-san.md
        (tự dò stack bằng cách đọc package.json/config — không cần bạn khai stack).
 
