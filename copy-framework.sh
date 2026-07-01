@@ -69,7 +69,7 @@ echo ""
 echo "[1/3] Tài liệu khung (Lớp 1 — dùng được ngay, mọi stack):"
 copy_into "docs/framework"
 copy_into "docs/ops"
-copy_into ".claude/commands"                   # slash commands của khung: /audit-toi-uu /tu-van /cong /su-co /adr /khoi-tao
+copy_into ".claude/commands"                   # slash commands của khung: /audit-toi-uu /audit-toan-dien /tu-van /cong /su-co /adr /khoi-tao
 copy_if_absent "docs/adr/0000-template.md"
 
 # ── File gốc dự án: chỉ copy nếu chưa có ──
