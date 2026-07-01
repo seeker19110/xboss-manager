@@ -24,12 +24,21 @@
 - ✅ **Quyết định giữ scaffold web** (Next.js+Supabase) làm hồ sơ mặc định — không tách/xóa.
 - ✅ PR #21 đã merge vào `main` (`main` = branch, 0/0).
 - ✅ **Codify quy trình PR → merge tự động** vào CLAUDE.md §8: sau khi tạo PR thì đăng ký theo dõi + đặt lịch 3 phút, CI xanh thì squash-merge vào `main`, luôn quay về `main`, **FIFO không nhảy cóc** (PR tạo trước merge trước).
+- ✅ **Thêm tính năng audit toàn diện** (`/audit-toan-dien`, khác `/audit-toi-uu` chỉ tối ưu mã nguồn):
+      - `docs/ops/audit-toan-dien-prompt.md` — playbook 11 nhóm (kiến trúc, bảo mật, chất lượng mã/
+        chống lỗi logic, test/coverage, hiệu năng, a11y/UI-UX, dependency, CI/CD/vận hành, tài liệu
+        đồng bộ, dữ liệu/migration, cấu hình & bí mật), quy trình 2 giai đoạn (quét → dừng chờ duyệt
+        → xử lý qua `/cong`).
+      - `.claude/commands/audit-toan-dien.md` — slash command, có bước bắt buộc hỏi người dùng
+        "quét lại từ đầu hay tiếp tục" dựa vào `docs/ops/AUDIT-TOAN-DIEN-TRANG-THAI.md` (file trạng
+        thái tạo tại dự án đích, cập nhật ngay sau mỗi nhóm để resume được qua nhiều phiên).
+      - Cập nhật `CLAUDE.md` §1 (TRIGGER mới), `copy-framework.sh`/`.ps1` (liệt kê lệnh mới khi copy khung).
 
 ## Đang làm
 - (xong)
 
 ## Tiếp theo
-- (chưa có — chờ yêu cầu mới)
+- Mở PR cho nhánh `claude/project-audit-feature-2jyw07`, theo dõi CI, merge khi xanh.
 
 ## Quyết định quan trọng (trỏ tới ADR nếu có)
 - Cấu hình Opusplan được thêm vào `_framework-dropins/` (an toàn, không đè cấu hình cũ)
