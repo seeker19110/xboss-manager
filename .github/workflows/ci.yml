@@ -7,6 +7,14 @@ on:
     branches: [main]
 
 jobs:
+  # Luôn chạy (không cần package.json) — bắt link gãy / tên file cũ sót lại trong tài liệu
+  # của chính repo khung, để không phải rà tay sau mỗi lần đổi tên file.
+  docs-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check-docs-consistency.sh
+
   quality:
     runs-on: ubuntu-latest
     steps:
