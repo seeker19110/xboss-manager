@@ -61,17 +61,43 @@ check_no_overwrite() {  # check_no_overwrite <mô tả> <target>
   fi
 }
 
+check_claude_config_not_overwritten() {   # check_claude_config_not_overwritten <mô tả> <target>
+  local label="$1" target="$2"
+  if grep -q "SENTINEL-KHONG-DUOC-DE" "$target/.claude/settings.json" 2>/dev/null; then
+    echo "  ok [$label]: .claude/settings.json sẵn có KHÔNG bị đè"
+  else
+    echo "  FAIL [$label]: .claude/settings.json sẵn có đã bị đè!"
+    fail=1
+  fi
+  [ -f "$target/.claude/settings.json.framework-new" ] \
+    && echo "  ok [$label]: bản khung để cạnh ở settings.json.framework-new" \
+    || { echo "  FAIL [$label]: thiếu settings.json.framework-new"; fail=1; }
+  if grep -q "SENTINEL-KHONG-DUOC-DE" "$target/.claude/hooks/my-hook.sh" 2>/dev/null; then
+    echo "  ok [$label]: .claude/hooks sẵn có KHÔNG bị đè"
+  else
+    echo "  FAIL [$label]: .claude/hooks sẵn có đã bị đè!"
+    fail=1
+  fi
+  [ -d "$target/.claude/hooks.framework-new" ] \
+    && echo "  ok [$label]: bản khung để cạnh ở hooks.framework-new" \
+    || { echo "  FAIL [$label]: thiếu hooks.framework-new"; fail=1; }
+}
+
 echo "== bash / đích trống =="
 targetA="$(new_target)"
 run_logged "bash / đích trống" bash "$REPO_ROOT/copy-framework.sh" "$targetA"
 check_structure "bash / đích trống" "$targetA"
 
 echo ""
-echo "== bash / đích đã có CLAUDE.md (không được đè) =="
+echo "== bash / đích đã có CLAUDE.md + .claude/settings.json + .claude/hooks (không được đè) =="
 targetB="$(new_target)"
 echo "SENTINEL-KHONG-DUOC-DE" > "$targetB/CLAUDE.md"
+mkdir -p "$targetB/.claude/hooks"
+echo '{"SENTINEL-KHONG-DUOC-DE": true}' > "$targetB/.claude/settings.json"
+echo "SENTINEL-KHONG-DUOC-DE" > "$targetB/.claude/hooks/my-hook.sh"
 run_logged "bash / đích có sẵn" bash "$REPO_ROOT/copy-framework.sh" "$targetB"
 check_no_overwrite "bash / đích có sẵn" "$targetB"
+check_claude_config_not_overwritten "bash / đích có sẵn" "$targetB"
 
 echo ""
 echo "== bash / chạy lại lần hai trên cùng đích =="
@@ -86,11 +112,15 @@ if command -v pwsh >/dev/null 2>&1; then
   check_structure "pwsh / đích trống" "$targetD"
 
   echo ""
-  echo "== pwsh / đích đã có CLAUDE.md (không được đè) =="
+  echo "== pwsh / đích đã có CLAUDE.md + .claude/settings.json + .claude/hooks (không được đè) =="
   targetE="$(new_target)"
   echo "SENTINEL-KHONG-DUOC-DE" > "$targetE/CLAUDE.md"
+  mkdir -p "$targetE/.claude/hooks"
+  echo '{"SENTINEL-KHONG-DUOC-DE": true}' > "$targetE/.claude/settings.json"
+  echo "SENTINEL-KHONG-DUOC-DE" > "$targetE/.claude/hooks/my-hook.sh"
   run_logged "pwsh / đích có sẵn" pwsh -NoProfile -File "$REPO_ROOT/copy-framework.ps1" "$targetE"
   check_no_overwrite "pwsh / đích có sẵn" "$targetE"
+  check_claude_config_not_overwritten "pwsh / đích có sẵn" "$targetE"
 else
   echo ""
   echo "  (bỏ qua kiểm thử .ps1 — máy này không có pwsh; CI ubuntu-latest có sẵn)"
