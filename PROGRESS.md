@@ -128,12 +128,25 @@
         tin hơn bản chỉ ghi "Bước 6 ở trên" của #26 — cả 2 đều sửa đúng cùng một tham chiếu mồ côi).
       - `PROGRESS.md`: hợp nhất nhật ký cả 2 nhánh, viết lại mục Đang làm/Tiếp theo cho khớp thực tế.
 
+- ✅ PR #27 (`claude/template-review-k4lpfy`) đã merge vào `main` (CI 3 job mới xanh).
+- ✅ **Xác minh opusplan đúng tài liệu nền (đợt 2026-07-02, nhánh `claude/opusplan-token-optimization-ihrkd6`):**
+      `settings.json` ≡ `settings-shared-opusplan.json` (diff trống); hooks/agents/scripts/copy-framework/
+      mọi chỗ nhắc opusplan đều khớp `models-and-automation.md`; đối chiếu nguồn sống docs chính thức
+      Claude Code — alias `opusplan` (Opus plan → Sonnet execution; API Anthropic: Opus 4.8/Sonnet 5),
+      `fallbackModel` dạng MẢNG, `effortLevel` đều chuẩn. **Không có drift — không sửa config.**
+- ✅ **Thêm §5 "Kỷ luật vận hành" vào `models-and-automation.md`** (tối ưu token thứ 3, theo yêu cầu người dùng):
+      plan MỘT LẦN cho cả khối việc (tránh re-plan lắt nhắt; ghi kết quả suy nghĩ ra PROGRESS/ADR làm
+      "cache chất lượng"), ngữ cảnh gọn (subagent gánh output dài; đóng mảng việc → `/gate` → commit →
+      phiên mới), checklist một phiên chuẩn, bảng 2 lỗi ngược nhau về plan mode. Đánh lại số mục cũ
+      §5–§8 → §6–§9 (tham chiếu ngoài chỉ trỏ §4 — không gãy; đã grep xác minh). Cập nhật mô tả file ở
+      CLAUDE.md §1 + `docs/framework/README.md`.
+
 ## Đang làm
-- (xong — chờ push lại + CI chạy lại cho nhánh `claude/template-review-k4lpfy` sau khi merge `main`)
+- (xong đợt §5 kỷ luật vận hành — chờ CI + merge PR của nhánh `claude/opusplan-token-optimization-ihrkd6`)
 
 ## Tiếp theo
-- Push nhánh đã merge, theo dõi CI (đặc biệt `framework-lint` + `docs-consistency` + `copy-framework-smoke`
-  chạy lần đầu cùng lúc), merge khi xanh (CLAUDE.md §8: quay về `main` sau merge).
+- Theo dõi CI của PR nhánh `claude/opusplan-token-optimization-ihrkd6`, merge khi xanh
+  (CLAUDE.md §8: squash, quay về `main` sau merge).
 - Case-study mới chạy phần D (hàng rào cục bộ). Phần Bước 6–8 (branch protection, Supabase, Vercel) cần
   tài khoản thật, chưa kiểm chứng được — nếu có dịp áp khung vào dự án thật, nên kiểm nốt phần này.
 - Dự án đã copy khung bản cũ → dùng bảng ánh xạ trong `docs/framework/README.md` khi cập nhật; chạy lại
@@ -151,9 +164,8 @@
 
 ## Bàn giao phiên (điền khi WIND-DOWN gần chạm limit 5h — để phiên sau "tiếp tục")
 > Chế độ tự động ghi ở đây trước khi dừng: việc vừa xong, việc DỞ ở đâu, bước kế tiếp cụ thể.
-- Lần cập nhật: 2026-07-02
-- Việc DỞ / bước tiếp theo: PR #27 (nhánh `claude/template-review-k4lpfy`) đã merge `main` (chứa PR #26,
-  merge song song lúc PR #27 đang mở) và giải xong 5 file xung đột (ci.yml, PROGRESS.md, copy-framework.sh/.ps1,
-  new-project-runbook.md) — cần chạy lại toàn bộ cổng cục bộ, commit merge, push, rồi theo dõi CI (3 job mới
-  chạy lần đầu cùng lúc: `framework-lint`, `docs-consistency`, `copy-framework-smoke`), merge khi xanh.
+- Lần cập nhật: 2026-07-02 (đợt 2 — sau khi PR #27 đã merge)
+- Việc DỞ / bước tiếp theo: nhánh `claude/opusplan-token-optimization-ihrkd6` thêm §5 "Kỷ luật vận hành"
+  vào `models-and-automation.md` (+ đồng bộ CLAUDE.md §1, framework/README.md, PROGRESS.md) — cần theo dõi
+  CI của PR, squash-merge khi xanh, quay về `main`.
 - Cần lưu ý khi chạy tiếp: TOÀN BỘ tên file/lệnh đã sang tiếng Anh — tra bản đồ tên cũ→mới ở `docs/framework/README.md`. Doc model/tự động: `docs/framework/models-and-automation.md`. Subagent Sonnet: `.claude/agents/executor.md`. Copy-framework giờ copy kèm `scripts/` + `PROGRESS.template.md` + KHÔNG đè `.claude/settings.json`/hooks/agents có sẵn (dùng `copy_if_absent`).
