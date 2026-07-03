@@ -141,12 +141,13 @@
       §5–§8 → §6–§9 (tham chiếu ngoài chỉ trỏ §4 — không gãy; đã grep xác minh). Cập nhật mô tả file ở
       CLAUDE.md §1 + `docs/framework/README.md`.
 
+- ✅ PR #29 (`claude/opusplan-token-optimization-ihrkd6`, §5 "Kỷ luật vận hành") đã merge vào `main`
+      (CI xanh, squash). Không còn PR nào đang mở trên repo (đã rà lại 2026-07-03).
+
 ## Đang làm
-- (xong đợt §5 kỷ luật vận hành — chờ CI + merge PR của nhánh `claude/opusplan-token-optimization-ihrkd6`)
+- (không có — mọi PR đang mở đã được rà và merge hết vào `main`)
 
 ## Tiếp theo
-- Theo dõi CI của PR nhánh `claude/opusplan-token-optimization-ihrkd6`, merge khi xanh
-  (CLAUDE.md §8: squash, quay về `main` sau merge).
 - Case-study mới chạy phần D (hàng rào cục bộ). Phần Bước 6–8 (branch protection, Supabase, Vercel) cần
   tài khoản thật, chưa kiểm chứng được — nếu có dịp áp khung vào dự án thật, nên kiểm nốt phần này.
 - Dự án đã copy khung bản cũ → dùng bảng ánh xạ trong `docs/framework/README.md` khi cập nhật; chạy lại
