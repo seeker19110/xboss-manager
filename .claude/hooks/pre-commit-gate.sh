@@ -36,10 +36,18 @@ if [ ! -x "$ROOT/scripts/dev-task.sh" ]; then
   exit 0
 fi
 
-if "$ROOT/scripts/dev-task.sh" gate; then
-  exit 0
-else
+if ! "$ROOT/scripts/dev-task.sh" gate; then
   echo "❌ Cổng trước commit ĐỎ (build/typecheck/lint/test). Sửa hết rồi commit lại (CLAUDE.md §5)." >&2
   echo "   Bỏ qua có chủ đích: thêm --no-verify vào lệnh git commit." >&2
   exit 2
 fi
+
+# Cổng máy móc (build/lint/test) chỉ bắt lỗi CÚ PHÁP, không bắt lỗi LOGIC/trùng lặp/hiệu năng —
+# đúng việc Sonnet làm tốt qua skill /code-review, /simplify. Nudge (không chặn) khi diff staged đủ lớn.
+lines_changed="$(git -C "$ROOT" diff --cached --numstat -- 2>/dev/null | awk '{a+=$1; d+=$2} END{print a+d+0}')"
+files_changed="$(git -C "$ROOT" diff --cached --name-only -- 2>/dev/null | grep -c . || true)"
+if [ "${lines_changed:-0}" -ge 80 ] || [ "${files_changed:-0}" -ge 5 ]; then
+  echo "💡 Diff staged khá lớn (${files_changed} file, ~${lines_changed} dòng đổi). Cổng máy móc chỉ bắt lỗi cú pháp — cân nhắc chạy /code-review (hoặc /simplify) trước khi commit để bắt lỗi logic/trùng lặp/hiệu năng." >&2
+fi
+
+exit 0

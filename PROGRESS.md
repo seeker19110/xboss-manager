@@ -143,6 +143,16 @@
 
 - ✅ PR #29 (`claude/opusplan-token-optimization-ihrkd6`, §5 "Kỷ luật vận hành") đã merge vào `main`
       (CI xanh, squash). Không còn PR nào đang mở trên repo (đã rà lại 2026-07-03).
+- ✅ **Rà lại opusplan sau khi người dùng hỏi "còn việc gì Sonnet làm tốt mà chưa vào hook":** xác nhận
+      `settings.json` không lệch bản shared, 3 subagent (executor/lookup/version-check) + 4 hook đã phủ
+      đủ vòng đời. Gap thật tìm được: cổng `pre-commit-gate.sh` chỉ chạy cổng MÁY MÓC (build/lint/test),
+      không bắt được lỗi logic/trùng lặp/hiệu năng — đúng việc Sonnet làm tốt qua `/code-review`,
+      `/simplify` nhưng chưa có gì nhắc chạy trước khi commit.
+      - **Vá:** thêm nudge (không chặn) vào `pre-commit-gate.sh` — khi diff staged ≥ 80 dòng đổi hoặc
+        ≥ 5 file, in gợi ý stderr đề nghị chạy `/code-review`/`/simplify` trước khi commit. Đã test tay:
+        diff nhỏ (2 file, hook change) → im lặng đúng như kỳ vọng; logic đếm dòng qua
+        `git diff --cached --numstat` đã kiểm chứng chạy được.
+      - Cập nhật bảng hook ở `docs/framework/models-and-automation.md` §6 khớp hành vi mới.
 
 ## Đang làm
 - (không có — mọi PR đang mở đã được rà và merge hết vào `main`)
