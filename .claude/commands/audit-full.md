@@ -4,6 +4,15 @@ description: Audit toàn diện mọi khía cạnh dự án — quét lại từ
 
 Đọc kỹ `docs/ops/comprehensive-audit-prompt.md` trong repo này và **làm theo đúng quy trình trong đó**.
 
+> 💡 **Model/effort cho ca này (tách rõ 2 việc khác thế mạnh):** quét từng nhóm ở GIAI ĐOẠN 1 (đọc
+> code, đối chiếu checklist, liệt kê bằng chứng) là việc **Sonnet đã đủ tốt** — giữ nguyên `opusplan`
+> + `/effort medium`, không cần nâng. Nhưng bước **tổng hợp BÁO CÁO cuối GIAI ĐOẠN 1** (cân đánh đổi
+> giữa 12 nhóm, xếp ưu tiên toàn cục — lý luận sâu, rủi ro cao nếu xếp sai) đúng việc Opus/Fable làm
+> tốt hơn hẳn Sonnet (`models-and-automation.md` §3 xếp `/audit-full` là "audit lớn" — nhóm cần nâng
+> model). Trước khi viết mục tổng hợp: nâng `/model claude-opus-4-8` (hoặc `claude-fable-5` nếu dự án
+> rất phức tạp/nhiều rủi ro) + `/effort xhigh`; xong quay lại `opusplan` + `/effort medium` cho
+> GIAI ĐOẠN 2 (xử lý — lại là việc Sonnet làm tốt).
+
 Ràng buộc bắt buộc (chi tiết & danh sách 12 nhóm nằm ở file trên — bám đúng `CLAUDE.md` §3–§4,
 `KHUNG-3` PHẦN C (hồ sơ theo loại dự án), `quality-supplements.md` Nhóm 1+2, `KHUNG-1` tiêu chuẩn
 từng giai đoạn):

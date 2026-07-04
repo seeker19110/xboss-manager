@@ -153,6 +153,18 @@
         diff nhỏ (2 file, hook change) → im lặng đúng như kỳ vọng; logic đếm dòng qua
         `git diff --cached --numstat` đã kiểm chứng chạy được.
       - Cập nhật bảng hook ở `docs/framework/models-and-automation.md` §6 khớp hành vi mới.
+- ✅ **Rà tiếp theo yêu cầu người dùng "việc Sonnet làm tốt để Sonnet làm, việc khác đẩy Opus/Fable":**
+      soát 8 slash command (`adr, audit-full, audit-optimize, auto, bootstrap, completion, consult,
+      gate, incident, ui-ux`) đối chiếu bảng năng lực §3 `models-and-automation.md`. 5/8 lệnh lý luận
+      sâu (`adr, auto, completion, consult, incident`) đã có dòng nhắc 💡 nâng model đúng pha. `gate`,
+      `ui-ux`, `bootstrap`, `audit-optimize` không cần nhắc (Sonnet ✅/✅✅ đã đủ theo bảng).
+      **Gap tìm được:** `audit-full.md` — bảng §3 xếp Sonnet chỉ ✅ cho *quét* nhưng mục "Đọc theo
+      nhóm" liệt `/audit-full` vào nhóm "audit lớn" cần nâng Opus cho *tổng hợp/xếp ưu tiên toàn cục*
+      — command file lại không có nhắc nào, 2 việc khác thế mạnh bị gộp chung một model.
+      - **Vá:** thêm dòng 💡 vào `audit-full.md` tách rõ 2 pha: GIAI ĐOẠN 1 quét từng nhóm (cơ học,
+        đối chiếu checklist) → Sonnet/`opusplan` giữ nguyên; bước tổng hợp báo cáo cuối GIAI ĐOẠN 1
+        (cân đánh đổi giữa 12 nhóm, xếp ưu tiên toàn cục) → nâng `/model claude-opus-4-8` (hoặc
+        `fable-5` nếu dự án rất phức tạp) + `/effort xhigh`, xong hạ lại cho GIAI ĐOẠN 2 (xử lý).
 
 ## Đang làm
 - (không có — mọi PR đang mở đã được rà và merge hết vào `main`)
