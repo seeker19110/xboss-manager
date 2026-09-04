@@ -1,8 +1,9 @@
 # ADR-0002: Kiến trúc & ngăn xếp tham chiếu cho AI Harness
 
-- **Trạng thái:** Đề xuất *(chờ người dùng chốt 8 câu hỏi ở SPEC-AIH-001 §13.3)*
+- **Trạng thái:** Đề xuất *(chờ người dùng chốt 12 câu hỏi ở SPEC-AI-100 §C2.4)*
 - **Ngày:** 2026-09-04
-- **Liên quan:** `docs/specs/AI-HARNESS-SPEC.md` (SPEC-AIH-001), KHUNG-3 (research-first), CLAUDE.md §3, §9
+- **Liên quan:** `docs/specs/AI-HARNESS-AND-COMPANY-SPEC.md` (SPEC-AI-100 — gộp SPEC-AIH-001 + SPEC-ASC-002 + SYNTH-001),
+  KHUNG-3 (research-first), CLAUDE.md §3, §9
 
 ## Bối cảnh
 
@@ -79,7 +80,7 @@ Ràng buộc:
 - Quy ước OTel GenAI còn đổi ⇒ phải duy trì một lớp adapter.
 
 **Việc cần làm tiếp**
-1. Người dùng chốt 8 câu hỏi ở SPEC-AIH-001 §13.3 (đặc biệt: use case đầu tiên, ngôn ngữ, phạm vi tuân thủ).
+1. Người dùng chốt 12 câu hỏi ở SPEC-AI-100 §C2.4 (đặc biệt: use case đầu tiên · có bao nhiêu NGƯỜI cho ba chốt · đã có đường cơ sở 8 tuần chưa · phạm vi tuân thủ).
 2. Mở tài liệu gốc OWASP Agentic Top 10 để xác nhận nguyên văn ASI01–ASI10 (phiên này bị egress proxy chặn).
 3. Xác minh lại phiên bản Python/PostgreSQL/Redis/OPA/sandbox bằng nguồn sống khi khởi tạo dự án.
 4. Chạy `/bootstrap` dựng nền theo mốc M0 sau khi ADR này được chấp nhận.

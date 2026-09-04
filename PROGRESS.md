@@ -203,14 +203,26 @@
       cổng tách máy-kiểm/người-kiểm, cổng nghiệm thu khách hàng, risk_tags, nhánh tích hợp, golden + eval replay,
       định tuyến hai chế độ chi phí, trực ban chỉ đọc).
 
+- ✅ **GỘP BA TÀI LIỆU → MỘT** (người dùng chốt): `docs/specs/AI-HARNESS-AND-COMPANY-SPEC.md`
+      (**SPEC-AI-100 v2.0**, ~2.040 dòng) thay thế và xoá `AI-HARNESS-SPEC.md` + `AI-SOFTWARE-COMPANY-SPEC.md`
+      + `LESSONS-FROM-CLAUDE-AGENTS.md`. Cấu trúc 3 phần: **A** harness (hạ tầng, A1–A11) · **B** công ty đa agent
+      (tổ chức, B1–B11) · **C** chứng cứ thực địa + rủi ro + phụ lục (C1–C5).
+      Khử trùng lặp thật, không dán ghép: gộp hai lộ trình (M0–M5 + Đ1–Đ5) thành **một lộ trình Đ0–Đ8**;
+      gộp hai danh sách câu hỏi (8+8) thành **12 câu** chia 4 nhóm; gộp hai sổ rủi ro thành **một bảng 12 dòng**;
+      hoà §15 (33 yêu cầu ASC-FR) vào đúng mục tự nhiên (skill → §B3.6, chủ ghi tri thức → §B3.5, ngữ cảnh theo
+      vai → §B4.0, kỷ luật dòng chảy → §B6.5, hai chế độ chi phí → §B8.4, trực ban → §B9.4, prompt-là-code → §C1.5);
+      **hợp nhất bảng cổng thành G0–G8 + G-esc**, mỗi cổng tách rõ *máy kiểm* vs *người tự kiểm*, thêm **G7 nghiệm
+      thu khách hàng**. Giải một mâu thuẫn giữa hai tài liệu cũ: quá hạn cổng — trước là "mặc định huỷ" (harness)
+      vs "không tự đi tiếp" (công ty) → chốt **không tự đi tiếp, không tự huỷ, chuyển leo thang cho người** (ASC-FR-14).
+      Cập nhật ADR-0002 trỏ sang tài liệu mới.
+
 ## Đang làm
-- Ba tài liệu (SPEC-AIH-001 v1.1 + SPEC-ASC-002 v1.1 + SYNTH-001) đã push lên nhánh
-  `claude/ai-harness-spec-research-4jmxqq`. **Đang chờ người dùng chốt câu hỏi ở SPEC-AIH-001 §13.3
-  và SPEC-ASC-002 §12.3** — đặc biệt: có bao nhiêu NGƯỜI cho 3 chốt (quyết định quy mô, §12.2)
-  và đã có đường cơ sở 8 tuần chưa (việc phải làm trước cả đợt Đ1).
+- Một tài liệu duy nhất (**SPEC-AI-100 v2.0**) đã push lên nhánh `claude/ai-harness-spec-research-4jmxqq`.
+  **Đang chờ người dùng chốt 12 câu hỏi ở §C2.4** — hai câu chặn thật: có bao nhiêu NGƯỜI cho ba chốt
+  (quyết định quy mô, công thức §C2.3) và đã có đường cơ sở 8 tuần chưa (đợt Đ0, trước cả Đ1).
 
 ## Tiếp theo
-- **Đề xuất ngược cho repo Claude-Agents** (SYNTH-001 §4, §6): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
+- **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
   vừa bị ADR-0021 khuếch đại vì reviewer thành lượt kiểm thử duy nhất); tách `summary` khỏi phần reviewer nhận;
   cập nhật phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
   nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
