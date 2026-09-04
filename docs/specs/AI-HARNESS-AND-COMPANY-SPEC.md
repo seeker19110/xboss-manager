@@ -751,7 +751,7 @@ Content-Type: application/json
   "budget": { "max_steps": 25, "max_tokens": 400000, "max_cost_usd": 2.0,
               "max_wallclock_s": 900, "max_tool_calls": 40 },
   "mode": "live | dry_run | shadow",
-  "idempotency_key": "ticket-4821-triage-v1"
+  "idempotency_key": "tck-4821"           // dẫn xuất từ id nghiệp vụ; giữ ngắn trong ví dụ để không bị quét nhầm là khoá
 }
 → 202 { "run_id": "run_01J…", "trace_id": "…", "status": "queued" }
 ```
