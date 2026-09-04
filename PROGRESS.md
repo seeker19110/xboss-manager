@@ -247,22 +247,26 @@
       time phải lấy từ API và tách CI khỏi người xem), đổi Đ0 thành **tiến cứu 4 tuần từ T0**, luồng A tuần 1 thêm
       việc **bật branch protection thật**. Câu chặn #2 ở §C2.4 đã có câu trả lời.
 
+- ✅ **PR #3 đã squash-merge vào `main`** (`132f141`) — gồm SPEC-AI-100 v2.0, ADR-0002, đường cơ sở Đ0, `.gitleaksignore`.
+      Vòng CI: `gitleaks` đỏ lúc mở vì quy tắc `generic-api-key` bắt VÍ DỤ `"idempotency_key"` trong tài liệu;
+      sửa bằng `.gitleaksignore` (2 fingerprint lịch sử, có lý do) + đổi ví dụ thành chuỗi 8 ký tự; tái hiện bằng đúng
+      gitleaks 8.24.3 của CI (2 vết → 0 vết) rồi mới push. Head mới 9/9 xanh, không review → merge, huỷ lịch, về `main`.
+
 ## Đang làm
-- **SPEC-AI-100 v2.0 + §B12 (hồ sơ n = 1)** đã push lên `claude/ai-harness-spec-research-4jmxqq`.
-  Câu chặn #1 (bao nhiêu người) **đã trả lời: 3 người** (nâng từ 1) → §B12.2; n = 1 giữ làm chế độ suy giảm §B12.3.
-  Câu chặn #2 **đã kiểm**: không có đường cơ sở hồi cứu (codebase 3 ngày tuổi) ⇒ đo tiến cứu 4 tuần từ T0 = 05/09
-  (`docs/ops/BASELINE-2026-09-04-claude-agents.md`). Việc tuần 1 luồng A giờ là **bật branch protection thật** trên
-  Claude-Agents — hiện PR merge được trước khi CI xong.
-  Việc kế tiếp theo lộ trình §B12.2.9: luồng B bắt đầu vai R4 viết test độc lập ngay tuần 1.
+- (không có — PR #3 đã merge, `main` = `132f141`, không còn PR nào mở)
 
 ## Tiếp theo
 - **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
   vừa bị ADR-0021 khuếch đại vì reviewer thành lượt kiểm thử duy nhất); tách `summary` khỏi phần reviewer nhận;
   cập nhật phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
   nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
-- **AI Harness — việc chặn:** người dùng trả lời §13.3 (use case đầu tiên · Python hay TS · triển khai
-  cloud/on-prem · đa tenant · phạm vi tuân thủ · mua hay tự xây observability · kênh HITL · quy mô năm đầu).
-  Có câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chấp nhận ADR-0002, rồi chạy `/bootstrap` cho mốc M0.
+- **Việc kế tiếp theo lộ trình SPEC-AI-100 §B12.2.9 (n = 3, tuần 1, ba luồng song song):**
+  luồng A — **bật branch protection thật** trên Claude-Agents (required check `quality`, cấm merge trước CI,
+  cấm commit thẳng) + mở đo tiến cứu 4 tuần từ T0 = 05/09; luồng B — bắt đầu **vai R4 viết test độc lập**;
+  luồng C — lịch trực luân phiên, G6 gộp lô, diễn tập kill switch.
+- **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
+  use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
+  Có đủ câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chuyển ADR-0002 sang "Đã chấp nhận".
 - **AI Harness — cần xác minh lại:** mở tài liệu gốc OWASP Agentic Top 10 2026 để xác nhận nguyên văn
   ASI01–ASI10 (phiên viết đặc tả bị egress proxy chặn `genai.owasp.org`, phải đối chiếu nguồn thứ cấp);
   xác minh phiên bản Python/PostgreSQL/Redis/OPA/sandbox bằng nguồn sống khi khởi tạo.
