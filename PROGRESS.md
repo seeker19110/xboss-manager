@@ -166,16 +166,37 @@
         (cân đánh đổi giữa 12 nhóm, xếp ưu tiên toàn cục) → nâng `/model claude-opus-4-8` (hoặc
         `fable-5` nếu dự án rất phức tạp) + `/effort xhigh`, xong hạ lại cho GIAI ĐOẠN 2 (xử lý).
 
+- ✅ **Đặc tả AI Harness (SPEC-AIH-001)** — `docs/specs/AI-HARNESS-SPEC.md` (~1030 dòng): đặc tả kỹ thuật
+      để xây một AI harness theo mô hình 7 cấu phần (Context · Tool · Orchestration · Evaluation · Security ·
+      Governance · AgentOps). Gồm: 12 nguyên tắc bất biến, kiến trúc 3 mặt phẳng + luồng một lượt, yêu cầu
+      chức năng có mã (`C1-FR-01`…`C7-FR-10`), mô hình dữ liệu Postgres, hợp đồng API + ánh xạ OTel GenAI,
+      ma trận truy vết ASI01–ASI10, chiến lược eval 3 tầng + red team, runbook vận hành, ngăn xếp tham chiếu
+      **đã xác minh phiên bản qua PyPI/npm ngày 2026-09-04**, lộ trình M0–M5.
+- ✅ **ADR-0002** (`docs/adr/0002-ai-harness-architecture.md`, trạng thái *Đề xuất*): chốt 7 quyết định kiến
+      trúc cốt lõi (vòng lặp ngoài xác định · event sourcing append-only · Tool Gateway là điểm nghẽn duy nhất ·
+      điều phối 2 tầng Temporal+LangGraph · ngăn xếp · định tuyến model · không-eval-không-deploy) + 4 phương
+      án đã cân nhắc và lý do loại.
+
 ## Đang làm
-- (không có — mọi PR đang mở đã được rà và merge hết vào `main`)
+- Đặc tả AI Harness đã viết xong và push lên nhánh `claude/ai-harness-spec-research-4jmxqq`.
+  **Đang chờ người dùng chốt 8 câu hỏi ở SPEC-AIH-001 §13.3** trước khi chuyển ADR-0002 sang "Đã chấp nhận".
 
 ## Tiếp theo
+- **AI Harness — việc chặn:** người dùng trả lời §13.3 (use case đầu tiên · Python hay TS · triển khai
+  cloud/on-prem · đa tenant · phạm vi tuân thủ · mua hay tự xây observability · kênh HITL · quy mô năm đầu).
+  Có câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chấp nhận ADR-0002, rồi chạy `/bootstrap` cho mốc M0.
+- **AI Harness — cần xác minh lại:** mở tài liệu gốc OWASP Agentic Top 10 2026 để xác nhận nguyên văn
+  ASI01–ASI10 (phiên viết đặc tả bị egress proxy chặn `genai.owasp.org`, phải đối chiếu nguồn thứ cấp);
+  xác minh phiên bản Python/PostgreSQL/Redis/OPA/sandbox bằng nguồn sống khi khởi tạo.
 - Case-study mới chạy phần D (hàng rào cục bộ). Phần Bước 6–8 (branch protection, Supabase, Vercel) cần
   tài khoản thật, chưa kiểm chứng được — nếu có dịp áp khung vào dự án thật, nên kiểm nốt phần này.
 - Dự án đã copy khung bản cũ → dùng bảng ánh xạ trong `docs/framework/README.md` khi cập nhật; chạy lại
   `copy-framework.sh` bản mới để nhận `scripts/` + hook hoạt động thật + fix không-đè-cấu-hình-có-sẵn.
 
 ## Quyết định quan trọng (trỏ tới ADR nếu có)
+- **ADR-0002 (Đề xuất):** kiến trúc AI harness — vòng lặp ngoài xác định do harness sở hữu, event sourcing
+  append-only làm nguồn sự thật duy nhất, Tool Gateway là điểm nghẽn duy nhất cho mọi tác động ra ngoài.
+  Nguyên tắc nền: *prompt không phải cơ chế bảo mật*.
 - Cấu hình Opusplan được thêm vào `_framework-dropins/` (an toàn, không đè cấu hình cũ)
 - `.claude/` (hooks + agents) cũng được copy vào `_framework-dropins/` để dự án cũ tự merge nếu cần
 - **opusplan là điểm ngọt, không đổi**; tối ưu token thêm bằng CHIA VIỆC (subagent) chứ không "route theo độ khó"
