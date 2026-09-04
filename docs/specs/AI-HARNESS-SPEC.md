@@ -6,6 +6,8 @@
 > có nghiên cứu đối chiếu nguồn sống ngày 2026-09-04 (xem §14 Nguồn tham khảo).
 > **Cách đọc:** §1–§3 cho người quyết định; §4–§6 cho người xây; §7–§10 cho người vận hành;
 > §11–§13 cho người lập kế hoạch. Mỗi yêu cầu có mã (vd `C2-FR-03`) để trích dẫn trong issue/PR/test.
+> **Tài liệu liên quan:** `docs/specs/AI-SOFTWARE-COMPANY-SPEC.md` (SPEC-ASC-002) — hệ thống đa agent
+> đóng vai một công ty phần mềm, chạy trên chính harness này.
 
 **Quy ước mức độ ràng buộc (theo RFC 2119):**
 | Từ khoá | Nghĩa |

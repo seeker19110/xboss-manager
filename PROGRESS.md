@@ -177,9 +177,22 @@
       điều phối 2 tầng Temporal+LangGraph · ngăn xếp · định tuyến model · không-eval-không-deploy) + 4 phương
       án đã cân nhắc và lý do loại.
 
+- ✅ **Đặc tả Công ty lập trình AI (SPEC-ASC-002)** — `docs/specs/AI-SOFTWARE-COMPANY-SPEC.md` (~725 dòng):
+      hệ thống đa agent đóng vai một công ty phần mềm, chạy trên harness SPEC-AIH-001. Trục thiết kế:
+      **nút thắt là năng lực xác minh, không phải năng lực sinh code** (dữ liệu DORA 2025–2026: throughput
+      +2–18% nhưng sự cố/PR +243%, PR agent chờ review lâu gấp 5.3×). Gồm: 7 luật bất biến (người viết ≠
+      người duyệt · test sinh từ spec không sinh từ diff · reviewer chỉ đọc diff+spec · WIP ≤ năng lực xác
+      minh · vai không bắt được lỗi thì xoá · không họp giữa agent · người giữ 3 chốt), máy trạng thái
+      WorkItem + 3 làn, 10 vai (R0–R9) mỗi vai gắn một lớp lỗi, ma trận phân quyền thực thi ở Tool Gateway,
+      6 hợp đồng artifact, 8 cổng G0–G7, 4 vòng học của trí nhớ tổ chức, ước tính chi phí/work item
+      (~$6.1, xác minh chiếm ~40%), bộ chỉ số + chỉ số CẤM dùng làm KPI, 11 chống chỉ định,
+      mức tự chủ L0–L4 có điều kiện vào đo được, công thức định cỡ theo số NGƯỜI.
+
 ## Đang làm
-- Đặc tả AI Harness đã viết xong và push lên nhánh `claude/ai-harness-spec-research-4jmxqq`.
-  **Đang chờ người dùng chốt 8 câu hỏi ở SPEC-AIH-001 §13.3** trước khi chuyển ADR-0002 sang "Đã chấp nhận".
+- Hai đặc tả (SPEC-AIH-001 harness + SPEC-ASC-002 công ty đa agent) đã push lên nhánh
+  `claude/ai-harness-spec-research-4jmxqq`. **Đang chờ người dùng chốt câu hỏi ở SPEC-AIH-001 §13.3
+  và SPEC-ASC-002 §12.3** — đặc biệt: có bao nhiêu NGƯỜI cho 3 chốt (quyết định quy mô, §12.2)
+  và đã có đường cơ sở 8 tuần chưa (việc phải làm trước cả đợt Đ1).
 
 ## Tiếp theo
 - **AI Harness — việc chặn:** người dùng trả lời §13.3 (use case đầu tiên · Python hay TS · triển khai
