@@ -1723,11 +1723,11 @@ Không "bật công ty AI" trong một lần. Mỗi mức có **điều kiện v
 |---|---|---|---|
 | **L0 — Trợ lý** | Đề xuất spec/plan/diff dưới dạng bản nháp | Mọi thứ | Đã có đường cơ sở 8 tuần (§B9.3) + harness M0–M1 xong |
 | **L1 — Sinh PR** | R1→R5 chạy, mở PR kèm test và báo cáo review | Người review và merge **mọi** PR | `first_pass_gate_rate` ≥ 70% trong 4 tuần · `escaped_defect_rate` ≤ đường cơ sở |
-| **L2 — Tự chủ làn nhanh** | Tự merge **làn nhanh** khi mọi cổng xanh | Duyệt spec làn chuẩn · review mẫu ≥ 10% · mọi việc làn kiến trúc | **200 lần merge liên tiếp** ở làn nhanh không có lỗi lọt mức nghiêm trọng · vi phạm phân tách đặc quyền = 0 · *(đội một người: 60 lần — xem §B12.5)* |
+| **L2 — Tự chủ làn nhanh** | Tự merge **làn nhanh** khi mọi cổng xanh | Duyệt spec làn chuẩn · review mẫu ≥ 10% · mọi việc làn kiến trúc | **200 lần merge liên tiếp** ở làn nhanh không có lỗi lọt mức nghiêm trọng · vi phạm phân tách đặc quyền = 0 · *(đội một người: 60 lần — xem §B12.3.5)* |
 | **L3 — Tự chủ làn chuẩn** | Chạy trọn tính năng làn chuẩn | Chốt G1 (spec) · chốt G6 với thay đổi nhạy cảm · review mẫu | 8 tuần ở L2 với `change_failure_rate` ≤ đường cơ sở · `human_intervention_rate` ≤ 15% |
 | **L4 — Tự chủ trong hàng rào** | Toàn bộ làn nhanh + chuẩn, tự phát hành theo canary | Chốt spec · giám sát · kill switch · **làn kiến trúc vẫn luôn có người** | Chỉ áp dụng cho hệ thống rủi ro thấp; cần phê duyệt quản trị (§A4.6) |
 
-**Với `n = 1`:** ngưỡng và khuyến nghị điều chỉnh ở §B12.5 — đặc biệt: **không lên L3** trong 6 tháng đầu.
+**Theo quy mô đội:** ngưỡng chốt cho `n = 3` ở §B12.2.6; chế độ suy giảm `n = 1` ở §B12.3.5 (không lên L3 trong 6 tháng đầu).
 
 **Đường lùi bắt buộc:** bất kỳ mức nào, nếu 2 tuần liên tiếp `escaped_defect_rate` xấu hơn đường cơ sở
 hoặc có 1 vi phạm phân tách đặc quyền ⇒ **tự động hạ một mức**, không cần họp bàn.
@@ -1754,13 +1754,156 @@ R4 đến trước R6/R7 vì nó bảo vệ mạnh nhất trên mỗi đồng b�
 
 ---
 
-## B12. Hồ sơ **một người** (n = 1)
+## B12. Hồ sơ theo quy mô đội (n = số người ở các chốt)
 
-> Người dùng đã chốt: **có đúng một người** cho ba chốt L7. Toàn bộ Phần B ở trên viết cho một đội;
-> mục này là **cấu hình chính thức khi đội chỉ có một người** — nói rõ cái gì giữ, cái gì tắt, số nào thay đổi.
-> Không phải bản rút gọn cho vui: các con số dưới đây suy ra từ công thức §C2.3 với `n = 1`.
+> Toàn bộ Phần B ở trên viết cho "một đội". Mục này chốt các con số theo **n** — số người thật sự
+> ngồi ở ba chốt L7 (duyệt đặc tả · duyệt kiến trúc · thao tác production).
+> **Người dùng đã chốt cho dự án này: `n = 3`** (§B12.2). Hồ sơ `n = 1` (§B12.3) giữ lại làm
+> **chế độ suy giảm** — đội ba người rơi về trạng thái đó mỗi khi hai người vắng.
 
-### B12.1 Ba điều đổi ngay khi n = 1
+### B12.1 Chọn nhanh theo n
+
+| | `n = 1` | **`n = 3` (chốt)** | `n ≥ 6` |
+|---|---|---|---|
+| Four-eyes **người ↔ người** | ✗ bất khả thi | ✓ | ✓, tách nhóm duyệt theo miền |
+| **Nút thắt** | Rà tay mẫu | **Duyệt đặc tả (G1)** | Phối hợp — cần R0 mạnh + hàng đợi theo miền |
+| WIP khởi điểm → trần | 2 → 3 | **3 → 6** | 2/người → trần theo miền |
+| Rà tay mẫu | ≥ 3 PR/tuần hoặc 20% | **10%, sàn ≥ 4 PR/tuần** | 10% |
+| L1 → L2 | 60 lần merge sạch | **200 lần** (≈ 6 tuần ở nhịp này) | 200 lần |
+| L3 | ✗ trong 6 tháng đầu | ✓ sau 8 tuần L2 | ✓ |
+| R0 điều phối | Thay bằng code | **Bật** | Bật, nhiều instance theo miền |
+| Xem | §B12.3 | §B12.2 | Ngoài phạm vi tài liệu này |
+
+### B12.2 Cấu hình chốt hiện tại — `n = 3`
+
+#### B12.2.1 Bốn điều đổi so với một người
+
+1. **Four-eyes người ↔ người khả thi trở lại** — và vì thế **bắt buộc**. ASC-FR-13 lấy lại nghĩa đầy đủ:
+   không chỉ *agent tạo ≠ người duyệt*, mà **người khởi tạo ≠ người duyệt** ở mọi cổng người (ASC-FR-39).
+2. **Nút thắt dời.** Với `n = 1` nút thắt là rà tay mẫu. Với `n = 3`, rà tay trở nên rẻ (một người
+   làm 1–2 PR/ngày là đủ 10%) và nút thắt dời sang **G1 — duyệt đặc tả**, vì G1 là 100% việc làn chuẩn,
+   không phải mẫu. Hàng đợi G1 dồn là **dấu hiệu R1 viết đặc tả chưa đủ chặt để duyệt trong 15 phút**,
+   không phải dấu hiệu người duyệt chậm.
+3. **Rủi ro mới xuất hiện: khuếch tán trách nhiệm.** "Ai cũng tưởng người kia đã duyệt." Với một người
+   không có chuyện này; với ba người nó là chuyện hằng ngày nếu hàng đợi là "của đội" (ASC-FR-38).
+4. **Rủi ro cũ không biến mất.** Duyệt bừa (§B12.2.7) vẫn xảy ra ở từng người — ba người có thể cùng
+   bấm bừa. Ba yêu cầu ASC-FR-35/36/37 giữ nguyên.
+
+#### B12.2.2 Phân vai người và lịch
+
+| Người | Vai | Cổng sở hữu | Cố định hay luân phiên |
+|---|---|---|---|
+| **A** | Chủ sản phẩm | **G1** (mọi việc làn chuẩn) · đại diện công ty ở G7 nếu có khách | Cố định theo quý |
+| **B** | Tech lead | **G2**/ADR · rà tay mẫu · **G-esc** | Cố định theo quý |
+| **C** | Người trực | **G6** phát hành (gộp lô) · sự cố · đọc báo cáo G8 | **Luân phiên hằng tuần** giữa ba người |
+
+Vì sao C luân phiên còn A, B cố định: trực là việc gây mòn; đặc tả và kiến trúc cần trí nhớ liên tục.
+Đổi vai phải **ghi vào hệ thống** (ASC-FR-40) — không thì ASC-FR-39 không kiểm được ai là ai.
+
+> **Với đội ba người, cả ba thường cũng đang code.** Điều đó không phá thiết kế, nhưng tạo ra một ca
+> ASC-FR-39 phải bắt được: người A vừa giao việc, vừa muốn duyệt đặc tả của chính việc đó. Khi đó B duyệt.
+
+#### B12.2.3 Định cỡ
+
+Cơ sở tính như §B12.3.2: G1 ≈ 15 phút/việc · rà tay ≈ 25 phút/PR · G6 gộp lô ≈ 10 phút · dự phòng 20 phút/người/ngày.
+
+| Thời gian **mỗi người**/ngày cho các chốt | 60 phút | **120 phút** | 180 phút |
+|---|---|---|---|
+| Việc làn chuẩn hoàn thành / ngày | 3–4 | **6–7** | 9–10 |
+| WIP đồng thời tối đa | 4 | **6** | 9 |
+| Rà tay mẫu / tuần | ≥ 4 PR (sàn) | 10% ≈ 4 PR | 15% ≈ 7 PR |
+| Duyệt phát hành | 1 lô/ngày | 1–2 lô/ngày | 2–3 lô/ngày |
+| Việc làn kiến trúc | ≤ 2/tuần | ≤ 3/tuần | ≤ 5/tuần |
+
+Cách ra con số ở cột 120 phút: **A** (120 − 20 dự phòng) / 15 ≈ **6–7 duyệt đặc tả/ngày → đây là trần**.
+**B** 1–2 rà tay (25–50') + ADR khi có (30') + dự phòng. **C** 2 lô phát hành (20') + dự phòng sự cố (40')
++ gánh thêm 1–2 rà tay khi rảnh. Ba người không cộng tuyến tính: thông lượng bị chặn bởi A, không bởi tổng.
+
+**Quy tắc khởi động:** WIP = **3** (mỗi người một việc đang chờ mình). Tăng lên 6 khi hàng đợi duyệt
+**rỗng vào cuối ngày, 5 ngày làm việc liên tiếp**. Hàng đợi G1 dồn hai ngày liên tiếp ⇒ **không tăng agent
+lập trình** — xem lại R1 (luật L4 áp cho nút thắt mới).
+
+#### B12.2.4 Vai agent bật/tắt
+
+| Vai | `n = 3` | Ghi chú |
+|---|---|---|
+| R3 · R4 · R5 · R7 | ✅ Bật | Như mọi cấu hình. **R4 vẫn không được tắt** — có ba người không thay được một vai viết test độc lập với vai viết code |
+| R1 Phân tích | ✅ Bật, **đầu tư mạnh nhất** | Vì G1 là nút thắt: SpecDoc phải đủ chặt để A duyệt ≤ 15 phút. Đo `g1_review_time_p50` |
+| **R0 Điều phối** | ✅ **Bật lại** | 6 việc song song, 3 người, hàng đợi phải gán đích danh — đây là việc của R0 (ASC-FR-38) |
+| R2 Kiến trúc | ✅ Bật cho việc có ảnh hưởng chéo | Không chỉ làn kiến trúc như ở `n = 1` |
+| R6 Bảo mật | ⚠️ Theo `risk_tags` | Không đổi |
+| R8 Vận hành | ✅ Bật | Người C đọc đầu ra hằng ngày |
+| R9 Trí nhớ | ⚠️ 2 lần/tuần | Nhịp việc gấp đôi nên vòng học cũng gấp đôi |
+
+#### B12.2.5 Cổng
+
+| Cổng | `n = 3` |
+|---|---|
+| G0 | 🤖 Tự động, R0 gán người cho mọi mục chờ người |
+| **G1** | 👤 **A** — nếu A là người khởi tạo việc thì **B** duyệt (ASC-FR-39) |
+| G2 / ADR | 👤 **B** |
+| G3a · G3b · G4 · G5 | 🤖 Máy |
+| **G6** | 👤 **C**, gộp lô — và **C ≠ người tạo release** (four-eyes thật) |
+| G7 | 👤 Nếu có khách: A đại diện công ty, **chữ ký là của khách** (ASC-FR-17) |
+| G8 | 🤖 + C đọc báo cáo ngày |
+| G-esc | 👤 **B** |
+
+#### B12.2.6 Ngưỡng
+
+| Ngưỡng | `n = 3` | So với `n = 1` |
+|---|---|---|
+| Rà tay mẫu | **10%**, sàn tuyệt đối **≥ 4 PR/tuần** | Về mức chuẩn của đội; giữ sàn để tháng vắng việc vẫn có hiệu chuẩn |
+| L1 → L2 | **200 lần merge** liên tiếp sạch ở làn nhanh | Khôi phục ngưỡng gốc — ở nhịp ~35 việc/tuần chỉ mất ~6 tuần, không cần hạ |
+| L2 → L3 | ✓ khả thi sau **8 tuần** ở L2 với điều kiện gốc (§B11) | Ở `n = 1` là không khuyến nghị; ở `n = 3` có người bắt được lúc một người nhìn nhầm |
+| `human_intervention_rate` ≤ 15% | ✓ dùng lại được làm cổng | Với 3 người nó đo hệ thống, không đo một người bận hay rảnh |
+| ASC-FR-37 (quá 48h tự hạ WIP) | ✓ giữ, áp **theo từng người** | Hàng đợi của một người dồn thì hạ WIP giao cho người đó, không hạ toàn cục |
+
+#### B12.2.7 Rủi ro đặc thù của ba người và yêu cầu kèm theo
+
+| Mã | Yêu cầu | Mức |
+|---|---|---|
+| ASC-FR-35 | Ghi **thời gian từ lúc mở màn duyệt tới lúc bấm** cho mọi cổng người. Cảnh báo khi `p50` < **90 giây** ở G1 hoặc < **3 phút** ở rà tay mẫu — cổng đã thành nghi thức. | BẮT BUỘC |
+| ASC-FR-36 | Màn duyệt **hiển thị diff và checklist trước**; nút quyết định **chỉ bật sau khi đã cuộn hết** phần bắt buộc. Không có nút "duyệt tất cả". | BẮT BUỘC |
+| ASC-FR-37 | Cổng quá hạn **không tự đi tiếp, không tự huỷ** (ASC-FR-14). Quá **48 giờ** ⇒ hệ thống **tự hạ WIP giao cho người đó xuống 1** và báo B. | BẮT BUỘC |
+| ASC-FR-38 | Mọi mục chờ người được **gán đích danh một người** kèm hạn; **không tồn tại hàng đợi "của đội"**. Chưa ai nhận sau **4 giờ** ⇒ R0 gán theo lịch trực. | BẮT BUỘC |
+| ASC-FR-39 | **Không tự duyệt việc mình khởi tạo**: người giao việc/viết yêu cầu không duyệt G1 của việc đó; người tạo release không duyệt G6 của release đó. Hệ thống **từ chối bằng code** — mở rộng ASC-FR-13 sang tầng người. | BẮT BUỘC |
+| ASC-FR-40 | Lịch trực và mọi lần **đổi vai người** được ghi vào hệ thống; ASC-FR-39 đối chiếu với lịch này, không đối chiếu với lời khai. | BẮT BUỘC |
+
+> **Một rủi ro không có mã yêu cầu vì không đo bằng máy được:** "duyệt chéo hình thức" — A duyệt của B,
+> B duyệt của A theo lệ, cả hai đều lướt. ASC-FR-35 bắt được triệu chứng (thời gian duyệt ngắn bất thường),
+> nhưng thuốc là **rà tay mẫu do người thứ ba** làm, và luân phiên C là cách có người thứ ba luôn tồn tại.
+
+#### B12.2.8 Chi phí
+
+Ở nhịp ~35 việc làn chuẩn/tuần × ~$6/việc (§B8.1): **~$210/tuần ≈ $900/tháng** nếu mua token qua API.
+Chế độ gói đăng ký (ASC-FR-29b) vẫn là mặc định khuyến nghị — và với ba người, **ba tài khoản xoay vòng**
+làm chế độ này hợp lý hơn hẳn so với một người: gói này hết hạn mức thì lượt đi gói kế, ít khi cả ba
+cùng cạn.
+
+#### B12.2.9 Lộ trình 8 tuần — ba luồng song song, **vẫn không xây Phần A từ đầu**
+
+Khuyến nghị ở §B12.3.9 giữ nguyên với ba người: dùng triển khai đã có (§C1) làm Phần A. Cái đổi là
+ba việc có thể chạy song song thay vì nối tiếp.
+
+| Tuần | **Luồng A** (chủ sản phẩm) | **Luồng B** (tech lead) | **Luồng C** (trực) |
+|---|---|---|---|
+| **1** | Đ0: chốt 4 số đường cơ sở (§B12.3.8) · khuôn `SpecDoc` cùng R1 | Bắt đầu **vai R4 độc lập** (§C1.2 mục 1) | Lịch trực luân phiên · G6 gộp lô · diễn tập kill switch |
+| **2–3** | Vận hành G1, đo `g1_review_time_p50`; sửa khuôn SpecDoc nếu > 15' | Xong R4: vai lập trình **mất quyền ghi** thư mục test | Bật R8 cảnh báo tối thiểu; nối G8 với báo cáo ngày |
+| **4** | — | Chống duyệt bừa: ASC-FR-35/36/37 + gán đích danh ASC-FR-38/39/40 | Diễn tập rollback ≤ 5 phút |
+| **5** | Rà lại `risk_tags` thực tế 4 tuần: có nới/siết? | Tách phần biện hộ khỏi thứ R5 nhận (§C1.2 mục 2) | Đối soát chi phí tháng đầu (ASC-FR-32) |
+| **6** | — | Nâng coverage thành phần giữ thông tin xác thực (§C1.3 mục 3) | — |
+| **7–8** | Chạy thật ở **L1**, WIP 3 → 6 nếu đủ điều kiện | Rà tay mẫu 10%, hiệu chuẩn κ với R5 | Đo lại 4 số so đường cơ sở |
+
+**Cổng ra tuần 8:** so đường cơ sở. `escaped_defect_rate` không tốt hơn ⇒ **không lên L2**, sửa cái đang hỏng trước.
+Với ba người, cám dỗ lớn nhất là *"đã có người duyệt rồi, lên L2 thôi"* — nhưng ba người duyệt vội vẫn là duyệt vội.
+
+### B12.3 Chế độ suy giảm — khi chỉ còn **một người** (`n = 1`)
+
+> Đội ba người rơi về trạng thái này khi hai người vắng (nghỉ phép, ốm, giai đoạn khởi động).
+> Khi đó **toàn bộ mục này thay thế §B12.2** cho tới khi đủ người trở lại — không "cố chạy như ba người".
+> Chuyển chế độ phải **ghi vào hệ thống** (ASC-FR-40) để ngưỡng và cổng tự đổi theo.
+
+#### B12.3.1 Ba điều đổi ngay khi n = 1
 
 1. **Ba vai người gộp làm một.** Chủ sản phẩm = Tech lead = người trực sự cố = bạn.
    Hệ quả: **four-eyes giữa hai người là bất khả thi** — nó chỉ còn tồn tại ở dạng
@@ -1769,9 +1912,9 @@ R4 đến trước R6/R7 vì nó bảo vệ mạnh nhất trên mỗi đồng b�
 2. **Bạn là trần thông lượng của cả hệ thống**, không phải số agent, không phải ngân sách token.
    Mọi thứ bên dưới chỉ là cách tiêu số phút của bạn cho khôn.
 3. **Rủi ro số một đổi.** Với đội, rủi ro lớn nhất là chất lượng rà soát trôi. Với một người, rủi ro lớn
-   nhất là **bạn duyệt bừa** — hàng đợi dồn, bạn bấm approve mà không mở diff. Xem §B12.6.
+   nhất là **bạn duyệt bừa** — hàng đợi dồn, bạn bấm approve mà không mở diff. Xem §B12.3.6.
 
-### B12.2 Định cỡ theo thời gian bạn thật sự bỏ ra
+#### B12.3.2 Định cỡ theo thời gian bạn thật sự bỏ ra
 
 Tham số duy nhất cần bạn điền: **mỗi ngày bạn dành bao nhiêu phút cho các chốt** (không tính thời gian
 bạn tự code). Cơ sở tính: G1 ≈ 15 phút/việc · rà tay một PR ≈ 25 phút · G6 gộp lô ≈ 10 phút ·
@@ -1793,7 +1936,7 @@ Hàng đợi dồn hai ngày liên tiếp ⇒ **hạ WIP xuống 1** và không 
 > khi bạn là cả hàng đợi review, một hàng đợi dồn nghĩa là hệ thống đang sản xuất nhanh hơn khả năng
 > tin được nó — đúng cái bẫy ở §B1.1.
 
-### B12.3 Vai nào bật, vai nào tắt
+#### B12.3.3 Vai nào bật, vai nào tắt
 
 | Vai | n = 1 | Lý do |
 |---|---|---|
@@ -1811,7 +1954,7 @@ Hàng đợi dồn hai ngày liên tiếp ⇒ **hạ WIP xuống 1** và không 
 **Đọc lại luật L5 ở đây:** vai nào không bắt được lớp lỗi đo được thì xoá. Với `n = 1` ngưỡng còn khắt khe
 hơn — mỗi vai bật thêm là thêm token, thêm độ trễ, và thêm một hàng đợi bạn phải trông.
 
-### B12.4 Cổng nào giữ, cổng nào để máy
+#### B12.3.4 Cổng nào giữ, cổng nào để máy
 
 | Cổng | n = 1 |
 |---|---|
@@ -1824,7 +1967,7 @@ hơn — mỗi vai bật thêm là thêm token, thêm độ trễ, và thêm m�
 | G8 đóng việc | 🤖 Tự động + bạn đọc **báo cáo tuần**, không đọc từng việc |
 | G-esc bế tắc | 👤 Bạn, ngay khi có |
 
-### B12.5 Ngưỡng điều chỉnh cho `n = 1`
+#### B12.3.5 Ngưỡng điều chỉnh cho `n = 1`
 
 | Ngưỡng gốc (đội) | Ngưỡng cho một người | Vì sao đổi |
 |---|---|---|
@@ -1833,21 +1976,13 @@ hơn — mỗi vai bật thêm là thêm token, thêm độ trễ, và thêm m�
 | L2 → L3 | ❌ **Không khuyến nghị trong 6 tháng đầu với `n = 1`** | L3 nghĩa là agent chạy trọn tính năng còn bạn chỉ chốt đặc tả và phát hành. Khi bạn là người duy nhất, không có ai bắt được lúc bạn nhìn nhầm |
 | `human_intervention_rate` ≤ 15% | Không dùng làm cổng | Với `n = 1` chỉ số này đo bạn bận hay rảnh, không đo chất lượng hệ thống |
 
-### B12.6 Chống "duyệt bừa" — chỉ số quan trọng nhất khi `n = 1`
+#### B12.3.6 Chống "duyệt bừa" — chỉ số quan trọng nhất khi `n = 1`
 
-Với đội, ASI09 (khai thác lòng tin của người) là chuyện agent thuyết phục người khác. Với một người,
-nó là chuyện **bạn tự bỏ qua** vì đang vội. Ba biện pháp cụ thể, đều đo được:
+Ba yêu cầu ASC-FR-35/36/37 (đo thời gian duyệt · nút chỉ bật sau khi cuộn hết · quá 48h tự hạ WIP)
+định nghĩa ở **§B12.2.7** và áp nguyên vẹn ở chế độ một người — thậm chí quan trọng hơn, vì không còn
+người thứ ba để rà tay mẫu bắt triệu chứng. Với `n = 1`, ASC-FR-37 hạ WIP **toàn cục** xuống 1.
 
-| Mã | Yêu cầu | Mức |
-|---|---|---|
-| ASC-FR-35 | Ghi **thời gian từ lúc mở màn duyệt tới lúc bấm** cho mọi cổng người. Cảnh báo khi `p50` < **90 giây** cho G1 hoặc < **3 phút** cho một lượt rà tay mẫu — đó là dấu hiệu cổng đã thành nghi thức. | BẮT BUỘC |
-| ASC-FR-36 | Màn duyệt **hiển thị diff và checklist trước**, nút quyết định **chỉ bật sau khi đã cuộn hết** phần bắt buộc. Không có nút "duyệt tất cả". | BẮT BUỘC |
-| ASC-FR-37 | Cổng quá hạn **không tự đi tiếp và không tự huỷ** (ASC-FR-14). Với `n = 1`, thêm: quá **48 giờ** thì hệ thống **tự hạ WIP xuống 1** và ngừng nhận việc mới — hàng đợi dồn là tín hiệu, không phải nền cảnh. | BẮT BUỘC |
-
-> Nếu bạn thấy ba yêu cầu này phiền: đó chính là điểm. Chúng phiền đúng vào lúc bạn định bỏ qua bước
-> mà cả hệ thống đang dựa vào.
-
-### B12.7 Chi phí: chế độ gói đăng ký là **mặc định**, không phải tuỳ chọn
+#### B12.3.7 Chi phí: chế độ gói đăng ký là **mặc định**, không phải tuỳ chọn
 
 Ở nhịp 15 việc làn chuẩn/tuần với đơn giá ~$6/việc (§B8.1): **~$90/tuần ≈ $390/tháng** nếu mua token qua API.
 Với một người, đó là khoản đáng kể cho một hệ chưa chứng minh được giá trị.
@@ -1856,7 +1991,7 @@ Với một người, đó là khoản đáng kể cho một hệ chưa chứng 
 chế độ API chỉ bật cho phần cần chạy theo lô lớn hoặc cần độ trễ ổn định. Giữ nguyên ASC-FR-30
 (khai `tier`, không khai tên model) để đổi chế độ không phải sửa gì ngoài cấu hình.
 
-### B12.8 Đường cơ sở Đ0 khi chỉ có một người
+#### B12.3.8 Đường cơ sở Đ0 khi chỉ có một người
 
 Đợt Đ0 nói "đo 8 tuần quy trình người hiện tại". Với một người, quy trình đó **là chính bạn** — và dữ liệu
 đã nằm sẵn trong git, không cần lập chương trình đo:
@@ -1880,7 +2015,7 @@ git log --first-parent --merges --since=8.weeks --format='%H' main \
 Ghi bốn số đó vào `docs/ops/` **trước khi bật bất kỳ agent nào**. Không có chúng thì sau này bạn không
 trả lời được câu duy nhất đáng hỏi: *hệ này có thật sự tốt hơn tôi làm tay không?*
 
-### B12.9 Lộ trình cho một người — **đừng xây Phần A từ đầu**
+#### B12.3.9 Lộ trình cho một người — **đừng xây Phần A từ đầu**
 
 Lộ trình Đ0–Đ8 (§B11.1) là **16–20 tuần làm việc toàn thời gian của một đội**. Với một người, đi trọn nó
 nghĩa là dành hơn nửa năm xây hạ tầng trước khi giao được dòng giá trị nào. Đó là cách hỏng phổ biến nhất.
@@ -1890,7 +2025,7 @@ vào các khoảng cách đã được chỉ ra, theo thứ tự giá trị trê
 
 | Tuần | Việc | Vì sao trước |
 |---|---|---|
-| **1** | Đ0: chốt bốn số đường cơ sở (§B12.8) · đặt WIP = 2 · tắt các vai theo §B12.3 | Rẻ nhất, và mọi kết luận sau này dựa vào nó |
+| **1** | Đ0: chốt bốn số đường cơ sở (§B12.3.8) · đặt WIP = 2 · tắt các vai theo §B12.3.3 | Rẻ nhất, và mọi kết luận sau này dựa vào nó |
 | **2–3** | **Thêm vai R4 viết test độc lập** (§C1.2 mục 1): nhận đặc tả + kế hoạch, **không** nhận diff ở lượt đầu; vai lập trình **mất quyền ghi** thư mục test | Rủi ro lớn nhất còn lại, và bạn không có đồng nghiệp bù vào |
 | **4** | Chống duyệt bừa: ASC-FR-35/36/37 | Với `n = 1` đây là cổng thật sự dễ mục nhất |
 | **5** | Tách phần biện hộ khỏi thứ vai rà soát nhận (§C1.2 mục 2) | Rẻ, sửa một chỗ trong hợp đồng dữ liệu |
@@ -1902,7 +2037,6 @@ hỏng trước. Với một người, lên mức tự chủ quá sớm không t
 lúc sửa sự cố, và lúc đó thì cũng chỉ có mình bạn.
 
 ---
-
 # PHẦN C — CHỨNG CỨ, RỦI RO & PHỤ LỤC
 
 ## C1. Bằng chứng thực địa — repo `seeker19110/Claude-Agents`
@@ -2059,8 +2193,8 @@ Số work item song song tối đa
 Ba số ở trên đều là **số người**, không phải số agent. Đây là câu trả lời trung thực cho câu hỏi
 "công ty AI này lớn cỡ nào": nó lớn bằng **năng lực xác minh**, không bằng số agent bật lên.
 
-> **Đã chốt cho dự án này: `n = 1`.** Toàn bộ hệ quả — vai nào tắt, cổng nào giữ, ngưỡng nào đổi,
-> lộ trình 8 tuần — nằm ở **§B12**.
+> **Đã chốt cho dự án này: `n = 3`.** Phân vai người, định cỡ, ngưỡng, lộ trình ba luồng ở **§B12.2**;
+> chế độ suy giảm khi chỉ còn một người ở **§B12.3**.
 
 
 ### C2.4 Mười hai câu phải chốt trước khi bắt tay

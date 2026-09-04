@@ -227,11 +227,22 @@
       đường cơ sở Đ0 rút thẳng từ git history (4 lệnh sẵn); và **lộ trình 8 tuần KHÔNG xây Phần A từ đầu** —
       dùng repo Claude-Agents đã có, chỉ vá các khoảng cách theo thứ tự giá trị/giờ.
 
+- ✅ **Chốt lại `n = 3` (ba người ở các chốt) → viết lại §B12 thành "Hồ sơ theo quy mô đội"**: §B12.1 bảng chọn
+      nhanh 1/3/6+; **§B12.2 cấu hình chốt n = 3**: four-eyes người↔người khả thi trở lại và thành BẮT BUỘC
+      (ASC-FR-39 không tự duyệt việc mình khởi tạo, từ chối bằng code); **nút thắt dời từ rà tay mẫu sang G1
+      duyệt đặc tả** (100% việc, không phải mẫu) → đầu tư mạnh nhất vào R1, đo `g1_review_time_p50`; phân vai
+      A chủ sản phẩm / B tech lead / C trực luân phiên tuần (ASC-FR-40 ghi đổi vai); định cỡ 120'/người →
+      6–7 việc/ngày, WIP 3 → 6, thông lượng bị chặn bởi A không cộng tuyến tính; ngưỡng về chuẩn đội (rà mẫu
+      10% sàn ≥ 4 PR/tuần, L1→L2 200 lần ≈ 6 tuần, L3 khả thi); rủi ro mới **khuếch tán trách nhiệm** →
+      ASC-FR-38 gán đích danh, không có hàng đợi "của đội"; chi phí ~$900/tháng API → 3 tài khoản xoay vòng;
+      lộ trình 8 tuần **ba luồng song song**. **§B12.3 = chế độ suy giảm n = 1** (nội dung cũ giữ nguyên,
+      kích hoạt khi hai người vắng, phải ghi vào hệ thống).
+
 ## Đang làm
 - **SPEC-AI-100 v2.0 + §B12 (hồ sơ n = 1)** đã push lên `claude/ai-harness-spec-research-4jmxqq`.
-  Câu chặn #1 (bao nhiêu người) **đã trả lời: 1 người** → §B12.
-  Câu chặn #2 **vẫn mở**: đã có đường cơ sở 8 tuần chưa — nếu chưa, đó là việc tuần 1 (§B12.8, chạy 4 lệnh git).
-  Việc kế tiếp theo lộ trình §B12.9: tuần 2–3 thêm vai R4 viết test độc lập vào repo Claude-Agents.
+  Câu chặn #1 (bao nhiêu người) **đã trả lời: 3 người** (nâng từ 1) → §B12.2; n = 1 giữ làm chế độ suy giảm §B12.3.
+  Câu chặn #2 **vẫn mở**: đã có đường cơ sở 8 tuần chưa — nếu chưa, đó là việc tuần 1 luồng A (§B12.3.8, chạy 4 lệnh git).
+  Việc kế tiếp theo lộ trình §B12.2.9: luồng B bắt đầu vai R4 viết test độc lập ngay tuần 1.
 
 ## Tiếp theo
 - **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
