@@ -166,16 +166,115 @@
         (cân đánh đổi giữa 12 nhóm, xếp ưu tiên toàn cục) → nâng `/model claude-opus-4-8` (hoặc
         `fable-5` nếu dự án rất phức tạp) + `/effort xhigh`, xong hạ lại cho GIAI ĐOẠN 2 (xử lý).
 
+- ✅ **Đặc tả AI Harness (SPEC-AIH-001)** — `docs/specs/AI-HARNESS-SPEC.md` (~1030 dòng): đặc tả kỹ thuật
+      để xây một AI harness theo mô hình 7 cấu phần (Context · Tool · Orchestration · Evaluation · Security ·
+      Governance · AgentOps). Gồm: 12 nguyên tắc bất biến, kiến trúc 3 mặt phẳng + luồng một lượt, yêu cầu
+      chức năng có mã (`C1-FR-01`…`C7-FR-10`), mô hình dữ liệu Postgres, hợp đồng API + ánh xạ OTel GenAI,
+      ma trận truy vết ASI01–ASI10, chiến lược eval 3 tầng + red team, runbook vận hành, ngăn xếp tham chiếu
+      **đã xác minh phiên bản qua PyPI/npm ngày 2026-09-04**, lộ trình M0–M5.
+- ✅ **ADR-0002** (`docs/adr/0002-ai-harness-architecture.md`, trạng thái *Đề xuất*): chốt 7 quyết định kiến
+      trúc cốt lõi (vòng lặp ngoài xác định · event sourcing append-only · Tool Gateway là điểm nghẽn duy nhất ·
+      điều phối 2 tầng Temporal+LangGraph · ngăn xếp · định tuyến model · không-eval-không-deploy) + 4 phương
+      án đã cân nhắc và lý do loại.
+
+- ✅ **Đặc tả Công ty lập trình AI (SPEC-ASC-002)** — `docs/specs/AI-SOFTWARE-COMPANY-SPEC.md` (~725 dòng):
+      hệ thống đa agent đóng vai một công ty phần mềm, chạy trên harness SPEC-AIH-001. Trục thiết kế:
+      **nút thắt là năng lực xác minh, không phải năng lực sinh code** (dữ liệu DORA 2025–2026: throughput
+      +2–18% nhưng sự cố/PR +243%, PR agent chờ review lâu gấp 5.3×). Gồm: 7 luật bất biến (người viết ≠
+      người duyệt · test sinh từ spec không sinh từ diff · reviewer chỉ đọc diff+spec · WIP ≤ năng lực xác
+      minh · vai không bắt được lỗi thì xoá · không họp giữa agent · người giữ 3 chốt), máy trạng thái
+      WorkItem + 3 làn, 10 vai (R0–R9) mỗi vai gắn một lớp lỗi, ma trận phân quyền thực thi ở Tool Gateway,
+      6 hợp đồng artifact, 8 cổng G0–G7, 4 vòng học của trí nhớ tổ chức, ước tính chi phí/work item
+      (~$6.1, xác minh chiếm ~40%), bộ chỉ số + chỉ số CẤM dùng làm KPI, 11 chống chỉ định,
+      mức tự chủ L0–L4 có điều kiện vào đo được, công thức định cỡ theo số NGƯỜI.
+
+- ✅ **Đọc repo `seeker19110/Claude-Agents` (X-Agents) và tổng hợp** → `docs/specs/LESSONS-FROM-CLAUDE-AGENTS.md`
+      (SYNTH-001, ~310 dòng): 18 điểm tốt rút từ một triển khai ĐÃ CHẠY (20 agent, 45 skill, 18 topic có JSON Schema,
+      5 loại human gate, ADR 0001–0025). Điểm đắt nhất: **bằng chứng chất lượng do CODE điền, không do model khai**
+      (`verified_by`), quét tài sản prompt của chính repo như chuỗi cung ứng, tầng skill hai mức + chủ quản,
+      eval ghi/phát lại cưỡng chế offline trong CI, chạy bằng gói đăng ký thay vì mua token.
+      Nêu thẳng **4 chỗ đặc tả của mình đã sai** (self_check do model tự khai; thiếu tầng skill; thiếu phân quyền ghi
+      TRI THỨC; nhãn untrusted một-kích-cỡ quá thô) và **3 chỗ đặc tả mạnh hơn repo** (test viết mù độc lập,
+      reviewer không đọc lời biện hộ, mức tự chủ L0–L4 + đường cơ sở).
+- ✅ **SPEC-AIH-001 → v1.1**: thêm C1-FR-11 (chống injection phân biệt theo nguồn) + C5-FR-12/13 (quét tài sản prompt,
+      ngân sách prompt tĩnh là cổng CI); cập nhật ma trận ASI04.
+- ✅ **SPEC-ASC-002 → v1.1**: sửa lỗi bằng chứng do model tự khai (§5.4 `evidence.verified_by`, cổng G3a đổi chủ sở hữu
+      sang runner) + thêm §15 với 33 yêu cầu bổ sung ASC-FR-01…33 (tầng skill, chủ ghi tri thức, ngữ cảnh theo vai,
+      cổng tách máy-kiểm/người-kiểm, cổng nghiệm thu khách hàng, risk_tags, nhánh tích hợp, golden + eval replay,
+      định tuyến hai chế độ chi phí, trực ban chỉ đọc).
+
+- ✅ **GỘP BA TÀI LIỆU → MỘT** (người dùng chốt): `docs/specs/AI-HARNESS-AND-COMPANY-SPEC.md`
+      (**SPEC-AI-100 v2.0**, ~2.040 dòng) thay thế và xoá `AI-HARNESS-SPEC.md` + `AI-SOFTWARE-COMPANY-SPEC.md`
+      + `LESSONS-FROM-CLAUDE-AGENTS.md`. Cấu trúc 3 phần: **A** harness (hạ tầng, A1–A11) · **B** công ty đa agent
+      (tổ chức, B1–B11) · **C** chứng cứ thực địa + rủi ro + phụ lục (C1–C5).
+      Khử trùng lặp thật, không dán ghép: gộp hai lộ trình (M0–M5 + Đ1–Đ5) thành **một lộ trình Đ0–Đ8**;
+      gộp hai danh sách câu hỏi (8+8) thành **12 câu** chia 4 nhóm; gộp hai sổ rủi ro thành **một bảng 12 dòng**;
+      hoà §15 (33 yêu cầu ASC-FR) vào đúng mục tự nhiên (skill → §B3.6, chủ ghi tri thức → §B3.5, ngữ cảnh theo
+      vai → §B4.0, kỷ luật dòng chảy → §B6.5, hai chế độ chi phí → §B8.4, trực ban → §B9.4, prompt-là-code → §C1.5);
+      **hợp nhất bảng cổng thành G0–G8 + G-esc**, mỗi cổng tách rõ *máy kiểm* vs *người tự kiểm*, thêm **G7 nghiệm
+      thu khách hàng**. Giải một mâu thuẫn giữa hai tài liệu cũ: quá hạn cổng — trước là "mặc định huỷ" (harness)
+      vs "không tự đi tiếp" (công ty) → chốt **không tự đi tiếp, không tự huỷ, chuyển leo thang cho người** (ASC-FR-14).
+      Cập nhật ADR-0002 trỏ sang tài liệu mới.
+
+- ✅ **Chốt `n = 1` (một người cho cả ba chốt) → thêm §B12 "Hồ sơ một người"** vào SPEC-AI-100:
+      định cỡ theo thời gian thật (60/120/180 phút/ngày → WIP 2/3/4, 1–5 việc làn chuẩn/ngày, khởi động
+      **luôn ở WIP = 2**); bảng vai bật/tắt (**R4 viết test độc lập không được tắt**; R0 điều phối thay bằng
+      code; R9 chạy theo lô tuần); cổng nào giữ người (G1, G6 gộp lô, G-esc) và cổng nào để máy;
+      ngưỡng điều chỉnh (rà tay mẫu **≥ 3 PR/tuần hoặc 20%** thay cho 10%; L1→L2 **60 lần merge** thay 200,
+      đổi lại phải thu hẹp làn nhanh; **không lên L3 trong 6 tháng đầu**); **ba yêu cầu chống duyệt bừa**
+      ASC-FR-35/36/37 (đo thời gian từ mở màn duyệt tới lúc bấm, cảnh báo khi p50 < 90 giây; nút chỉ bật sau
+      khi cuộn hết; quá 48h thì tự hạ WIP); chế độ **gói đăng ký là mặc định** (~$390/tháng nếu mua token);
+      đường cơ sở Đ0 rút thẳng từ git history (4 lệnh sẵn); và **lộ trình 8 tuần KHÔNG xây Phần A từ đầu** —
+      dùng repo Claude-Agents đã có, chỉ vá các khoảng cách theo thứ tự giá trị/giờ.
+
+- ✅ **Chốt lại `n = 3` (ba người ở các chốt) → viết lại §B12 thành "Hồ sơ theo quy mô đội"**: §B12.1 bảng chọn
+      nhanh 1/3/6+; **§B12.2 cấu hình chốt n = 3**: four-eyes người↔người khả thi trở lại và thành BẮT BUỘC
+      (ASC-FR-39 không tự duyệt việc mình khởi tạo, từ chối bằng code); **nút thắt dời từ rà tay mẫu sang G1
+      duyệt đặc tả** (100% việc, không phải mẫu) → đầu tư mạnh nhất vào R1, đo `g1_review_time_p50`; phân vai
+      A chủ sản phẩm / B tech lead / C trực luân phiên tuần (ASC-FR-40 ghi đổi vai); định cỡ 120'/người →
+      6–7 việc/ngày, WIP 3 → 6, thông lượng bị chặn bởi A không cộng tuyến tính; ngưỡng về chuẩn đội (rà mẫu
+      10% sàn ≥ 4 PR/tuần, L1→L2 200 lần ≈ 6 tuần, L3 khả thi); rủi ro mới **khuếch tán trách nhiệm** →
+      ASC-FR-38 gán đích danh, không có hàng đợi "của đội"; chi phí ~$900/tháng API → 3 tài khoản xoay vòng;
+      lộ trình 8 tuần **ba luồng song song**. **§B12.3 = chế độ suy giảm n = 1** (nội dung cũ giữ nguyên,
+      kích hoạt khi hai người vắng, phải ghi vào hệ thống).
+
+- ✅ **Chạy đường cơ sở Đ0 trên repo Claude-Agents** → `docs/ops/BASELINE-2026-09-04-claude-agents.md`.
+      Kết luận: **không tồn tại đường cơ sở hồi cứu 8 tuần** — X-Agents mới 3 ngày tuổi, tháng 8 là dự án tiền thân
+      MEP-Agents (PR `(#N)` trỏ repo khác), 6 tuần giữa trống; quy trình hiện tại đã là 1 người + Claude Code.
+      Số đáng chú ý: lead time PR **trung vị 4,4 phút = thời gian CI**, 2/38 PR merge TRƯỚC khi CI xong (#29: 23 s,
+      `quality` xanh 3 phút sau merge ⇒ branch protection không chặn); **35% commit thẳng vào main**; 1 sự cố xoá
+      nhầm cả dự án 11/08 (138 file). Đã chỉnh bộ lệnh §B12.3.8 cho squash-merge (đếm `(#N)` + commit thẳng; lead
+      time phải lấy từ API và tách CI khỏi người xem), đổi Đ0 thành **tiến cứu 4 tuần từ T0**, luồng A tuần 1 thêm
+      việc **bật branch protection thật**. Câu chặn #2 ở §C2.4 đã có câu trả lời.
+
 ## Đang làm
-- (không có — mọi PR đang mở đã được rà và merge hết vào `main`)
+- **SPEC-AI-100 v2.0 + §B12 (hồ sơ n = 1)** đã push lên `claude/ai-harness-spec-research-4jmxqq`.
+  Câu chặn #1 (bao nhiêu người) **đã trả lời: 3 người** (nâng từ 1) → §B12.2; n = 1 giữ làm chế độ suy giảm §B12.3.
+  Câu chặn #2 **đã kiểm**: không có đường cơ sở hồi cứu (codebase 3 ngày tuổi) ⇒ đo tiến cứu 4 tuần từ T0 = 05/09
+  (`docs/ops/BASELINE-2026-09-04-claude-agents.md`). Việc tuần 1 luồng A giờ là **bật branch protection thật** trên
+  Claude-Agents — hiện PR merge được trước khi CI xong.
+  Việc kế tiếp theo lộ trình §B12.2.9: luồng B bắt đầu vai R4 viết test độc lập ngay tuần 1.
 
 ## Tiếp theo
+- **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
+  vừa bị ADR-0021 khuếch đại vì reviewer thành lượt kiểm thử duy nhất); tách `summary` khỏi phần reviewer nhận;
+  cập nhật phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
+  nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
+- **AI Harness — việc chặn:** người dùng trả lời §13.3 (use case đầu tiên · Python hay TS · triển khai
+  cloud/on-prem · đa tenant · phạm vi tuân thủ · mua hay tự xây observability · kênh HITL · quy mô năm đầu).
+  Có câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chấp nhận ADR-0002, rồi chạy `/bootstrap` cho mốc M0.
+- **AI Harness — cần xác minh lại:** mở tài liệu gốc OWASP Agentic Top 10 2026 để xác nhận nguyên văn
+  ASI01–ASI10 (phiên viết đặc tả bị egress proxy chặn `genai.owasp.org`, phải đối chiếu nguồn thứ cấp);
+  xác minh phiên bản Python/PostgreSQL/Redis/OPA/sandbox bằng nguồn sống khi khởi tạo.
 - Case-study mới chạy phần D (hàng rào cục bộ). Phần Bước 6–8 (branch protection, Supabase, Vercel) cần
   tài khoản thật, chưa kiểm chứng được — nếu có dịp áp khung vào dự án thật, nên kiểm nốt phần này.
 - Dự án đã copy khung bản cũ → dùng bảng ánh xạ trong `docs/framework/README.md` khi cập nhật; chạy lại
   `copy-framework.sh` bản mới để nhận `scripts/` + hook hoạt động thật + fix không-đè-cấu-hình-có-sẵn.
 
 ## Quyết định quan trọng (trỏ tới ADR nếu có)
+- **ADR-0002 (Đề xuất):** kiến trúc AI harness — vòng lặp ngoài xác định do harness sở hữu, event sourcing
+  append-only làm nguồn sự thật duy nhất, Tool Gateway là điểm nghẽn duy nhất cho mọi tác động ra ngoài.
+  Nguyên tắc nền: *prompt không phải cơ chế bảo mật*.
 - Cấu hình Opusplan được thêm vào `_framework-dropins/` (an toàn, không đè cấu hình cũ)
 - `.claude/` (hooks + agents) cũng được copy vào `_framework-dropins/` để dự án cũ tự merge nếu cần
 - **opusplan là điểm ngọt, không đổi**; tối ưu token thêm bằng CHIA VIỆC (subagent) chứ không "route theo độ khó"
