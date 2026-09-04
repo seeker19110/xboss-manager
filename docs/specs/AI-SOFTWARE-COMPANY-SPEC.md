@@ -1,6 +1,8 @@
 # ĐẶC TẢ — CÔNG TY LẬP TRÌNH AI (hệ thống đa agent)
 
-> **Mã tài liệu:** SPEC-ASC-002 · **Phiên bản:** 1.0 · **Ngày:** 2026-09-04 · **Trạng thái:** Bản nháp để duyệt
+> **Mã tài liệu:** SPEC-ASC-002 · **Phiên bản:** 1.1 · **Ngày:** 2026-09-04 · **Trạng thái:** Bản nháp để duyệt
+> **v1.1:** sửa lỗi "bằng chứng do model tự khai" (§5.4, G3a) và thêm §15 — các cơ chế rút từ một triển khai
+> thật, xem `docs/specs/LESSONS-FROM-CLAUDE-AGENTS.md` (SYNTH-001).
 > **Nền tảng chạy trên:** `docs/specs/AI-HARNESS-SPEC.md` (SPEC-AIH-001) — tài liệu này **không** lặp lại
 > phần hạ tầng harness; nó đặc tả **tổ chức** chạy trên hạ tầng đó.
 > **Loại:** hệ thống đa agent thực hiện trọn vòng đời phát triển phần mềm, có người ở các chốt đã định.
@@ -430,7 +432,15 @@ branch: work/W-1042
 commits: [{ sha: "…", message: "feat(reports): thêm endpoint xuất doanh thu" }]
 files_changed: 6
 files_outside_plan: []              # khác rỗng ⇒ phải giải trình, R5 xem kỹ chỗ này
-self_check: { build: pass, types: pass, lint: pass, format: pass, secrets_scan: pass }
+# BẰNG CHỨNG DO CODE ĐIỀN — R3 không được ghi vào khối này (v1.1, xem SYNTH-001 §3.1)
+evidence:
+  verified_by: runner               # runner | unverified — model khai gì ở đây cũng bị ghi đè
+  stack: python-uv                  # nhận diện từ repo thật; không nhận ra ⇒ verified_by: unverified
+  build: pass
+  lint: pass
+  tests: { passed: 128, failed: 0 }
+  secrets_scan: pass
+  commit: "…"                       # runner tự commit rồi ghi lại, không tin lời khai
 notes_for_reviewer: "…"             # KHÔNG chuyển cho R5 (luật L3); chỉ để người đọc khi cần
 ```
 
@@ -471,7 +481,7 @@ canary: { enabled: true, percent: 10, watch_minutes: 60 }
 | **G0** | Nhận việc | R0 | Đủ thông tin tối thiểu · không trùng · đã phân làn có lý do | Việc rác vào hệ thống |
 | **G1** | Đặc tả rõ | R1 + **Chủ sản phẩm** | Tiêu chí chấp nhận kiểm chứng được · ngoài-phạm-vi đã ghi · ≤ 1 câu hỏi mở | Làm sai việc |
 | **G2** | Kế hoạch đạt | R2 (+ **Tech lead** nếu có ADR) | Bước ≤ nửa ngày · có chiến lược test cho từng AC · có đường lui | Sai kiến trúc |
-| **G3a** | Tự kiểm mã | R3 | Build/type/lint/format xanh · không bí mật · diff trong phạm vi | Rác vào review |
+| **G3a** | Bằng chứng mã | **Runner (code), không phải R3** | `evidence.verified_by = runner` · build/lint/test **thật theo stack của repo** xanh · không bí mật · diff trong phạm vi. Worktree không đổi ⇒ từ chối (không có PR rỗng); không chạy được ⇒ `unverified`, **không** đi tiếp | Bằng chứng giả |
 | **G3b** | Bằng chứng test | R4 | Mỗi AC có test ánh xạ 1–1 · ca biên đủ · test viết mù đã chạy | "Xanh mà sai" |
 | **G4** | Rà soát đạt | R5 | 0 phát hiện *Chặn* · mỗi phát hiện có kịch bản thất bại | Lỗi logic |
 | **G5** | Bảo mật đạt | R6 (+ **người** với thay đổi nhạy cảm) | 0 phát hiện Cao/Nghiêm trọng · quét phụ thuộc & bí mật xanh | Lỗ hổng |
@@ -720,6 +730,102 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
 
 ---
 
-**Hết đặc tả SPEC-ASC-002 v1.0.**
+---
+
+## 15. Bổ sung v1.1 — cơ chế rút từ một triển khai thật
+
+> Nguồn: `docs/specs/LESSONS-FROM-CLAUDE-AGENTS.md` (SYNTH-001), đọc repo `seeker19110/Claude-Agents`
+> tại commit `a3544c1`. Mỗi mục dưới đây là **yêu cầu bổ sung**, mã `ASC-FR-xx`, ràng buộc BẮT BUỘC trừ khi ghi khác.
+
+### 15.1 Tầng năng lực (skill) tách khỏi vai
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-01 | Năng lực dùng chung (test, bảo mật, quan sát, hợp đồng API…) là **tệp skill riêng**, không nhúng vào từng vai. Vai khai `skills` (nạp **toàn văn** — vai **chủ quản** lĩnh vực) và `skills_core` (nạp **rút gọn**: mục tiêu + quy trình + checklist — vai chỉ phải **tuân thủ**). |
+| ASC-FR-02 | **Mỗi skill phải có ≥ 1 vai chủ quản nạp toàn văn.** Skill mồ côi ⇒ **lỗi khởi động hệ thống**, không phải cảnh báo. |
+| ASC-FR-03 | Skill phải có mục `Quy trình` và `Checklist`; thiếu ⇒ lỗi khi nạp. |
+| ASC-FR-04 | Cổng CI so **prompt tĩnh** (thân vai + toàn văn skill) với ngân sách khai báo của vai; vượt ngưỡng ⇒ đỏ. |
+
+> *Lý do có số:* nhân bản năng lực qua nhiều vai đẩy prompt hệ thống lên ~175k token — một việc đi qua 6 vai
+> tốn ~60k token **trước khi đọc dòng dữ liệu nào**. Bản rút gọn ~23% độ dài.
+> Phân chia này biến giới hạn token thành **ranh giới trách nhiệm**: chủ quản quyết định sâu, vai khác chỉ phải đạt checklist.
+
+### 15.2 Phân quyền ghi **tri thức** (bổ sung ma trận §3.4)
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-05 | Kho tri thức chung chia **namespace** (`prd`, `architecture`, `api-contract`, `schema`, `threat-model`, `infra`, `docs`, `knowledge`, `contract`…). **Mỗi namespace đúng một vai được ghi; mọi vai được đọc.** |
+| ASC-FR-06 | Bảng namespace → chủ ghi là **nguồn sự thật có test**, đối chiếu với khai báo của vai; lệch ⇒ CI đỏ. |
+| ASC-FR-07 | Quyền sở hữu **được phép đổi theo giai đoạn** và phải ghi rõ (vd `api-contract`: R2 khởi tạo → R3 backend cập nhật các phiên bản sau). |
+| ASC-FR-08 | Artifact tri thức đi qua bus mang **toàn văn** (bus là nguồn sự thật, replay dựng lại được); bản lưu ra kho tệp chỉ là bản sao để người đọc và so sánh. |
+
+### 15.3 Ngữ cảnh theo vai
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-09 | Mỗi vai khai **danh sách namespace được đọc toàn văn** và **trần ký tự đầu vào riêng** (không vượt trần toàn cục). Vai rà soát/QA/vận hành đặt trần thấp; vai lập trình cao hơn. |
+| ASC-FR-10 | Namespace ngoài danh sách chỉ còn tóm tắt + cờ **`content_omitted`** — vai **biết mình đang thiếu** để đi hỏi hoặc mở tệp, **không đoán**. |
+| ASC-FR-11 | Cắt ngữ cảnh phải **có nhãn** tại chỗ cắt và phát sự kiện `context_trimmed`. |
+
+### 15.4 Cổng: tách rõ máy kiểm và người kiểm
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-12 | Checklist mỗi cổng chia **hai phần**: *(a)* **Code gửi kèm** — đúng các khoá mà hệ thống sinh ra, hiển thị trong hàng đợi duyệt; *(b)* **Người tự kiểm thêm** — không có khoá, người duyệt phải tự đọc và trả lời. |
+| ASC-FR-13 | **Four-eyes cưỡng chế bằng code**: người duyệt ≠ người tạo; vi phạm là **lỗi ném ra**, không phải quy ước trong tài liệu. |
+| ASC-FR-14 | Gate có **hạn chờ (mặc định 24h) và nhắc ở giữa hạn (12h)**. **Quá hạn KHÔNG tự đi tiếp** — chuyển leo thang cho người. *(Thay quy tắc "mặc định huỷ" ở §6.4 v1.0.)* |
+| ASC-FR-15 | **Bế tắc là một loại cổng**, không phải ngoại lệ: việc `blocked` hoặc bị giám sát escalate ⇒ mở cổng `escalation` (duyệt = mở lại kèm gợi ý, từ chối = đóng việc). |
+
+### 15.5 Cổng nghiệm thu khách hàng (bổ sung máy trạng thái §3.1)
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-16 | Với công ty **có khách hàng**, thêm cổng **`acceptance`** sau khi phát hành production: có trong hàng đợi duyệt, có hạn, có nhắc. |
+| ASC-FR-17 | **Chữ ký của khách đóng cổng**; hệ thống **từ chối** nếu người ký trùng vai đại diện công ty. Kết quả `conditional` đóng cổng ở dạng *yêu cầu sửa*, phần còn lại đi qua luồng **thay đổi yêu cầu**. Việc chỉ `closed` khi khách chấp nhận. |
+| ASC-FR-18 | Kịch bản nghiệm thu **ánh xạ 1–1 với tiêu chí Must** trong đặc tả đã duyệt; **không** thêm tiêu chí mới ở bước nghiệm thu. Lỗi đã biết phải nêu **trước** khi ký. |
+| ASC-FR-19 | Bộ mẫu tài liệu thương mại là một phần của hệ: SOW/tiêu chí nghiệm thu · kịch bản UAT · yêu cầu thay đổi · biên bản sự cố · ghi chú phát hành · runbook. |
+
+### 15.6 Điều kiện dispatch và nhãn rủi ro
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-20 | Việc **không có ước lượng token thì không được dispatch**; ngân sách cấp = ước lượng × 1.5. Việc phải ≤ 1 ngày người và ≤ trần token đã chốt. |
+| ASC-FR-21 | **`risk_tags` là trường dữ liệu có schema**, không phải phán đoán: `auth · payment · pii · crypto · upload · admin · external-api`. Có bất kỳ tag nào ⇒ **bắt buộc** thêm rà soát bảo mật (R6) trước khi vào hàng đợi phát hành. |
+| ASC-FR-22 | Phụ thuộc giữa các việc (`depends_on`) và độ ưu tiên là trường dữ liệu; việc có phụ thuộc chưa xong ở trạng thái `waiting`. **Việc bị bỏ KHÔNG thoả mãn phụ thuộc**: việc đang chờ nó chuyển `blocked`, không được dispatch trên nền thiếu code. |
+
+### 15.7 Nhánh tích hợp (thay/bổ sung hàng đợi FIFO §4.8)
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-23 | Việc rẽ nhánh từ **nhánh tích hợp của hệ thống**, không từ `main` của khách; ứng viên phát hành `merge --no-ff` vào nhánh tích hợp **trước** khi chạy phát hành. Xung đột ⇒ huỷ ứng viên, làm lại **trên nền mới**. `main` của khách không bị chạm cho tới bước phát hành. |
+| ASC-FR-24 | Mỗi vai lập trình làm trong **worktree riêng theo việc**; vai rà soát đọc **diff thật** của nhánh đó, không đọc mô tả. |
+
+### 15.8 Cưỡng chế "prompt là code" bằng cổng offline
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-25 | Định nghĩa vai và skill có **số phiên bản**; đổi nội dung ⇒ tăng phiên bản, đi qua PR, rollback bằng revert. |
+| ASC-FR-26 | **Golden snapshot**: CI tái sinh ảnh chụp prompt rồi so khác biệt; quên tái sinh ⇒ đỏ. Prompt phải **nhìn thấy được trong diff**. |
+| ASC-FR-27 | **Bản ghi eval bắt buộc**: danh sách vai bắt buộc có bản ghi tươi; thiếu bản ghi, **hoặc bản ghi tạo ở phiên bản prompt cũ hơn**, ⇒ CI đỏ. CI chạy **phát lại, không gọi model** — cổng có răng mà không tốn tiền. |
+| ASC-FR-28 | Bản ghi eval là **artifact có phiên bản, không phải cache**: xoá đi là mất bằng chứng, không phải mất tốc độ. |
+
+### 15.9 Định tuyến model: hai chế độ ngang hàng (bổ sung §8.3)
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-29 | Hệ thống hỗ trợ **hai chế độ chi phí ngang hàng**: *(a)* mua token qua API (bảng giá §8.1); *(b)* **chạy bằng gói đăng ký sẵn có** qua CLI/proxy cục bộ, xoay vòng nhiều tài khoản, gói hết hạn mức thì tự nghỉ và lượt đó đi gói kế. Đổi chế độ bằng **cấu hình, không đổi mã hay prompt**. |
+| ASC-FR-30 | Vai khai **tier** (`strong` / `standard` / `light`), không khai tên model. **Không bao giờ hạ tier của yêu cầu** — chỉ nâng khi backend không có model cho tier đó. |
+| ASC-FR-31 | Bảng vai → tier phải ghi **lý do** theo 4 tiêu chí: độ sâu suy luận · hậu quả nếu sai và có lớp nào bắt phía sau · độ phức tạp đầu ra · tần suất chạy. **Mọi lần đổi tier phải kèm bằng chứng eval**, kể cả lần đảo ngược quyết định cũ. |
+| ASC-FR-32 | Đo **tiền**, không chỉ đo token: mỗi lượt gọi quy ra chi phí; giám sát cắt theo ngân sách việc **và** ngân sách dự án. |
+
+### 15.10 Giao diện vận hành
+
+| Mã | Yêu cầu |
+|---|---|
+| ASC-FR-33 | Trang trực ban **chỉ đọc mặc định**; quyền duyệt cổng, đổi cấu hình, giao việc mới nằm sau **cờ bật riêng biệt**; phiên có token riêng mỗi lần chạy. Least privilege áp cho **cả giao diện người dùng vận hành**, không chỉ cho agent. |
+
+---
+
+**Hết đặc tả SPEC-ASC-002 v1.1.**
 Thay đổi đi qua PR + tăng số phiên bản ở đầu tài liệu. Thêm/xoá một vai ⇒ phải nêu **lớp lỗi**
-vai đó bắt (luật L5) và cập nhật ma trận quyền §3.4.
+vai đó bắt (luật L5) và cập nhật ma trận quyền §3.4 **và** ma trận chủ ghi tri thức (ASC-FR-05).

@@ -188,13 +188,32 @@
       (~$6.1, xác minh chiếm ~40%), bộ chỉ số + chỉ số CẤM dùng làm KPI, 11 chống chỉ định,
       mức tự chủ L0–L4 có điều kiện vào đo được, công thức định cỡ theo số NGƯỜI.
 
+- ✅ **Đọc repo `seeker19110/Claude-Agents` (X-Agents) và tổng hợp** → `docs/specs/LESSONS-FROM-CLAUDE-AGENTS.md`
+      (SYNTH-001, ~310 dòng): 18 điểm tốt rút từ một triển khai ĐÃ CHẠY (20 agent, 45 skill, 18 topic có JSON Schema,
+      5 loại human gate, ADR 0001–0025). Điểm đắt nhất: **bằng chứng chất lượng do CODE điền, không do model khai**
+      (`verified_by`), quét tài sản prompt của chính repo như chuỗi cung ứng, tầng skill hai mức + chủ quản,
+      eval ghi/phát lại cưỡng chế offline trong CI, chạy bằng gói đăng ký thay vì mua token.
+      Nêu thẳng **4 chỗ đặc tả của mình đã sai** (self_check do model tự khai; thiếu tầng skill; thiếu phân quyền ghi
+      TRI THỨC; nhãn untrusted một-kích-cỡ quá thô) và **3 chỗ đặc tả mạnh hơn repo** (test viết mù độc lập,
+      reviewer không đọc lời biện hộ, mức tự chủ L0–L4 + đường cơ sở).
+- ✅ **SPEC-AIH-001 → v1.1**: thêm C1-FR-11 (chống injection phân biệt theo nguồn) + C5-FR-12/13 (quét tài sản prompt,
+      ngân sách prompt tĩnh là cổng CI); cập nhật ma trận ASI04.
+- ✅ **SPEC-ASC-002 → v1.1**: sửa lỗi bằng chứng do model tự khai (§5.4 `evidence.verified_by`, cổng G3a đổi chủ sở hữu
+      sang runner) + thêm §15 với 33 yêu cầu bổ sung ASC-FR-01…33 (tầng skill, chủ ghi tri thức, ngữ cảnh theo vai,
+      cổng tách máy-kiểm/người-kiểm, cổng nghiệm thu khách hàng, risk_tags, nhánh tích hợp, golden + eval replay,
+      định tuyến hai chế độ chi phí, trực ban chỉ đọc).
+
 ## Đang làm
-- Hai đặc tả (SPEC-AIH-001 harness + SPEC-ASC-002 công ty đa agent) đã push lên nhánh
+- Ba tài liệu (SPEC-AIH-001 v1.1 + SPEC-ASC-002 v1.1 + SYNTH-001) đã push lên nhánh
   `claude/ai-harness-spec-research-4jmxqq`. **Đang chờ người dùng chốt câu hỏi ở SPEC-AIH-001 §13.3
   và SPEC-ASC-002 §12.3** — đặc biệt: có bao nhiêu NGƯỜI cho 3 chốt (quyết định quy mô, §12.2)
   và đã có đường cơ sở 8 tuần chưa (việc phải làm trước cả đợt Đ1).
 
 ## Tiếp theo
+- **Đề xuất ngược cho repo Claude-Agents** (SYNTH-001 §4, §6): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
+  vừa bị ADR-0021 khuếch đại vì reviewer thành lượt kiểm thử duy nhất); tách `summary` khỏi phần reviewer nhận;
+  cập nhật phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
+  nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
 - **AI Harness — việc chặn:** người dùng trả lời §13.3 (use case đầu tiên · Python hay TS · triển khai
   cloud/on-prem · đa tenant · phạm vi tuân thủ · mua hay tự xây observability · kênh HITL · quy mô năm đầu).
   Có câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chấp nhận ADR-0002, rồi chạy `/bootstrap` cho mốc M0.

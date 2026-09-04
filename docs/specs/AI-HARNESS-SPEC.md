@@ -1,6 +1,8 @@
 # ĐẶC TẢ KỸ THUẬT — XÂY DỰNG MỘT AI HARNESS
 
-> **Mã tài liệu:** SPEC-AIH-001 · **Phiên bản:** 1.0 · **Ngày:** 2026-09-04 · **Trạng thái:** Bản nháp để duyệt
+> **Mã tài liệu:** SPEC-AIH-001 · **Phiên bản:** 1.1 · **Ngày:** 2026-09-04 · **Trạng thái:** Bản nháp để duyệt
+> **v1.1:** bổ sung C1-FR-11 (chính sách chống injection phân biệt theo nguồn) và C5-FR-12/13 (quét tài sản
+> prompt của chính repo + ngân sách prompt tĩnh), rút từ `docs/specs/LESSONS-FROM-CLAUDE-AGENTS.md` (SYNTH-001).
 > **Loại dự án (KHUNG-3 §A0):** Backend/API + Nền tảng vận hành (hồ sơ C3 + C7) — **không** phải web app.
 > **Nguồn gốc:** viết lại từ mô hình *7 AI Harnesses* (chương trình Agent Engineering — Team ProtonX),
 > có nghiên cứu đối chiếu nguồn sống ngày 2026-09-04 (xem §14 Nguồn tham khảo).
@@ -205,6 +207,7 @@ của từng mẩu, trong một **ngân sách token** đã định trước.
 | C1-FR-04 | Khi lịch sử vượt ngưỡng (mặc định 70% cửa sổ), **nén** thay vì cắt cụt; bản nén phải giữ: mục tiêu, ràng buộc, quyết định đã chốt, việc còn dở, id tài nguyên đang mở. | BẮT BUỘC |
 | C1-FR-05 | Trí nhớ dài hạn phải có **chính sách ghi tường minh** (ai được ghi, ghi loại gì) và **TTL/quên**; không ghi tự động mọi thứ agent nói. | BẮT BUỘC |
 | C1-FR-06 | Nội dung `trust_level = untrusted` phải được bọc trong ranh giới rõ ràng và **không bao giờ** nối trực tiếp vào vùng chỉ thị hệ thống. | BẮT BUỘC |
+| C1-FR-11 | Chính sách chống injection **phân biệt theo nguồn**, không dùng một mức cho tất cả: nội dung từ **agent/thành phần nội bộ** khớp mẫu tấn công ⇒ **từ chối xử lý**; nội dung từ **khách hàng / người dùng / web / kết quả công cụ** ⇒ **khử đoạn khớp bằng nhãn rồi đi tiếp** + ghi sự kiện. Kết quả công cụ đọc dữ liệu ngoài (đọc file, tìm kiếm, chạy lệnh trên repo khách) đi qua **đúng bộ lọc như nội dung web**. | BẮT BUỘC |
 | C1-FR-07 | Mọi lần lắp ngữ cảnh phát ra sự kiện `context.assembled` với **danh sách id mẩu + tổng token**, đủ để replay. | BẮT BUỘC |
 | C1-FR-08 | Hỗ trợ **cache prefix**: phần ổn định (chỉ thị, danh sách công cụ) đặt trước, phần biến động (thời gian, id request) đặt sau điểm cache cuối. | NÊN |
 | C1-FR-09 | Đo và báo cáo **tỉ lệ hữu ích của ngữ cảnh**: % mẩu được trích dẫn/được dùng trên tổng mẩu nạp vào. | NÊN |
@@ -494,7 +497,7 @@ dẫn tới hành động có hại.
 | **ASI01** | Agent Goal Hijack | Nhãn `untrusted` (C1-FR-06), hạ đặc quyền sau khi đọc dữ liệu lạ (§4.3.4), HITL cho hành động không hoàn tác |
 | **ASI02** | Tool Misuse and Exploitation | Schema nghiêm ngặt + policy engine + hạn mức (C2-FR-02/04/05) |
 | **ASI03** | Identity and Privilege Abuse | Token OBO ngắn hạn, phạm vi hẹp, tách danh tính người ↔ agent (C2-FR-04) |
-| **ASI04** | Agentic Supply Chain Vulnerabilities | Ghim phiên bản + hash máy chủ/mô tả công cụ MCP, chặn khi đổi (C2-FR-07) |
+| **ASI04** | Agentic Supply Chain Vulnerabilities | Ghim phiên bản + hash máy chủ/mô tả công cụ MCP, chặn khi đổi (C2-FR-07) **và quét tài sản prompt của chính repo (C5-FR-12)** — một chuỗi tấn công nằm trong một skill dùng chung hỏng mọi vai nạp nó, ở mọi lượt |
 | **ASI05** | Unexpected Code Execution | Sandbox microVM/gVisor, egress danh sách trắng, không mạng mặc định (C2-FR-08) |
 | **ASI06** | Memory & Context Poisoning | Chính sách ghi trí nhớ + đánh dấu nguồn + không dùng cho quyết định đặc quyền (C1-FR-05/10) |
 | **ASI07** | Insecure Inter-Agent Communication | Bàn giao có schema + xác thực đôi bên + thẻ agent có chữ ký (C3-FR-06/12) |
@@ -534,6 +537,8 @@ Ràng buộc thật nằm ở vòng 2 và 3 — thuần xác định (P1).
 | C5-FR-09 | **Kill switch** ở ba mức: một run · một phiên bản agent · toàn hệ thống. Tác dụng ≤ 10 s, kèm thu hồi token. | BẮT BUỘC |
 | C5-FR-10 | Red team tự động chạy định kỳ (tối thiểu hàng tuần) trên môi trường staging với bộ tấn công cập nhật. | NÊN |
 | C5-FR-11 | Kiểm thử xâm nhập có uỷ quyền trước khi lên production và định kỳ ≥ 1 lần/năm. | NÊN |
+| C5-FR-12 | **Tài sản prompt của chính hệ thống là chuỗi cung ứng** (định nghĩa agent, skill, template, mô tả cổng, schema): phải có cổng CI quét chúng với tối thiểu 4 luật — mẫu injection (**dùng chung một nguồn sự thật với bộ lọc runtime**), ký tự ẩn (zero-width, bidi override, tệp không phải UTF-8), lệnh nguy hiểm, chuỗi giống bí mật. Miễn trừ phải ghi **lý do**; miễn trừ không còn khớp phải bị báo để dọn. | BẮT BUỘC |
+| C5-FR-13 | **Ngân sách prompt tĩnh là cổng CI**: tổng độ dài prompt hệ thống của một vai so với ngân sách khai báo — vượt ngưỡng đã chốt là đỏ; tham chiếu tới tài sản không tồn tại cũng đỏ. | BẮT BUỘC |
 
 #### 4.5.5 Tiêu chí nghiệm thu
 1. Bộ ca injection (≥ 50 ca, gồm tài liệu, email, HTML ẩn, kết quả công cụ) ⇒ **0 ca** dẫn tới hành động không được phép.
@@ -772,7 +777,7 @@ Content-Type: application/json
 | ASI01 Goal hijack | C1-FR-06, §4.3.4 (hạ đặc quyền), C2-FR-03 | Bộ eval injection ≥ 50 ca (C4-FR-07) |
 | ASI02 Tool misuse | C2-FR-02, C2-FR-04, C2-FR-05 | Test schema/authz/hạn mức ở gateway |
 | ASI03 Privilege abuse | C2-FR-04, C5-FR-02 | Test token hết hạn, scope hẹp, không leo thang |
-| ASI04 Supply chain | C2-FR-07 | Test đổi mô tả công cụ ⇒ bị chặn |
+| ASI04 Supply chain | C2-FR-07, C5-FR-12 | Test đổi mô tả công cụ ⇒ bị chặn; ca ký tự ẩn/injection nhét vào file skill ⇒ CI đỏ |
 | ASI05 Code execution | C2-FR-08, C5-FR-05 | Test thoát sandbox, test egress |
 | ASI06 Memory poisoning | C1-FR-05, C1-FR-10 | Test ghi trí nhớ từ nguồn untrusted |
 | ASI07 Inter-agent comms | C3-FR-06, C3-FR-12 | Test bàn giao không schema/không chữ ký ⇒ từ chối |
