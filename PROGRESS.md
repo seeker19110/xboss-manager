@@ -238,10 +238,21 @@
       lộ trình 8 tuần **ba luồng song song**. **§B12.3 = chế độ suy giảm n = 1** (nội dung cũ giữ nguyên,
       kích hoạt khi hai người vắng, phải ghi vào hệ thống).
 
+- ✅ **Chạy đường cơ sở Đ0 trên repo Claude-Agents** → `docs/ops/BASELINE-2026-09-04-claude-agents.md`.
+      Kết luận: **không tồn tại đường cơ sở hồi cứu 8 tuần** — X-Agents mới 3 ngày tuổi, tháng 8 là dự án tiền thân
+      MEP-Agents (PR `(#N)` trỏ repo khác), 6 tuần giữa trống; quy trình hiện tại đã là 1 người + Claude Code.
+      Số đáng chú ý: lead time PR **trung vị 4,4 phút = thời gian CI**, 2/38 PR merge TRƯỚC khi CI xong (#29: 23 s,
+      `quality` xanh 3 phút sau merge ⇒ branch protection không chặn); **35% commit thẳng vào main**; 1 sự cố xoá
+      nhầm cả dự án 11/08 (138 file). Đã chỉnh bộ lệnh §B12.3.8 cho squash-merge (đếm `(#N)` + commit thẳng; lead
+      time phải lấy từ API và tách CI khỏi người xem), đổi Đ0 thành **tiến cứu 4 tuần từ T0**, luồng A tuần 1 thêm
+      việc **bật branch protection thật**. Câu chặn #2 ở §C2.4 đã có câu trả lời.
+
 ## Đang làm
 - **SPEC-AI-100 v2.0 + §B12 (hồ sơ n = 1)** đã push lên `claude/ai-harness-spec-research-4jmxqq`.
   Câu chặn #1 (bao nhiêu người) **đã trả lời: 3 người** (nâng từ 1) → §B12.2; n = 1 giữ làm chế độ suy giảm §B12.3.
-  Câu chặn #2 **vẫn mở**: đã có đường cơ sở 8 tuần chưa — nếu chưa, đó là việc tuần 1 luồng A (§B12.3.8, chạy 4 lệnh git).
+  Câu chặn #2 **đã kiểm**: không có đường cơ sở hồi cứu (codebase 3 ngày tuổi) ⇒ đo tiến cứu 4 tuần từ T0 = 05/09
+  (`docs/ops/BASELINE-2026-09-04-claude-agents.md`). Việc tuần 1 luồng A giờ là **bật branch protection thật** trên
+  Claude-Agents — hiện PR merge được trước khi CI xong.
   Việc kế tiếp theo lộ trình §B12.2.9: luồng B bắt đầu vai R4 viết test độc lập ngay tuần 1.
 
 ## Tiếp theo

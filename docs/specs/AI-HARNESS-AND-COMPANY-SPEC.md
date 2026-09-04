@@ -1887,7 +1887,7 @@ ba việc có thể chạy song song thay vì nối tiếp.
 
 | Tuần | **Luồng A** (chủ sản phẩm) | **Luồng B** (tech lead) | **Luồng C** (trực) |
 |---|---|---|---|
-| **1** | Đ0: chốt 4 số đường cơ sở (§B12.3.8) · khuôn `SpecDoc` cùng R1 | Bắt đầu **vai R4 độc lập** (§C1.2 mục 1) | Lịch trực luân phiên · G6 gộp lô · diễn tập kill switch |
+| **1** | Đ0: **đường cơ sở hồi cứu không tồn tại** (`docs/ops/BASELINE-2026-09-04-claude-agents.md`) ⇒ mở đo **tiến cứu 4 tuần** từ T0 · **bật branch protection thật** (required check, cấm merge trước CI, cấm commit thẳng) · khuôn `SpecDoc` cùng R1 | Bắt đầu **vai R4 độc lập** (§C1.2 mục 1) | Lịch trực luân phiên · G6 gộp lô · diễn tập kill switch |
 | **2–3** | Vận hành G1, đo `g1_review_time_p50`; sửa khuôn SpecDoc nếu > 15' | Xong R4: vai lập trình **mất quyền ghi** thư mục test | Bật R8 cảnh báo tối thiểu; nối G8 với báo cáo ngày |
 | **4** | — | Chống duyệt bừa: ASC-FR-35/36/37 + gán đích danh ASC-FR-38/39/40 | Diễn tập rollback ≤ 5 phút |
 | **5** | Rà lại `risk_tags` thực tế 4 tuần: có nới/siết? | Tách phần biện hộ khỏi thứ R5 nhận (§C1.2 mục 2) | Đối soát chi phí tháng đầu (ASC-FR-32) |
@@ -1992,6 +1992,12 @@ chế độ API chỉ bật cho phần cần chạy theo lô lớn hoặc cần 
 (khai `tier`, không khai tên model) để đổi chế độ không phải sửa gì ngoài cấu hình.
 
 #### B12.3.8 Đường cơ sở Đ0 khi chỉ có một người
+
+> **Đã đo thật ngày 2026-09-04** cho repo `seeker19110/Claude-Agents` → `docs/ops/BASELINE-2026-09-04-claude-agents.md`.
+> Hai điều chỉnh rút ra khi chạy: *(a)* repo **squash-merge** thì `--merges` đếm thiếu — phải đếm commit có đuôi
+> `(#N)` và đếm riêng **commit thẳng vào `main`** (mục tiêu 0); *(b)* lead time PR **không lấy được từ git** với
+> squash-merge — dùng GitHub API và **tách thời gian CI khỏi thời gian người xem** (so `completed_at` của check-run
+> với `merged_at`). Bộ lệnh đã chỉnh nằm trong file kết quả; bộ dưới đây giữ cho repo merge-commit thường.
 
 Đợt Đ0 nói "đo 8 tuần quy trình người hiện tại". Với một người, quy trình đó **là chính bạn** — và dữ liệu
 đã nằm sẵn trong git, không cần lập chương trình đo:
@@ -2206,7 +2212,7 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
 
 **Về con người và quy mô** *(quyết định quy mô — §C2.3)*
 4. **Có bao nhiêu người thật cho ba chốt** (duyệt đặc tả · duyệt kiến trúc · thao tác production)?
-5. **Đã có đường cơ sở 8 tuần chưa?** Chưa có thì đó là việc số 0, trước cả Đ1.
+5. **Đã có đường cơ sở 8 tuần chưa?** — *Đã kiểm 2026-09-04: **chưa, và không thể có hồi cứu*** (codebase mới 3 ngày tuổi). Chuyển sang đo tiến cứu 4 tuần từ T0; chi tiết `docs/ops/BASELINE-2026-09-04-claude-agents.md`.
 6. **Mức tự chủ mục tiêu trong 6 tháng:** L1, L2 hay L3?
 7. **Kênh chốt của người:** web nội bộ, Slack/Teams, hay hệ thống ticket sẵn có?
 
