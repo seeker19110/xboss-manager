@@ -1723,9 +1723,11 @@ Không "bật công ty AI" trong một lần. Mỗi mức có **điều kiện v
 |---|---|---|---|
 | **L0 — Trợ lý** | Đề xuất spec/plan/diff dưới dạng bản nháp | Mọi thứ | Đã có đường cơ sở 8 tuần (§B9.3) + harness M0–M1 xong |
 | **L1 — Sinh PR** | R1→R5 chạy, mở PR kèm test và báo cáo review | Người review và merge **mọi** PR | `first_pass_gate_rate` ≥ 70% trong 4 tuần · `escaped_defect_rate` ≤ đường cơ sở |
-| **L2 — Tự chủ làn nhanh** | Tự merge **làn nhanh** khi mọi cổng xanh | Duyệt spec làn chuẩn · review mẫu ≥ 10% · mọi việc làn kiến trúc | **200 lần merge liên tiếp** ở làn nhanh không có lỗi lọt mức nghiêm trọng · vi phạm phân tách đặc quyền = 0 |
+| **L2 — Tự chủ làn nhanh** | Tự merge **làn nhanh** khi mọi cổng xanh | Duyệt spec làn chuẩn · review mẫu ≥ 10% · mọi việc làn kiến trúc | **200 lần merge liên tiếp** ở làn nhanh không có lỗi lọt mức nghiêm trọng · vi phạm phân tách đặc quyền = 0 · *(đội một người: 60 lần — xem §B12.5)* |
 | **L3 — Tự chủ làn chuẩn** | Chạy trọn tính năng làn chuẩn | Chốt G1 (spec) · chốt G6 với thay đổi nhạy cảm · review mẫu | 8 tuần ở L2 với `change_failure_rate` ≤ đường cơ sở · `human_intervention_rate` ≤ 15% |
 | **L4 — Tự chủ trong hàng rào** | Toàn bộ làn nhanh + chuẩn, tự phát hành theo canary | Chốt spec · giám sát · kill switch · **làn kiến trúc vẫn luôn có người** | Chỉ áp dụng cho hệ thống rủi ro thấp; cần phê duyệt quản trị (§A4.6) |
+
+**Với `n = 1`:** ngưỡng và khuyến nghị điều chỉnh ở §B12.5 — đặc biệt: **không lên L3** trong 6 tháng đầu.
 
 **Đường lùi bắt buộc:** bất kỳ mức nào, nếu 2 tuần liên tiếp `escaped_defect_rate` xấu hơn đường cơ sở
 hoặc có 1 vi phạm phân tách đặc quyền ⇒ **tự động hạ một mức**, không cần họp bàn.
@@ -1749,6 +1751,155 @@ Một agent chạy an toàn có giá trị hơn năm agent không kiểm soát �
 
 **Nếu chỉ đủ nguồn lực cho ba vai:** **R3 (lập trình) → R4 (viết test độc lập) → R5 (rà soát)**.
 R4 đến trước R6/R7 vì nó bảo vệ mạnh nhất trên mỗi đồng bỏ ra.
+
+---
+
+## B12. Hồ sơ **một người** (n = 1)
+
+> Người dùng đã chốt: **có đúng một người** cho ba chốt L7. Toàn bộ Phần B ở trên viết cho một đội;
+> mục này là **cấu hình chính thức khi đội chỉ có một người** — nói rõ cái gì giữ, cái gì tắt, số nào thay đổi.
+> Không phải bản rút gọn cho vui: các con số dưới đây suy ra từ công thức §C2.3 với `n = 1`.
+
+### B12.1 Ba điều đổi ngay khi n = 1
+
+1. **Ba vai người gộp làm một.** Chủ sản phẩm = Tech lead = người trực sự cố = bạn.
+   Hệ quả: **four-eyes giữa hai người là bất khả thi** — nó chỉ còn tồn tại ở dạng
+   *agent tạo ra ↔ người duyệt*. ASC-FR-13 vẫn hiệu lực nhưng đổi nghĩa: hệ thống phải **từ chối để một
+   agent tự duyệt sản phẩm của chính nó**; nó không còn bảo vệ bạn khỏi chính bạn.
+2. **Bạn là trần thông lượng của cả hệ thống**, không phải số agent, không phải ngân sách token.
+   Mọi thứ bên dưới chỉ là cách tiêu số phút của bạn cho khôn.
+3. **Rủi ro số một đổi.** Với đội, rủi ro lớn nhất là chất lượng rà soát trôi. Với một người, rủi ro lớn
+   nhất là **bạn duyệt bừa** — hàng đợi dồn, bạn bấm approve mà không mở diff. Xem §B12.6.
+
+### B12.2 Định cỡ theo thời gian bạn thật sự bỏ ra
+
+Tham số duy nhất cần bạn điền: **mỗi ngày bạn dành bao nhiêu phút cho các chốt** (không tính thời gian
+bạn tự code). Cơ sở tính: G1 ≈ 15 phút/việc · rà tay một PR ≈ 25 phút · G6 gộp lô ≈ 10 phút ·
+dự phòng leo thang 15–25 phút/ngày.
+
+| Thời gian/ngày cho các chốt | **60 phút** | **120 phút** | **180 phút** |
+|---|---|---|---|
+| Việc làn chuẩn hoàn thành / ngày | 1–2 | **3** | 4–5 |
+| WIP đồng thời tối đa | **2** | **3** | **4** |
+| Rà tay mẫu / tuần | 2 PR | 3–4 PR | 5–6 PR |
+| Duyệt phát hành | gộp 1 lần / 2 ngày | 1 lần / ngày | 2 lần / ngày |
+| Việc làn kiến trúc | ≤ 1 / tuần | ≤ 2 / tuần | ≤ 3 / tuần |
+
+**Quy tắc khởi động:** bắt đầu ở **WIP = 2**, bất kể bạn nghĩ mình làm được bao nhiêu.
+Chỉ tăng lên 3 khi hàng đợi duyệt **rỗng vào cuối ngày, 5 ngày làm việc liên tiếp**.
+Hàng đợi dồn hai ngày liên tiếp ⇒ **hạ WIP xuống 1** và không nhận việc mới cho tới khi rỗng.
+
+> Đây không phải lời khuyên năng suất. Đó là luật **L4** (WIP ≤ năng lực xác minh) áp cho `n = 1`:
+> khi bạn là cả hàng đợi review, một hàng đợi dồn nghĩa là hệ thống đang sản xuất nhanh hơn khả năng
+> tin được nó — đúng cái bẫy ở §B1.1.
+
+### B12.3 Vai nào bật, vai nào tắt
+
+| Vai | n = 1 | Lý do |
+|---|---|---|
+| **R3 Lập trình** | ✅ Bật | Vai sản xuất |
+| **R4 Viết test độc lập** | ✅ **Bật — không được tắt** | Đây là vai dễ bị cắt nhất khi làm một mình, và là vai **đắt giá nhất** khi không có đồng nghiệp: nó là "người thứ hai" duy nhất còn lại giữa bạn và một bộ test tự khẳng định |
+| **R5 Rà soát** | ✅ Bật, model **khác** R3 | Điểm mù không tương quan — thay thế được một phần cho việc không có ai review cùng |
+| **R7 Tích hợp** | ✅ Bật | Là code, gần như miễn phí, và giữ `main` sạch |
+| **R1 Phân tích** | ✅ Bật, **ở dạng phiên dịch** | Bạn nói ý bằng vài câu; R1 biến thành `SpecDoc` có tiêu chí kiểm chứng được để bạn duyệt. Đừng để R1 "phỏng vấn" bạn dài dòng |
+| **R6 Bảo mật** | ⚠️ Chỉ khi `risk_tags` | Đúng như ASC-FR-21 — nhưng với `n = 1` thì tuyệt đối không nới danh sách tag |
+| **R2 Kiến trúc** | ⚠️ Chỉ làn kiến trúc | Việc thường không cần một vai kiến trúc riêng khi codebase còn nhỏ |
+| **R8 Vận hành** | ⚠️ Mức tối thiểu, model rẻ | Chỉ phân loại cảnh báo + dựng giả thuyết; bạn bấm mọi thứ chạm production |
+| **R9 Trí nhớ** | ⚠️ **Chạy theo lô hằng tuần** | Không chạy mỗi việc — một lượt cuối tuần gom quy ước, cập nhật bản đồ tính năng, sinh ca eval từ sự cố |
+| **R0 Điều phối** | ❌ **Thay bằng code** | Với 2–4 việc song song, một hàng đợi + trần WIP trong script làm tốt hơn một agent điều phối, và không tốn token |
+
+**Đọc lại luật L5 ở đây:** vai nào không bắt được lớp lỗi đo được thì xoá. Với `n = 1` ngưỡng còn khắt khe
+hơn — mỗi vai bật thêm là thêm token, thêm độ trễ, và thêm một hàng đợi bạn phải trông.
+
+### B12.4 Cổng nào giữ, cổng nào để máy
+
+| Cổng | n = 1 |
+|---|---|
+| G0 nhận việc | 🤖 Tự động (hàng đợi + trần WIP) |
+| **G1 đặc tả** | 👤 **Bạn — không bỏ được.** Đây là chốt chống "làm sai việc"; sai ở đây tốn nhất |
+| G2 kế hoạch/ADR | 👤 Chỉ làn kiến trúc |
+| G3a bằng chứng mã · G3b bằng chứng test · G4 rà soát · G5 bảo mật | 🤖 Máy, không có bạn trong vòng lặp |
+| **G6 phát hành** | 👤 **Bạn — gộp theo lô**, không duyệt lẻ từng việc |
+| G7 nghiệm thu khách | ⛔ **Tắt nếu không có khách hàng.** Có khách thì bật nguyên trạng — và chữ ký phải là của khách, không phải của bạn (ASC-FR-17) |
+| G8 đóng việc | 🤖 Tự động + bạn đọc **báo cáo tuần**, không đọc từng việc |
+| G-esc bế tắc | 👤 Bạn, ngay khi có |
+
+### B12.5 Ngưỡng điều chỉnh cho `n = 1`
+
+| Ngưỡng gốc (đội) | Ngưỡng cho một người | Vì sao đổi |
+|---|---|---|
+| Rà tay mẫu **≥ 10% PR** | **≥ 3 PR/tuần _hoặc_ 20% — lấy số lớn hơn**, cho tới khi tích luỹ đủ **50 PR** đã rà tay | 10% của 15 PR/tuần là 1,5 PR — quá ít để biết R5 còn tốt hay không. Với lượng nhỏ, phải dùng **số tuyệt đối** |
+| L1 → L2: **200 lần merge** liên tiếp sạch | **60 lần merge** liên tiếp sạch ở làn nhanh | 200 lần ở nhịp 15/tuần là hơn 3 tháng — dài tới mức bạn sẽ bỏ qua quy trình. **Đánh đổi phải nói rõ:** 60 cho ít bằng chứng thống kê hơn, nên bù bằng cách **thu hẹp làn nhanh** (chỉ sửa lỗi ≤ 20 dòng, nâng phiên bản phụ thuộc, sửa tài liệu — không gì khác) |
+| L2 → L3 | ❌ **Không khuyến nghị trong 6 tháng đầu với `n = 1`** | L3 nghĩa là agent chạy trọn tính năng còn bạn chỉ chốt đặc tả và phát hành. Khi bạn là người duy nhất, không có ai bắt được lúc bạn nhìn nhầm |
+| `human_intervention_rate` ≤ 15% | Không dùng làm cổng | Với `n = 1` chỉ số này đo bạn bận hay rảnh, không đo chất lượng hệ thống |
+
+### B12.6 Chống "duyệt bừa" — chỉ số quan trọng nhất khi `n = 1`
+
+Với đội, ASI09 (khai thác lòng tin của người) là chuyện agent thuyết phục người khác. Với một người,
+nó là chuyện **bạn tự bỏ qua** vì đang vội. Ba biện pháp cụ thể, đều đo được:
+
+| Mã | Yêu cầu | Mức |
+|---|---|---|
+| ASC-FR-35 | Ghi **thời gian từ lúc mở màn duyệt tới lúc bấm** cho mọi cổng người. Cảnh báo khi `p50` < **90 giây** cho G1 hoặc < **3 phút** cho một lượt rà tay mẫu — đó là dấu hiệu cổng đã thành nghi thức. | BẮT BUỘC |
+| ASC-FR-36 | Màn duyệt **hiển thị diff và checklist trước**, nút quyết định **chỉ bật sau khi đã cuộn hết** phần bắt buộc. Không có nút "duyệt tất cả". | BẮT BUỘC |
+| ASC-FR-37 | Cổng quá hạn **không tự đi tiếp và không tự huỷ** (ASC-FR-14). Với `n = 1`, thêm: quá **48 giờ** thì hệ thống **tự hạ WIP xuống 1** và ngừng nhận việc mới — hàng đợi dồn là tín hiệu, không phải nền cảnh. | BẮT BUỘC |
+
+> Nếu bạn thấy ba yêu cầu này phiền: đó chính là điểm. Chúng phiền đúng vào lúc bạn định bỏ qua bước
+> mà cả hệ thống đang dựa vào.
+
+### B12.7 Chi phí: chế độ gói đăng ký là **mặc định**, không phải tuỳ chọn
+
+Ở nhịp 15 việc làn chuẩn/tuần với đơn giá ~$6/việc (§B8.1): **~$90/tuần ≈ $390/tháng** nếu mua token qua API.
+Với một người, đó là khoản đáng kể cho một hệ chưa chứng minh được giá trị.
+
+⇒ Với `n = 1`, **chế độ (b) của ASC-FR-29 — chạy bằng gói đăng ký sẵn có — là mặc định**;
+chế độ API chỉ bật cho phần cần chạy theo lô lớn hoặc cần độ trễ ổn định. Giữ nguyên ASC-FR-30
+(khai `tier`, không khai tên model) để đổi chế độ không phải sửa gì ngoài cấu hình.
+
+### B12.8 Đường cơ sở Đ0 khi chỉ có một người
+
+Đợt Đ0 nói "đo 8 tuần quy trình người hiện tại". Với một người, quy trình đó **là chính bạn** — và dữ liệu
+đã nằm sẵn trong git, không cần lập chương trình đo:
+
+```bash
+# Tần suất phát hành (8 tuần gần nhất)
+git log --first-parent --merges --since=8.weeks --oneline main | wc -l
+
+# Tỉ lệ thay đổi gây lỗi — đếm revert/hotfix trên tổng số merge
+git log --first-parent --since=8.weeks --oneline main | grep -icE 'revert|hotfix|fix!|urgent'
+
+# Lead time thô: khoảng cách từ commit đầu của nhánh tới lúc merge (xem 20 nhánh gần nhất)
+git log --first-parent --merges --since=8.weeks --format='%H %ci %s' main | head -20
+
+# Kích thước thay đổi trung bình (để so sau khi bật agent — PR phình là dấu hiệu xấu)
+git log --first-parent --merges --since=8.weeks --format='%H' main \
+  | xargs -I{} git show --stat --format= {} | awk '/files? changed/ {print $1}' \
+  | awk '{s+=$1; n++} END {if (n) print "trung bình", s/n, "file/PR trên", n, "PR"}'
+```
+
+Ghi bốn số đó vào `docs/ops/` **trước khi bật bất kỳ agent nào**. Không có chúng thì sau này bạn không
+trả lời được câu duy nhất đáng hỏi: *hệ này có thật sự tốt hơn tôi làm tay không?*
+
+### B12.9 Lộ trình cho một người — **đừng xây Phần A từ đầu**
+
+Lộ trình Đ0–Đ8 (§B11.1) là **16–20 tuần làm việc toàn thời gian của một đội**. Với một người, đi trọn nó
+nghĩa là dành hơn nửa năm xây hạ tầng trước khi giao được dòng giá trị nào. Đó là cách hỏng phổ biến nhất.
+
+**Khuyến nghị thẳng:** bạn **đã có** một triển khai chạy được (§C1) — dùng nó làm Phần A, và tiêu công sức
+vào các khoảng cách đã được chỉ ra, theo thứ tự giá trị trên mỗi giờ bỏ ra:
+
+| Tuần | Việc | Vì sao trước |
+|---|---|---|
+| **1** | Đ0: chốt bốn số đường cơ sở (§B12.8) · đặt WIP = 2 · tắt các vai theo §B12.3 | Rẻ nhất, và mọi kết luận sau này dựa vào nó |
+| **2–3** | **Thêm vai R4 viết test độc lập** (§C1.2 mục 1): nhận đặc tả + kế hoạch, **không** nhận diff ở lượt đầu; vai lập trình **mất quyền ghi** thư mục test | Rủi ro lớn nhất còn lại, và bạn không có đồng nghiệp bù vào |
+| **4** | Chống duyệt bừa: ASC-FR-35/36/37 | Với `n = 1` đây là cổng thật sự dễ mục nhất |
+| **5** | Tách phần biện hộ khỏi thứ vai rà soát nhận (§C1.2 mục 2) | Rẻ, sửa một chỗ trong hợp đồng dữ liệu |
+| **6** | Nâng ngưỡng coverage của thành phần giữ thông tin xác thực (§C1.3 mục 3) | Chỗ rủi ro cao nhất đang được canh lỏng nhất |
+| **7–8** | Bật L1 đầy đủ, chạy thật, đo lại bốn số so đường cơ sở | Có số rồi mới bàn tới L2 |
+
+Sau 8 tuần, so đường cơ sở. **Nếu `escaped_defect_rate` không tốt hơn, đừng lên L2** — hãy sửa cái đang
+hỏng trước. Với một người, lên mức tự chủ quá sớm không tiết kiệm thời gian; nó chỉ dời công việc sang
+lúc sửa sự cố, và lúc đó thì cũng chỉ có mình bạn.
 
 ---
 
@@ -1832,25 +1983,28 @@ Không có đường cơ sở thì không trả lời được câu quan trọng
 
 ### C1.4 Chỉ mục nguồn trong repo (để tra lại)
 
+> Cột bên phải là **đường dẫn tương đối trong repo `seeker19110/Claude-Agents`**, không phải repo này —
+> nên cố ý không viết trong backtick.
+
 | Chủ đề | Đường dẫn trong `seeker19110/Claude-Agents` |
 |---|---|
-| Kiến trúc công ty, vòng đời ticket, thành phần dùng chung | `software-company/docs/architecture.md` |
-| Checklist từng gate (máy kiểm vs người kiểm) | `software-company/gates/checklists.md` |
-| Bảng topic ↔ producer/consumer, chủ ghi namespace | `software-company/topics/README.md` |
-| Tool có ranh giới, bằng chứng do code điền, eval replay | `software-company/docs/adr/0010-tool-boundary-eval-replay.md` |
-| Bản ghi eval bắt buộc | `software-company/docs/adr/0015-eval-recordings-required.md` + `evals/recordings/REQUIRED.txt` |
-| Skill hai mức | `software-company/docs/adr/0008-skill-tiering.md` |
-| Skill phải có chủ quản | `software-company/docs/adr/0016-skill-must-have-owner.md` |
-| Ngữ cảnh theo vai | `software-company/docs/adr/0020-context-by-role.md` |
-| Cắt vai bằng dữ liệu | `software-company/docs/adr/0021-review-lean.md` |
-| Quét tài sản prompt | `software-company/docs/adr/0022-quet-tai-san-prompt.md` |
-| Blackboard toàn văn, guard theo nguồn, ngân sách tiền | `software-company/docs/adr/0012-content-context-cost-parallel.md` |
-| Nhánh tích hợp | `software-company/docs/adr/0011-integration-branch.md` |
-| Định tuyến theo gói đăng ký + bảng agent→tier | `docs/DIEU-PHOI-MODEL.md`, `software-company/docs/adr/0019-subscription-routing.md` |
-| Four-eyes, timeout gate | `software-company/src/company/gates.py` |
-| Kiểm theo stack thật | `software-company/src/company/stacks.py` |
-| Mẫu agent (front matter đầy đủ) | `software-company/agents/quality/reviewer.md` |
-| Mẫu skill (Quy trình + Checklist bắt buộc) | `software-company/skills/code-review.md` |
+| Kiến trúc công ty, vòng đời ticket, thành phần dùng chung | software-company/docs/architecture.md |
+| Checklist từng gate (máy kiểm vs người kiểm) | software-company/gates/checklists.md |
+| Bảng topic ↔ producer/consumer, chủ ghi namespace | software-company/topics/README.md |
+| Tool có ranh giới, bằng chứng do code điền, eval replay | software-company/docs/adr/0010-tool-boundary-eval-replay.md |
+| Bản ghi eval bắt buộc | software-company/docs/adr/0015-eval-recordings-required.md + `evals/recordings/REQUIRED.txt` |
+| Skill hai mức | software-company/docs/adr/0008-skill-tiering.md |
+| Skill phải có chủ quản | software-company/docs/adr/0016-skill-must-have-owner.md |
+| Ngữ cảnh theo vai | software-company/docs/adr/0020-context-by-role.md |
+| Cắt vai bằng dữ liệu | software-company/docs/adr/0021-review-lean.md |
+| Quét tài sản prompt | software-company/docs/adr/0022-quet-tai-san-prompt.md |
+| Blackboard toàn văn, guard theo nguồn, ngân sách tiền | software-company/docs/adr/0012-content-context-cost-parallel.md |
+| Nhánh tích hợp | software-company/docs/adr/0011-integration-branch.md |
+| Định tuyến theo gói đăng ký + bảng agent→tier | docs/DIEU-PHOI-MODEL.md, software-company/docs/adr/0019-subscription-routing.md |
+| Four-eyes, timeout gate | software-company/src/company/gates.py |
+| Kiểm theo stack thật | software-company/src/company/stacks.py |
+| Mẫu agent (front matter đầy đủ) | software-company/agents/quality/reviewer.md |
+| Mẫu skill (Quy trình + Checklist bắt buộc) | software-company/skills/code-review.md |
 
 ---
 
@@ -1904,6 +2058,9 @@ Số work item song song tối đa
 ```
 Ba số ở trên đều là **số người**, không phải số agent. Đây là câu trả lời trung thực cho câu hỏi
 "công ty AI này lớn cỡ nào": nó lớn bằng **năng lực xác minh**, không bằng số agent bật lên.
+
+> **Đã chốt cho dự án này: `n = 1`.** Toàn bộ hệ quả — vai nào tắt, cổng nào giữ, ngưỡng nào đổi,
+> lộ trình 8 tuần — nằm ở **§B12**.
 
 
 ### C2.4 Mười hai câu phải chốt trước khi bắt tay

@@ -216,10 +216,22 @@
       vs "không tự đi tiếp" (công ty) → chốt **không tự đi tiếp, không tự huỷ, chuyển leo thang cho người** (ASC-FR-14).
       Cập nhật ADR-0002 trỏ sang tài liệu mới.
 
+- ✅ **Chốt `n = 1` (một người cho cả ba chốt) → thêm §B12 "Hồ sơ một người"** vào SPEC-AI-100:
+      định cỡ theo thời gian thật (60/120/180 phút/ngày → WIP 2/3/4, 1–5 việc làn chuẩn/ngày, khởi động
+      **luôn ở WIP = 2**); bảng vai bật/tắt (**R4 viết test độc lập không được tắt**; R0 điều phối thay bằng
+      code; R9 chạy theo lô tuần); cổng nào giữ người (G1, G6 gộp lô, G-esc) và cổng nào để máy;
+      ngưỡng điều chỉnh (rà tay mẫu **≥ 3 PR/tuần hoặc 20%** thay cho 10%; L1→L2 **60 lần merge** thay 200,
+      đổi lại phải thu hẹp làn nhanh; **không lên L3 trong 6 tháng đầu**); **ba yêu cầu chống duyệt bừa**
+      ASC-FR-35/36/37 (đo thời gian từ mở màn duyệt tới lúc bấm, cảnh báo khi p50 < 90 giây; nút chỉ bật sau
+      khi cuộn hết; quá 48h thì tự hạ WIP); chế độ **gói đăng ký là mặc định** (~$390/tháng nếu mua token);
+      đường cơ sở Đ0 rút thẳng từ git history (4 lệnh sẵn); và **lộ trình 8 tuần KHÔNG xây Phần A từ đầu** —
+      dùng repo Claude-Agents đã có, chỉ vá các khoảng cách theo thứ tự giá trị/giờ.
+
 ## Đang làm
-- Một tài liệu duy nhất (**SPEC-AI-100 v2.0**) đã push lên nhánh `claude/ai-harness-spec-research-4jmxqq`.
-  **Đang chờ người dùng chốt 12 câu hỏi ở §C2.4** — hai câu chặn thật: có bao nhiêu NGƯỜI cho ba chốt
-  (quyết định quy mô, công thức §C2.3) và đã có đường cơ sở 8 tuần chưa (đợt Đ0, trước cả Đ1).
+- **SPEC-AI-100 v2.0 + §B12 (hồ sơ n = 1)** đã push lên `claude/ai-harness-spec-research-4jmxqq`.
+  Câu chặn #1 (bao nhiêu người) **đã trả lời: 1 người** → §B12.
+  Câu chặn #2 **vẫn mở**: đã có đường cơ sở 8 tuần chưa — nếu chưa, đó là việc tuần 1 (§B12.8, chạy 4 lệnh git).
+  Việc kế tiếp theo lộ trình §B12.9: tuần 2–3 thêm vai R4 viết test độc lập vào repo Claude-Agents.
 
 ## Tiếp theo
 - **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
