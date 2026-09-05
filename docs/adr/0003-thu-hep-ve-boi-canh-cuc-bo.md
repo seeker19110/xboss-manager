@@ -38,6 +38,10 @@ Nói cách khác: ADR-0002 mô tả một hệ thống nhiều máy, còn thứ 
 4. **Phạm vi tuân thủ: nội bộ, tự dùng.** Nghĩa vụ EU AI Act không gắn vào hệ thống này; §A4.6.3 thu về
    một ghi chú tham khảo **kèm điều kiện làm nó hết hiệu lực**. Minh bạch + kiểm toán vẫn giữ.
 5. **Mức tự chủ mục tiêu 6 tháng: L2**, không nhắm L3.
+6. **Ngưỡng "làn nhanh" là một vị từ kiểm được bằng máy, mặc định fail closed** (định nghĩa đầy đủ ở
+   SPEC-AI-100 §B3.1a): hợp lấy giao của 5 điều kiện — không chạm `SECRET_FILES`/schema/`gateway/` ·
+   `risk_tags` rỗng · ≤ 1 package · ≤ 150 dòng · có test phủ nhánh sửa và CI xanh. Ba nhóm **luôn** là làn
+   kiến trúc bất kể kích thước: xác thực/phân quyền, thanh toán, mật mã.
 
 ## Lý do
 
@@ -57,6 +61,14 @@ Ghi ra để nó là một đánh đổi có ý thức, không phải một lỗ
 không chạm EU, nên đó là chi phí không có người trả. Thứ thay thế rẻ hơn nhiều: một **điều kiện kích hoạt**
 ghi rõ trong §A4.6.3, để lúc có khách đầu tiên thì biết phải bật cái gì.
 
+**Vì sao ngưỡng làn nhanh phải fail closed, và vì sao có ngoại lệ cứng.** Ở L2, đây là ranh giới agent tự
+merge mà **không ai xem trước** — nên một điều kiện "không đánh giá được" phải tính là trượt, chứ không phải
+bỏ qua. Ngoại lệ cứng cho xác thực/thanh toán/mật mã không phải điều kiện thứ sáu mà là một loại khác: hậu
+quả sai ở ba nhóm đó **không tỉ lệ với kích thước diff**. Một dòng sửa sai trong kiểm tra quyền là một lỗ
+hổng, dù diff chỉ một dòng — nên không có ngưỡng dòng nào bảo vệ được, chỉ có "luôn có người".
+Ngưỡng 150 dòng chọn theo **dung lượng đọc của người**, không theo độ khó; nó là con số đầu tiên, kèm sẵn
+điều kiện xem lại sau 4 tuần và quy tắc nới **chỉ được nới số dòng**, không được bỏ điều kiện hay ngoại lệ.
+
 **Vì sao L2 chứ không L3.** Điều kiện vào L3 là *8 tuần ở L2 với `change_failure_rate` ≤ đường cơ sở*.
 Đường cơ sở mới bắt đầu đo tiến cứu từ T0 = 05/09 (đường cơ sở hồi cứu **không tồn tại** — xem
 `docs/ops/BASELINE-2026-09-04-claude-agents.md`). Nhắm L3 lúc này là nhắm vào một ngưỡng chưa tồn tại.
@@ -72,8 +84,10 @@ ghi rõ trong §A4.6.3, để lúc có khách đầu tiên thì biết phải b�
 ## Hệ quả
 
 - **Tích cực:** đặc tả dùng được ngay mà không phải dựng thêm hạ tầng nào; ba thứ cốt lõi đã có sẵn trong repo.
-- **Phải làm để L2 có nghĩa:** định nghĩa "làn nhanh" bằng máy (§C2.4 câu 3 — **đang là đề xuất, chưa ai chốt**);
-  đếm `first_pass_gate_rate` và số lần merge làn nhanh liên tiếp không lỗi lọt; giữ đường lùi về L1.
+- **Phải làm để L2 có nghĩa:** ngưỡng làn nhanh **đã chốt ở §B3.1a nhưng CHƯA thực thi** — phải cài vào chỗ
+  chọn người review của `Claude-Agents` (`BASE_REVIEWS`/`RISK_REVIEWS`); cho tới lúc đó mọi thay đổi vẫn đi
+  làn chuẩn, đúng mặc định fail closed. Kèm theo: đếm `first_pass_gate_rate` và số lần merge làn nhanh liên
+  tiếp không lỗi lọt; giữ đường lùi tự động về L1 khi có lỗi lọt nghiêm trọng.
 - **Nợ để lại:** hồ sơ cục bộ không có cách ly mức nhân. Ghi ở §A11.1.a. Phải xử lý trước khi chạy mã bên ngoài.
 - **Điều kiện đọc lại ADR này:** có khách trả tiền hoặc người dùng EU · cần nhiều worker/nhiều máy ·
   có tenant thứ hai · phải chạy mã do người ngoài gửi.

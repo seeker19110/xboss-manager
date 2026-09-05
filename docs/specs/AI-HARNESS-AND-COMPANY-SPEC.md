@@ -1137,6 +1137,36 @@ stateDiagram-v2
 | **Làn chuẩn** | Tính năng mới, sửa lỗi có ảnh hưởng chéo, refactor có phạm vi | R1→R7 đầy đủ | Duyệt SpecDoc (G1) | ≤ 120 bước · ≤ $15 · ≤ 8 giờ |
 | **Làn kiến trúc** | Đổi schema, đổi hợp đồng API, breaking change, chạm bảo mật/thanh toán/dữ liệu người dùng thật | R1→R8 + ADR bắt buộc | Duyệt SpecDoc **và** ADR **và** phát hành | Không định trước — người cấp theo giai đoạn |
 
+#### B3.1a Định nghĩa "làn nhanh" — kiểm được bằng máy *(chốt 2026-09-05, §C2.4 câu 3)*
+
+Ở **L2** (mức tự chủ đã chốt — §B11) đây không còn là một mô tả để người đọc tự hiểu: nó là **ranh giới
+agent được tự merge mà không ai xem trước**. Nên nó phải là một vị từ chạy được, và **mặc định phải là
+"không phải làn nhanh"** — mọi điều kiện không đánh giá được đều tính là trượt (fail closed, cùng tinh
+thần với `tests_authored_by: "assignee"` của ADR-0028).
+
+**Là làn nhanh khi và chỉ khi ĐỦ CẢ NĂM.** Thiếu một ⇒ làn chuẩn (người duyệt), không phải "gần đủ thì cho qua":
+
+| # | Điều kiện | Kiểm bằng gì | Vì sao |
+|---|---|---|---|
+| 1 | Không chạm **đường dẫn nhạy cảm**: `SECRET_FILES`, file schema/migration, và toàn bộ `gateway/` | Danh sách đường dẫn của diff | `gateway/` giữ thông tin xác thực nhiều tài khoản; migration là thao tác **không hoàn tác được** (CLAUDE.md §9) |
+| 2 | `risk_tags` **rỗng** | Trường đã có sẵn trong events.py — 7 nhãn: `auth`, `payment`, `pii`, `crypto`, `upload`, `admin`, `external-api` | Không phát minh phân loại mới; dùng lại thứ repo đã dùng để chọn người review |
+| 3 | Diff nằm trong **≤ 1 package** | Đường dẫn của diff | Thay đổi bắc ngang package là thay đổi giao diện giữa các phần — luôn đáng để người nhìn |
+| 4 | **≤ 150 dòng** thay đổi (cộng cả thêm và xoá, **không** tính file sinh tự động và lockfile) | `git diff --numstat` | Ngưỡng theo dung lượng đọc của người, không theo độ khó. Chọn 150 vì đó là cỡ một PR đọc hết được trong một lượt |
+| 5 | **Có test phủ nhánh vừa sửa** và **toàn bộ cổng CI xanh** | Cổng CI sẵn có | Không có test thì không có gì bắt lỗi thay cho người |
+
+**Ba nhóm LUÔN là làn kiến trúc**, kể cả khi thoả cả năm điều kiện trên: **xác thực/phân quyền · thanh
+toán · mật mã**. Đây là ngoại lệ cứng, không phải một điều kiện thứ sáu — vì hậu quả sai ở ba nhóm này
+không tỉ lệ với kích thước diff. Một dòng sửa sai trong kiểm tra quyền là một lỗ hổng, dù diff chỉ 1 dòng.
+
+**Điều kiện xem lại ngưỡng này:** sau 4 tuần đo tiến cứu (T0 = 05/09). Hai tín hiệu buộc phải chỉnh —
+(a) có lỗi lọt mức nghiêm trọng qua làn nhanh ⇒ **siết**, và tự động lùi về L1 cho tới khi rà xong nguyên
+nhân (§B11); (b) tỉ lệ vào làn nhanh **< 20%** trong 4 tuần ⇒ ngưỡng quá chặt, L2 không mua được gì so
+với L1, nên **nới** — nhưng nới bằng cách nâng số dòng, **không bao giờ** bằng cách bỏ điều kiện 1, 2 hay ngoại lệ cứng.
+
+**Chưa thực thi.** Đây là quyết định ở tầng đặc tả; muốn nó có hiệu lực thì phải cài vào chỗ chọn người
+review của `Claude-Agents` (nơi đang dùng `BASE_REVIEWS`/`RISK_REVIEWS`). Cho tới lúc đó, **mọi thay đổi
+vẫn đi làn chuẩn** — đúng mặc định fail closed ở trên.
+
 **Quy tắc phân làn (R0 quyết, ghi lý do):** nghi ngờ ⇒ **lên làn cao hơn**, không xuống.
 Một việc bị đẩy xuống làn thấp sai là cách sự cố production ra đời.
 
@@ -2290,14 +2320,11 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
    (tên gói `video-creators` — dựng video/TTS), `gateway` 0.1.0 (proxy xoay vòng tài khoản, chuẩn
    OpenAI Chat Completions ở `127.0.0.1:1123`), `console` 0.1.0. ⇒ R2 và R9 phải viết theo lối
    **nâng cấp tăng dần**, không phải dựng nền.
-3. ⚠️ **Ngưỡng phân làn cụ thể** — *đề xuất dưới đây, chưa có người chốt.* Vì đã chọn L2 (§B11), "làn nhanh"
-   phải kiểm được **bằng máy** chứ không bằng cảm tính — đây là thứ agent tự merge. Đề xuất **hợp lấy giao**,
-   thiếu một điều kiện là rớt về làn chuẩn:
-   - Không đụng `SECRET_FILES`, không đổi schema/migration, không đụng `gateway/` (giữ thông tin xác thực);
-   - `risk_tags` rỗng (đã có sẵn trong events.py — không phải phát minh thêm);
-   - diff ≤ 1 package và ≤ ~150 dòng thay đổi;
-   - có test bao phủ nhánh sửa, và toàn bộ cổng CI xanh.
-   Ba nhóm **luôn** là làn kiến trúc, không bao giờ nhanh: xác thực/phân quyền · thanh toán · mật mã.
+3. ✅ **Ngưỡng phân làn cụ thể** → **chốt 2026-09-05**, xem **§B3.1a** để có định nghĩa đầy đủ.
+   Ở L2 đây là ranh giới **agent được tự merge**, nên phải kiểm được bằng máy chứ không bằng cảm tính.
+   Rút gọn: **hợp lấy giao** của 5 điều kiện, thiếu một là rớt về làn chuẩn — không đụng
+   `SECRET_FILES`/schema/`gateway/` · `risk_tags` rỗng · ≤ 1 package · ≤ 150 dòng · có test phủ nhánh sửa
+   và mọi cổng CI xanh. Ba nhóm **luôn** là làn kiến trúc: xác thực/phân quyền · thanh toán · mật mã.
 
 **Về con người và quy mô** *(quyết định quy mô — §C2.3)*
 4. **Có bao nhiêu người thật cho ba chốt** (duyệt đặc tả · duyệt kiến trúc · thao tác production)?

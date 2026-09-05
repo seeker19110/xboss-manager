@@ -321,7 +321,9 @@
       hồ sơ cục bộ**: `subprocess` + hạn chế đường ghi KHÔNG phải cách ly mức nhân — ổn khi chạy mã của chính
       mình, không ổn nếu chạy mã người ngoài gửi.
       §A4.6.3 thu EU AI Act về ghi chú tham khảo **kèm điều kiện làm nó hết hiệu lực**; §B11 chốt L2 kèm ba việc
-      phải làm để L2 có nghĩa. **ADR-0002 chuyển sang "Đã chấp nhận phần nguyên tắc"** — quyết định 4 và 7
+      phải làm để L2 có nghĩa; **§B3.1a chốt luôn ngưỡng "làn nhanh"** thành vị từ 5 điều kiện kiểm được bằng
+      máy, **mặc định fail closed**, kèm ngoại lệ cứng (xác thực/thanh toán/mật mã luôn là làn kiến trúc bất kể
+      kích thước diff) và điều kiện xem lại sau 4 tuần. **ADR-0002 chuyển sang "Đã chấp nhận phần nguyên tắc"** — quyết định 4 và 7
       (ngăn xếp) do ADR-0003 điều chỉnh; theo quy ước của khung, **không sửa nội dung ADR cũ**, chỉ đổi dòng trạng thái.
 
 ## Đang làm
@@ -333,10 +335,10 @@
 
 ## Tiếp theo
 - **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh. Đây giờ là việc lớn duy nhất còn treo ở Claude-Agents.
-- **§C2.4 còn đúng MỘT câu chưa ai chốt — câu 3, ngưỡng phân làn.** Tôi đã đề xuất một định nghĩa
-  "làn nhanh" kiểm được bằng máy (hợp lấy giao: không đụng SECRET_FILES/schema/gateway · `risk_tags` rỗng ·
-  ≤ 1 package và ~150 dòng · có test phủ nhánh sửa · CI xanh; ba nhóm luôn là làn kiến trúc: xác thực,
-  thanh toán, mật mã). **Cần người chốt** vì ở L2 đây chính là ranh giới agent được tự merge.
+- **Thực thi ngưỡng làn nhanh (§B3.1a) trên `Claude-Agents`** — đã chốt ở tầng đặc tả nhưng **chưa có code**.
+  Phải cài vị từ 5 điều kiện + ngoại lệ cứng vào chỗ chọn người review (`BASE_REVIEWS`/`RISK_REVIEWS`).
+  Cho tới lúc đó mọi thay đổi vẫn đi làn chuẩn — đúng mặc định fail closed, không phải thiếu sót.
+  Kèm theo: đếm `first_pass_gate_rate` + số lần merge làn nhanh liên tiếp không lỗi lọt, và đường lùi tự động về L1.
 - ~~**AI Harness — cần xác minh lại**~~ — **đã làm xong 2026-09-05**, kết quả ở dưới mục "Đã xong".
   Phần còn hở duy nhất: **mô tả và biện pháp giảm thiểu nguyên văn** của từng mục ASI (chỉ có trên
   `genai.owasp.org`, vẫn bị egress proxy chặn). Không chặn việc dùng ma trận kiểm soát vì cột biện pháp
