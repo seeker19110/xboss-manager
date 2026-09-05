@@ -2226,10 +2226,19 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
 
 ### C2.4 Mười hai câu phải chốt trước khi bắt tay
 
+> **Đã dò bằng chứng 2026-09-05 trên repo `Claude-Agents`** (`main` = `1b34ac3`). **Sáu câu dưới đây
+> KHÔNG cần hỏi người — code đã trả lời rồi**, ghi luôn để khỏi mất một vòng trao đổi. Câu nào còn
+> mở thì đánh dấu ❓.
+
 **Về bài toán**
-1. **Use case đầu tiên là gì?** Mọi ngưỡng SLO và eval phải gắn với một bài toán thật.
-2. **Công ty này làm sản phẩm gì, trên repo nào** — codebase có sẵn hay greenfield? (đổi hẳn phần R2 và R9)
-3. **Ngưỡng phân làn cụ thể:** cái gì được tính là "làn nhanh" trong bối cảnh của bạn?
+1. ❓ **Use case đầu tiên là gì?** Mọi ngưỡng SLO và eval phải gắn với một bài toán thật. — *Chưa chốt:
+   repo có bốn ứng viên (`software-company`, `Studio-creators`, `gateway`, `console`), phải chọn MỘT.*
+2. ✅ **Công ty này làm sản phẩm gì, trên repo nào — có sẵn hay greenfield?** → **Brownfield.**
+   `Claude-Agents` gồm bốn package: `software-company` 0.5.0 (công ty phần mềm agent), `Studio-creators`
+   (tên gói `video-creators` — dựng video/TTS), `gateway` 0.1.0 (proxy xoay vòng tài khoản, chuẩn
+   OpenAI Chat Completions ở `127.0.0.1:1123`), `console` 0.1.0. ⇒ R2 và R9 phải viết theo lối
+   **nâng cấp tăng dần**, không phải dựng nền.
+3. ❓ **Ngưỡng phân làn cụ thể:** cái gì được tính là "làn nhanh"? — *Chưa chốt.*
 
 **Về con người và quy mô** *(quyết định quy mô — §C2.3)*
 4. **Có bao nhiêu người thật cho ba chốt** (duyệt đặc tả · duyệt kiến trúc · thao tác production)?
@@ -2238,15 +2247,41 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
 7. **Kênh chốt của người:** web nội bộ, Slack/Teams, hay hệ thống ticket sẵn có?
 
 **Về kỹ thuật**
-8. **Ngôn ngữ chính:** Python (đề xuất mặc định) hay TypeScript toàn phần?
-9. **Triển khai:** đám mây công cộng, on-prem, hay lai? (quyết định lựa chọn sandbox và lưu trữ)
-10. **Đa tenant hay một tổ chức?** (quyết định mô hình cách ly dữ liệu và hạn mức)
+8. ✅ **Ngôn ngữ chính** → **Python**, đã rồi. `requires-python = ">=3.11"` ở cả bốn `pyproject.toml`;
+   CI chạy ma trận 3.11 + 3.13; công cụ là `uv` + `Makefile`. Không có câu hỏi ở đây nữa.
+9. ✅ **Triển khai** → **cục bộ / on-prem, chạy trên máy cá nhân.** Bằng chứng phủ định cũng rõ như
+   bằng chứng khẳng định: **không** `Dockerfile`, **không** `docker-compose`, **không** `.tf`, không
+   file cấu hình cloud nào; bus là **SQLite** (`software-company/src/company/sqlite_bus.py`,
+   `Studio-creators/src/studio/sqlite_bus.py`); gateway lắng nghe `127.0.0.1`.
+10. ✅ **Đa tenant hay một tổ chức?** → **một tổ chức, thực chất một người một máy.** Không có ranh giới
+    tenant nào trong dữ liệu; file SQLite cục bộ; hạn mức tính theo *tài khoản model*, không theo tenant.
 
 **Về tuân thủ và chi phí**
-11. **Phạm vi tuân thủ:** có phục vụ thị trường EU hoặc ngành có quy định riêng không?
-    Mức chấp nhận lỗi lọt: nội bộ hay khách hàng trả tiền?
-12. **Chế độ chi phí** (ASC-FR-29): mua token qua API hay chạy bằng gói đăng ký? **Ngân sách/tháng** và ai
-    chịu trách nhiệm khi vượt? Mua hay tự xây tầng quan sát/eval?
+11. ❓ **Phạm vi tuân thủ:** có phục vụ thị trường EU hoặc ngành có quy định riêng không?
+    Mức chấp nhận lỗi lọt: nội bộ hay khách hàng trả tiền? — *Chưa chốt, và không suy ra được từ code.
+    Đây là câu đắt nhất: nếu KHÔNG chạm EU thì cả phần EU AI Act (§A9, §C1) co lại còn một ghi chú.*
+12. ✅ **Chế độ chi phí** (ASC-FR-29) → **gói đăng ký, KHÔNG mua token qua API.** Nói thẳng trong
+    docs/DIEU-PHOI-MODEL.md **của repo `Claude-Agents`** (không phải repo này): *"không mua token qua API. Chúng dùng những gói đăng ký đang có trên máy"*;
+    ADR-0019 `subscription-routing` chốt điều này. Hệ quả: `Completion.model` vẫn giữ tên model thật để
+    khớp bảng giá, nhưng **giá bằng 0** — nên "ngân sách/tháng" theo tiền là **sai đơn vị**; ràng buộc thật
+    là **quota mỗi tài khoản** và cooldown khi 429/402. Tầng quan sát/eval: **tự xây** (đã có golden
+    snapshot + eval record/replay chạy offline trong CI).
+
+> ### ⚠️ Điểm lệch phải xử lý trước khi dùng đặc tả này
+>
+> Bằng chứng ở câu 9 và 12 **mâu thuẫn với §A11.1**. Đặc tả đang đề xuất một ngăn xếp quy mô đám mây —
+> PostgreSQL 18.6, Temporal, LangGraph, OPA, gVisor/Firecracker, OTel collector — trong khi thứ đang được
+> xây là **SQLite + một daemon cục bộ + quota gói đăng ký, trên một máy**. Không phải đặc tả sai: nó viết
+> cho trường hợp tổng quát. Nhưng áp nguyên si vào bối cảnh này thì mỗi thành phần đều là chi phí không có
+> người trả. Ba lối đi, phải chọn **trước** khi chuyển ADR-0002 sang "Đã chấp nhận":
+>
+> 1. **Thu hẹp đặc tả về đúng bối cảnh cục bộ** — PostgreSQL → SQLite (WAL), Temporal → vòng lặp bền tự
+>    viết trên chính bảng sự kiện, OPA → hàm chính sách trong tiến trình, gVisor → `subprocess` hạn chế
+>    quyền. Rẻ nhất, đúng hiện trạng, và §A11.1 đã có sẵn dòng "Tối giản (đội < 3 người, 1 use case)".
+> 2. **Giữ nguyên làm kiến trúc đích**, ghi rõ đây là bản vẽ cho tương lai chứ không phải bản dựng hôm nay,
+>    kèm mốc chuyển đổi. Tốn công đọc nhưng không tốn công xây.
+> 3. **Tách đôi:** phần bất biến (nguyên tắc P1–P12, ranh giới tin cậy, Tool Gateway, event sourcing) giữ
+>    nguyên vì đúng ở mọi quy mô; phần chọn công nghệ tách ra thành phụ lục có hai hồ sơ *cục bộ* và *đám mây*.
 
 ---
 
