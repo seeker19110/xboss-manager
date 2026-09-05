@@ -1,6 +1,6 @@
 # ADR-0002: Kiến trúc & ngăn xếp tham chiếu cho AI Harness
 
-- **Trạng thái:** Đề xuất *(chờ người dùng chốt 12 câu hỏi ở SPEC-AI-100 §C2.4)*
+- **Trạng thái:** **Đã chấp nhận phần nguyên tắc** (quyết định 1, 2, 3, 5, 6) — quyết định **4 và 7 (ngăn xếp) được ADR-0003 điều chỉnh**: từ nay đọc là *hồ sơ đám mây*, không phải bản dựng hôm nay. 12 câu ở §C2.4 đã chốt 11/12 ngày 2026-09-05.
 - **Ngày:** 2026-09-04
 - **Liên quan:** `docs/specs/AI-HARNESS-AND-COMPANY-SPEC.md` (SPEC-AI-100 — gộp SPEC-AIH-001 + SPEC-ASC-002 + SYNTH-001),
   KHUNG-3 (research-first), CLAUDE.md §3, §9
