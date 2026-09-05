@@ -628,12 +628,18 @@ dựa trên dữ liệu nào, và ai đã duyệt?"*
 
 #### A4.6.3 Bối cảnh tuân thủ (tình trạng ngày 2026-09-04 — cần luật sư/DPO xác nhận cho từng thị trường)
 
-- **EU AI Act:** nghĩa vụ **minh bạch (Điều 50)** và thẩm quyền thực thi với nhà cung cấp GPAI **đã có hiệu lực
-  từ 02/08/2026**. Nghĩa vụ cho hệ thống **rủi ro cao độc lập (Phụ lục III)** được lùi tới **02/12/2027**,
-  và hệ thống rủi ro cao nhúng trong sản phẩm đã được quản lý (Phụ lục I) tới **02/08/2028**,
-  theo Digital Omnibus — Regulation (EU) 2026/1744, hiệu lực 27/07/2026.
-  ⇒ **Hệ quả thiết kế:** minh bạch + kiểm toán là **bắt buộc ngay**; hồ sơ rủi ro cao có thêm thời gian
-  nhưng **phải thiết kế sẵn** vì bổ sung sau rất tốn kém.
+> **Phạm vi đã chốt 2026-09-05 (§C2.4 câu 11): nội bộ, tự dùng — không có khách trả tiền, không chạm
+> thị trường EU.** ⇒ **Nghĩa vụ EU AI Act KHÔNG gắn vào hệ thống này.** Phần dưới thu về một ghi chú
+> tham khảo, giữ lại để khi có khách đầu tiên thì biết phải bật cái gì chứ không phải tra lại từ đầu.
+> **Điều kiện làm ghi chú này hết hiệu lực:** phát hành cho người ngoài tổ chức, hoặc có người dùng ở EU.
+
+- **EU AI Act (tham khảo, chưa áp dụng):** nghĩa vụ **minh bạch (Điều 50)** và thẩm quyền thực thi với nhà
+  cung cấp GPAI có hiệu lực từ 02/08/2026; hệ thống **rủi ro cao độc lập (Phụ lục III)** lùi tới **02/12/2027**,
+  rủi ro cao nhúng trong sản phẩm đã được quản lý (Phụ lục I) tới **02/08/2028** — Digital Omnibus,
+  Regulation (EU) 2026/1744, hiệu lực 27/07/2026.
+  ⇒ **Điều đáng giữ lại dù không bị ràng buộc:** minh bạch + kiểm toán **vẫn nên làm**, không vì luật mà vì
+  không có nhật ký kiểm toán thì chính bạn cũng không dựng lại được một run hỏng. Chúng đã nằm trong C6 rồi,
+  nên chi phí biên bằng 0. Ngược lại, **hồ sơ rủi ro cao thì KHÔNG dựng sẵn** — đó là chi phí không có người trả.
 - **NIST AI RMF / ISO/IEC 42001:** dùng làm khung quản trị nội bộ (Govern–Map–Measure–Manage);
   ánh xạ mỗi yêu cầu C6 vào một mục kiểm soát để phục vụ audit.
 - Ngành đặc thù (tài chính, y tế, dữ liệu cá nhân trong nước) có yêu cầu riêng — **phải rà trước khi lên production**.
@@ -930,7 +936,38 @@ tỉ lệ lỗi > 2× đường cơ sở · vi phạm policy > 0 · chi phí/nhi
 > **Phiên bản dưới đây đã xác minh bằng nguồn sống (PyPI / npm registry / nodejs.org) ngày 2026-09-04**,
 > trừ các dòng ghi rõ "chưa xác minh". Xác minh lại tại thời điểm khởi tạo dự án (KHUNG-3 §B4).
 
-### A11.1 Lõi (khuyến nghị: Python cho harness-core, TypeScript cho control plane/UI)
+### A11.1 Lõi — **hai hồ sơ, chọn trước khi đọc bảng**
+
+> **Quyết định 2026-09-05 (§C2.4):** nguyên tắc của đặc tả (P1–P12, ranh giới tin cậy, Tool Gateway,
+> event sourcing, các cổng) là **bất biến, đúng ở mọi quy mô** — chúng nằm ở Phần A và không đổi theo hồ sơ.
+> Riêng **lựa chọn công nghệ** tách thành hai hồ sơ dưới đây. Đọc nhầm hồ sơ là nguồn lãng phí lớn nhất
+> của tài liệu này: mỗi thành phần trong hồ sơ đám mây đều có chi phí vận hành, và ở bối cảnh một máy
+> thì **không có ai trả chi phí đó**.
+
+#### A11.1.a Hồ sơ **CỤC BỘ** — ĐANG ÁP DỤNG cho `Claude-Agents`
+
+Một tổ chức, một máy, gói đăng ký (§C2.4 câu 9, 10, 12). Cột "đã có" là thứ **đã chạy trong repo**, không phải đề xuất.
+
+| Vai trò | Chọn ở hồ sơ cục bộ | Đã có? | Vì sao đủ ở quy mô này |
+|---|---|---|---|
+| Ngôn ngữ | Python ≥ 3.11 (CI 3.11 + 3.13), `uv` | ✅ | Giống hồ sơ đám mây — không có gì phải đổi |
+| Nguồn sự thật / event log | **SQLite (WAL)** — sqlite_bus.py | ✅ | Một tiến trình ghi, không cần đồng thời đa nút. Vẫn append-only + hash chain được |
+| Vòng ngoài bền | **Vòng lặp bền tự viết trên chính bảng sự kiện** | ⚠️ một phần | Temporal giải bài toán *nhiều worker, nhiều máy, chờ nhiều ngày*. Ở một máy, `resume từ event cuối` là đủ |
+| Vòng trong (agent graph) | **Route tường minh** — orchestrator.ROUTES | ✅ | Luồng đã cố định và đọc được; LangGraph thêm một lớp trừu tượng không mua thêm gì |
+| Policy | **Hàm chính sách trong tiến trình** — `Toolbox._path`, `write_scope` | ✅ | Đúng tinh thần P: cưỡng chế ở runtime. OPA chỉ đáng khi chính sách do người khác viết và đổi độc lập |
+| Sandbox | **`subprocess` hạn chế quyền** + `write_scope` + chặn `SECRET_FILES`/symlink/`..` | ✅ | ⚠️ **Đây là chỗ yếu thật của hồ sơ cục bộ** — không cách ly mức nhân. Chấp nhận được vì mã chạy là của chính mình; **không** chấp nhận được nếu chạy mã do người ngoài gửi |
+| Quan sát / eval | **Golden snapshot + eval record/replay offline trong CI** | ✅ | Bắt trôi hành vi mà không cần collector chạy thường trực |
+| Model | **Gateway xoay vòng tài khoản**, gói đăng ký | ✅ | Giá bằng 0; ràng buộc là **quota mỗi tài khoản**, không phải tiền |
+| Hạn mức | **Quota tài khoản + cooldown** (401→300s, 402/403/429→3600s) | ✅ | Không có tenant để chia hạn mức |
+
+**Ba thứ KHÔNG được cắt dù ở hồ sơ nào** — cắt là mất luận điểm của cả tài liệu: **Tool Gateway** (điểm nghẽn
+duy nhất ra ngoài) · **event log append-only** (nguồn sự thật) · **eval có cổng trong CI** (phát hiện trôi).
+Cả ba đã có trong `Claude-Agents`.
+
+#### A11.1.b Hồ sơ **ĐÁM MÂY** — chưa áp dụng, giữ làm đích khi vượt một máy
+
+**Điều kiện chuyển sang:** cần nhiều worker/nhiều máy · hoặc có tenant thứ hai · hoặc phải chạy mã do người
+ngoài gửi (bắt buộc sandbox mức nhân) · hoặc thời gian chờ người vượt vòng đời một tiến trình.
 
 | Vai trò | Chọn | Phiên bản (2026-09-04) | Ghi chú |
 |---|---|---|---|
@@ -976,8 +1013,8 @@ nghĩa là **một không gian cache** (cache theo model), chuỗi nhiều model
 
 ### A11.3 Phương án thay thế (nếu ràng buộc khác)
 - **Toàn TypeScript:** LangGraph.js + Temporal TS SDK + `@modelcontextprotocol/sdk`; eval yếu hơn ⇒ tự xây nhiều hơn.
-- **Tối giản (đội < 3 người, 1 use case):** bỏ Temporal, dùng LangGraph + Postgres checkpoint; **giữ nguyên**
-  gateway, event log, eval — đây là phần không được cắt.
+- ~~**Tối giản (đội < 3 người, 1 use case)**~~ — **đã được thay bằng hồ sơ CỤC BỘ ở §A11.1.a**, cụ thể hơn
+  và bám đúng thứ đang chạy. Dòng cũ vẫn còn đúng ở phần cốt lõi: gateway, event log, eval là phần không được cắt.
 - **Doanh nghiệp đã có nền tảng:** ưu tiên tích hợp IAM/SIEM/data platform sẵn có thay vì dựng mới.
 
 ---
@@ -1750,6 +1787,18 @@ Không "bật công ty AI" trong một lần. Mỗi mức có **điều kiện v
 
 **Theo quy mô đội:** ngưỡng chốt cho `n = 3` ở §B12.2.6; chế độ suy giảm `n = 1` ở §B12.3.5 (không lên L3 trong 6 tháng đầu).
 
+> **Mục tiêu 6 tháng đã chốt 2026-09-05 (§C2.4 câu 6): dừng ở L2.** Nghĩa là: agent tự merge **làn nhanh**
+> khi mọi cổng xanh; người giữ ba chốt (duyệt đặc tả · duyệt kiến trúc · thao tác production) + review mẫu ≥ 10%.
+> **L3 không nằm trong mục tiêu** — điều kiện vào L3 là *8 tuần ở L2 với `change_failure_rate` ≤ đường cơ sở*,
+> mà đường cơ sở thì đang đo tiến cứu từ T0 = 05/09 và chưa có số. Nhắm L3 lúc này là nhắm vào một ngưỡng
+> chưa tồn tại.
+>
+> **Hệ quả cụ thể phải làm để L2 có nghĩa** (chứ không chỉ là một nhãn trong tài liệu):
+> 1. **Định nghĩa "làn nhanh" bằng máy**, không bằng cảm tính — xem §C2.4 câu 3.
+> 2. **Đếm `first_pass_gate_rate` và số lần merge làn nhanh liên tiếp không lỗi lọt.** Không đếm được thì
+>    không bao giờ chứng minh được đã đủ điều kiện ở L2, và cũng không biết lúc nào phải lùi.
+> 3. **Giữ đường lùi:** một lỗi lọt mức nghiêm trọng ở làn nhanh ⇒ tự động về L1 cho tới khi rà xong nguyên nhân.
+
 **Đường lùi bắt buộc:** bất kỳ mức nào, nếu 2 tuần liên tiếp `escaped_defect_rate` xấu hơn đường cơ sở
 hoặc có 1 vi phạm phân tách đặc quyền ⇒ **tự động hạ một mức**, không cần họp bàn.
 
@@ -2231,20 +2280,36 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
 > mở thì đánh dấu ❓.
 
 **Về bài toán**
-1. ❓ **Use case đầu tiên là gì?** Mọi ngưỡng SLO và eval phải gắn với một bài toán thật. — *Chưa chốt:
-   repo có bốn ứng viên (`software-company`, `Studio-creators`, `gateway`, `console`), phải chọn MỘT.*
+1. ✅ **Use case đầu tiên** → **`software-company`** (chốt 2026-09-05). Là package trưởng thành nhất (0.5.0),
+   có luồng ticket → test-author → code → review, golden snapshot + eval replay sẵn. Ba chỉ số neo vào đây:
+   **lead time ticket**, **`review_catch_rate`**, **tỉ lệ `tests_red_as_expected`** (ADR-0028 — test đỏ ngay sau
+   lượt test-author là kết quả ĐÚNG; xanh mới đáng ngờ). `Studio-creators`, `gateway`, `console` **không** đặt
+   SLO trong giai đoạn này — đo bốn thứ cùng lúc thì không thứ nào có đủ mẫu.
 2. ✅ **Công ty này làm sản phẩm gì, trên repo nào — có sẵn hay greenfield?** → **Brownfield.**
    `Claude-Agents` gồm bốn package: `software-company` 0.5.0 (công ty phần mềm agent), `Studio-creators`
    (tên gói `video-creators` — dựng video/TTS), `gateway` 0.1.0 (proxy xoay vòng tài khoản, chuẩn
    OpenAI Chat Completions ở `127.0.0.1:1123`), `console` 0.1.0. ⇒ R2 và R9 phải viết theo lối
    **nâng cấp tăng dần**, không phải dựng nền.
-3. ❓ **Ngưỡng phân làn cụ thể:** cái gì được tính là "làn nhanh"? — *Chưa chốt.*
+3. ⚠️ **Ngưỡng phân làn cụ thể** — *đề xuất dưới đây, chưa có người chốt.* Vì đã chọn L2 (§B11), "làn nhanh"
+   phải kiểm được **bằng máy** chứ không bằng cảm tính — đây là thứ agent tự merge. Đề xuất **hợp lấy giao**,
+   thiếu một điều kiện là rớt về làn chuẩn:
+   - Không đụng `SECRET_FILES`, không đổi schema/migration, không đụng `gateway/` (giữ thông tin xác thực);
+   - `risk_tags` rỗng (đã có sẵn trong events.py — không phải phát minh thêm);
+   - diff ≤ 1 package và ≤ ~150 dòng thay đổi;
+   - có test bao phủ nhánh sửa, và toàn bộ cổng CI xanh.
+   Ba nhóm **luôn** là làn kiến trúc, không bao giờ nhanh: xác thực/phân quyền · thanh toán · mật mã.
 
 **Về con người và quy mô** *(quyết định quy mô — §C2.3)*
 4. **Có bao nhiêu người thật cho ba chốt** (duyệt đặc tả · duyệt kiến trúc · thao tác production)?
 5. **Đã có đường cơ sở 8 tuần chưa?** — *Đã kiểm 2026-09-04: **chưa, và không thể có hồi cứu*** (codebase mới 3 ngày tuổi). Chuyển sang đo tiến cứu 4 tuần từ T0; chi tiết `docs/ops/BASELINE-2026-09-04-claude-agents.md`.
-6. **Mức tự chủ mục tiêu trong 6 tháng:** L1, L2 hay L3?
-7. **Kênh chốt của người:** web nội bộ, Slack/Teams, hay hệ thống ticket sẵn có?
+6. ✅ **Mức tự chủ mục tiêu trong 6 tháng** → **L2** (chốt 2026-09-05): agent tự merge làn nhanh khi mọi cổng
+   xanh, người giữ ba chốt + review mẫu ≥ 10%. **Không nhắm L3** — điều kiện vào L3 cần 8 tuần số liệu so với
+   đường cơ sở, mà đường cơ sở mới bắt đầu đo tiến cứu từ T0 = 05/09. Hệ quả phải làm: xem §B11.
+7. ✅ **Kênh chốt của người** → **GitHub PR + CLI**, đã vậy rồi, không cần dựng kênh mới.
+   Bằng chứng: cổng review chạy qua PR trên GitHub; lệnh điều khiển yêu cầu `--actor human:<tên>` nên
+   danh tính người chốt được ghi vào chính bảng sự kiện. **Không** Slack/Teams (thêm một hệ thống phải
+   vận hành), **không** web nội bộ (chưa có ai để phục vụ). Điểm yếu phải biết: kênh này **không có
+   thông báo đẩy** — người chỉ thấy khi mở GitHub, nên hạn thời gian ở cổng phải tính theo giờ, không theo phút.
 
 **Về kỹ thuật**
 8. ✅ **Ngôn ngữ chính** → **Python**, đã rồi. `requires-python = ">=3.11"` ở cả bốn `pyproject.toml`;
@@ -2257,9 +2322,10 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
     tenant nào trong dữ liệu; file SQLite cục bộ; hạn mức tính theo *tài khoản model*, không theo tenant.
 
 **Về tuân thủ và chi phí**
-11. ❓ **Phạm vi tuân thủ:** có phục vụ thị trường EU hoặc ngành có quy định riêng không?
-    Mức chấp nhận lỗi lọt: nội bộ hay khách hàng trả tiền? — *Chưa chốt, và không suy ra được từ code.
-    Đây là câu đắt nhất: nếu KHÔNG chạm EU thì cả phần EU AI Act (§A9, §C1) co lại còn một ghi chú.*
+11. ✅ **Phạm vi tuân thủ** → **nội bộ, tự dùng; không khách trả tiền, không chạm EU** (chốt 2026-09-05).
+    ⇒ Nghĩa vụ EU AI Act **không gắn vào** hệ thống này; §A4.6.3 đã thu về một ghi chú tham khảo kèm
+    **điều kiện làm ghi chú đó hết hiệu lực** (phát hành ra ngoài tổ chức, hoặc có người dùng ở EU).
+    Minh bạch + kiểm toán vẫn giữ — không vì luật mà vì thiếu chúng thì chính mình không dựng lại được run hỏng.
 12. ✅ **Chế độ chi phí** (ASC-FR-29) → **gói đăng ký, KHÔNG mua token qua API.** Nói thẳng trong
     docs/DIEU-PHOI-MODEL.md **của repo `Claude-Agents`** (không phải repo này): *"không mua token qua API. Chúng dùng những gói đăng ký đang có trên máy"*;
     ADR-0019 `subscription-routing` chốt điều này. Hệ quả: `Completion.model` vẫn giữ tên model thật để
@@ -2269,19 +2335,16 @@ Ba số ở trên đều là **số người**, không phải số agent. Đây 
 
 > ### ⚠️ Điểm lệch phải xử lý trước khi dùng đặc tả này
 >
-> Bằng chứng ở câu 9 và 12 **mâu thuẫn với §A11.1**. Đặc tả đang đề xuất một ngăn xếp quy mô đám mây —
-> PostgreSQL 18.6, Temporal, LangGraph, OPA, gVisor/Firecracker, OTel collector — trong khi thứ đang được
-> xây là **SQLite + một daemon cục bộ + quota gói đăng ký, trên một máy**. Không phải đặc tả sai: nó viết
-> cho trường hợp tổng quát. Nhưng áp nguyên si vào bối cảnh này thì mỗi thành phần đều là chi phí không có
-> người trả. Ba lối đi, phải chọn **trước** khi chuyển ADR-0002 sang "Đã chấp nhận":
+> Bằng chứng ở câu 9 và 12 **mâu thuẫn với ngăn xếp tham chiếu**: đặc tả đề xuất PostgreSQL 18.6, Temporal,
+> LangGraph, OPA, gVisor/Firecracker, OTel collector — trong khi thứ đang được xây là **SQLite + một daemon
+> cục bộ + quota gói đăng ký, trên một máy**. Không phải đặc tả sai: nó viết cho trường hợp tổng quát.
+> Nhưng áp nguyên si vào bối cảnh này thì mỗi thành phần đều là chi phí không có người trả.
 >
-> 1. **Thu hẹp đặc tả về đúng bối cảnh cục bộ** — PostgreSQL → SQLite (WAL), Temporal → vòng lặp bền tự
->    viết trên chính bảng sự kiện, OPA → hàm chính sách trong tiến trình, gVisor → `subprocess` hạn chế
->    quyền. Rẻ nhất, đúng hiện trạng, và §A11.1 đã có sẵn dòng "Tối giản (đội < 3 người, 1 use case)".
-> 2. **Giữ nguyên làm kiến trúc đích**, ghi rõ đây là bản vẽ cho tương lai chứ không phải bản dựng hôm nay,
->    kèm mốc chuyển đổi. Tốn công đọc nhưng không tốn công xây.
-> 3. **Tách đôi:** phần bất biến (nguyên tắc P1–P12, ranh giới tin cậy, Tool Gateway, event sourcing) giữ
->    nguyên vì đúng ở mọi quy mô; phần chọn công nghệ tách ra thành phụ lục có hai hồ sơ *cục bộ* và *đám mây*.
+> **✅ Đã chốt 2026-09-05 — tách đôi.** Nguyên tắc (P1–P12, ranh giới tin cậy, Tool Gateway, event sourcing,
+> các cổng) **giữ nguyên ở Phần A** vì đúng ở mọi quy mô. Lựa chọn công nghệ tách thành **hai hồ sơ ở §A11.1**:
+> **A11.1.a CỤC BỘ (đang áp dụng)** và **A11.1.b ĐÁM MÂY (đích, kèm điều kiện chuyển)**. Đã ghi rõ ba thứ
+> không được cắt ở hồ sơ nào, và **điểm yếu thật của hồ sơ cục bộ**: không có cách ly mức nhân — chấp nhận
+> được khi chỉ chạy mã của chính mình, **không** chấp nhận được nếu chạy mã người ngoài gửi.
 
 ---
 

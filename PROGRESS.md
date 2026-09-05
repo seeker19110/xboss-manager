@@ -307,6 +307,23 @@
          gVisor **release-20260831.0** / Kata **4.1.0** / Firecracker **1.17.0**. `temporalio` 1.32.0 và
          `langgraph` 1.2.11 **đã đúng sẵn**. Chỗ sai thật: đặc tả ghi PostgreSQL "16/17" — **lỗi thời**, 18 mới là major hiện hành.
 
+- ✅ **Chốt 11/12 câu ở §C2.4 và thu hẹp đặc tả về đúng bối cảnh → ADR-0003** (2026-09-05).
+      **Sáu câu trả lời bằng cách đọc code chứ không hỏi người** (repo `Claude-Agents`, `main` = `1b34ac3`):
+      brownfield 4 package · Python ≥3.11 (CI 3.11+3.13, uv) · chạy **cục bộ một máy** (không Dockerfile/compose/.tf,
+      bus là SQLite, gateway ở `127.0.0.1`) · một tổ chức · **gói đăng ký, không mua token API** (giá 0, ràng buộc
+      thật là quota mỗi tài khoản) · kênh chốt là **GitHub PR + CLI** (`--actor human:<tên>` ghi danh tính vào
+      bảng sự kiện). Bốn câu người quyết: **tách đôi ngăn xếp** · use case đầu tiên **`software-company`** ·
+      **nội bộ, không chạm EU** · mức tự chủ **L2**.
+      **Điểm lệch quan trọng nhất phát hiện được:** đặc tả đề xuất PostgreSQL/Temporal/OPA/gVisor trong khi thứ
+      đang xây là SQLite + daemon cục bộ. Xử lý bằng **hai hồ sơ ở §A11.1** — A11.1.a CỤC BỘ (đang áp dụng, có
+      cột "đã có?" đối chiếu code thật) và A11.1.b ĐÁM MÂY (đích, kèm điều kiện chuyển), ba thứ không được cắt
+      ở hồ sơ nào (Tool Gateway · event log append-only · eval có cổng trong CI). Ghi thẳng **điểm yếu thật của
+      hồ sơ cục bộ**: `subprocess` + hạn chế đường ghi KHÔNG phải cách ly mức nhân — ổn khi chạy mã của chính
+      mình, không ổn nếu chạy mã người ngoài gửi.
+      §A4.6.3 thu EU AI Act về ghi chú tham khảo **kèm điều kiện làm nó hết hiệu lực**; §B11 chốt L2 kèm ba việc
+      phải làm để L2 có nghĩa. **ADR-0002 chuyển sang "Đã chấp nhận phần nguyên tắc"** — quyết định 4 và 7
+      (ngăn xếp) do ADR-0003 điều chỉnh; theo quy ước của khung, **không sửa nội dung ADR cũ**, chỉ đổi dòng trạng thái.
+
 ## Đang làm
 - **PR #40 (Claude-Agents) — chặn ở người dùng.** Chờ nhập `.github/rulesets/main.json` qua Settings → Rules →
   Rulesets → *Import a ruleset*, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job
@@ -316,9 +333,10 @@
 
 ## Tiếp theo
 - **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh. Đây giờ là việc lớn duy nhất còn treo ở Claude-Agents.
-- **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
-  use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
-  Có đủ câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chuyển ADR-0002 sang "Đã chấp nhận".
+- **§C2.4 còn đúng MỘT câu chưa ai chốt — câu 3, ngưỡng phân làn.** Tôi đã đề xuất một định nghĩa
+  "làn nhanh" kiểm được bằng máy (hợp lấy giao: không đụng SECRET_FILES/schema/gateway · `risk_tags` rỗng ·
+  ≤ 1 package và ~150 dòng · có test phủ nhánh sửa · CI xanh; ba nhóm luôn là làn kiến trúc: xác thực,
+  thanh toán, mật mã). **Cần người chốt** vì ở L2 đây chính là ranh giới agent được tự merge.
 - ~~**AI Harness — cần xác minh lại**~~ — **đã làm xong 2026-09-05**, kết quả ở dưới mục "Đã xong".
   Phần còn hở duy nhất: **mô tả và biện pháp giảm thiểu nguyên văn** của từng mục ASI (chỉ có trên
   `genai.owasp.org`, vẫn bị egress proxy chặn). Không chặn việc dùng ma trận kiểm soát vì cột biện pháp
@@ -329,7 +347,9 @@
   `copy-framework.sh` bản mới để nhận `scripts/` + hook hoạt động thật + fix không-đè-cấu-hình-có-sẵn.
 
 ## Quyết định quan trọng (trỏ tới ADR nếu có)
-- **ADR-0002 (Đề xuất):** kiến trúc AI harness — vòng lặp ngoài xác định do harness sở hữu, event sourcing
+- **ADR-0003 (Đã chấp nhận):** thu hẹp đặc tả về bối cảnh thật — hai hồ sơ ngăn xếp (cục bộ đang áp dụng /
+  đám mây làm đích), phạm vi nội bộ nên không gắn nghĩa vụ EU AI Act, mức tự chủ mục tiêu L2.
+- **ADR-0002 (Đã chấp nhận phần nguyên tắc):** kiến trúc AI harness — vòng lặp ngoài xác định do harness sở hữu, event sourcing
   append-only làm nguồn sự thật duy nhất, Tool Gateway là điểm nghẽn duy nhất cho mọi tác động ra ngoài.
   Nguyên tắc nền: *prompt không phải cơ chế bảo mật*.
 - **ADR-0028 Claude-Agents (Đề xuất, đã merge tài liệu):** vai viết test tách khỏi vai viết code; cưỡng chế ở
