@@ -282,6 +282,17 @@
       đúng luật L4 (WIP ≤ năng lực kiểm chứng) của chính đặc tả vừa viết. Thứ tự merge cũng do ràng buộc kỹ thuật
       quyết định (#47 → #45 → #40 sau khi nhập ruleset), không theo thứ tự tạo.
 
+- ✅ **Toàn bộ 4 "đề xuất ngược" gửi Claude-Agents đã được thực thi — bởi PR của repo đó, KHÔNG phải tôi.**
+      Ghi lại để phiên sau không đi làm lại. Đã xác minh từng mục bằng `grep` trên `main` (`dd7c0f1`), không tin tiêu đề PR:
+      | Đề xuất (SPEC-AI-100 §C1.2–C1.3) | Ai làm | Bằng chứng đã kiểm |
+      |---|---|---|
+      | Vai `test-author` độc lập | ADR-0028 (#45, tôi) → **code #50 `dd7c0f1`** | `tools.py:153 _check_write_scope`; `stacks.py:24 test_globs`, `UNKNOWN` không có test_globs; `orchestrator.py:283-285` hai route + `_no_test_author` fail closed; `_audit("tests_authored_by_assignee")` |
+      | Tách `summary` của coder khỏi phần reviewer nhận | PR khác | `orchestrator.py:202` — "Reviewer/QA/security đọc **diff thật** của branch ticket thay vì tin `summary` của PR" |
+      | Sửa "Hệ quả" ADR-0015 (nói REQUIRED.txt trống) | PR khác | ADR-0015 không còn câu đó; `REQUIRED.txt` có **29 dòng** |
+      | Nâng coverage `gateway` (73) | **#48 `34d7fbd`** | cả 4 package `fail_under = 100` |
+      Điều đáng rút ra: **đề xuất viết đủ cụ thể để người khác thực thi được thì không cần chính mình cầm tay làm** —
+      ADR-0028 đưa sẵn ràng buộc ở runtime, điểm cưỡng chế, và cách fail closed, nên #50 làm đúng thiết kế mà tôi không tham gia.
+
 ## Đang làm
 - **PR #40 (Claude-Agents) — chặn ở người dùng.** Chờ nhập `.github/rulesets/main.json` qua Settings → Rules →
   Rulesets → *Import a ruleset*, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job
@@ -290,16 +301,7 @@
 - **Đo tiến cứu 4 tuần từ T0 = 05/09** đã mở trên Claude-Agents (đường cơ sở hồi cứu không tồn tại — xem Đ0).
 
 ## Tiếp theo
-- **Thi hành ADR-0028 trên Claude-Agents — 4 PR tách rời** (thiết kế đã chốt, giờ tới code):
-  (1) `Stack.test_globs` + `Toolbox.write_scope` + test cưỡng chế; (2) agent `test-author`, topic `test-suites`
-  + schema, route mới, `make golden`, `make eval-record`; (3) cờ `tests_authored_by` / `test_dispute` + prompt
-  reviewer; (4) cập nhật `docs/architecture.md` và `docs/DIEU-PHOI-MODEL.md` (cố ý để sau cùng — cập nhật trước
-  thì tài liệu mô tả thứ chưa tồn tại).
-- **Đề xuất ngược còn lại cho Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): tách `summary` của coder khỏi phần
-  reviewer nhận; sửa phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
-  ~~nâng ngưỡng coverage của `gateway` (73)~~ — **đã xong bởi PR #48** (`34d7fbd`, không phải tôi):
-  cả bốn package giờ `fail_under = 100`. Đã xác minh bằng `grep fail_under` trên `main`.
-- **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh và ADR-0028 có PR code đầu tiên.
+- **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh. Đây giờ là việc lớn duy nhất còn treo ở Claude-Agents.
 - **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
   use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
   Có đủ câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chuyển ADR-0002 sang "Đã chấp nhận".
