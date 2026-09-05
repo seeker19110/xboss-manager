@@ -293,6 +293,20 @@
       Điều đáng rút ra: **đề xuất viết đủ cụ thể để người khác thực thi được thì không cần chính mình cầm tay làm** —
       ADR-0028 đưa sẵn ràng buộc ở runtime, điểm cưỡng chế, và cách fail closed, nên #50 làm đúng thiết kế mà tôi không tham gia.
 
+- ✅ **Đóng mục "cần xác minh lại" của đặc tả — bằng nguồn sơ cấp, không phải nguồn thứ cấp** (2026-09-05).
+      `genai.owasp.org`, `owasp.org` và `endoflife.date` đều bị egress proxy chặn; `api.github.com` thì
+      chặn repo ngoài phạm vi phiên. Vòng qua bằng hai đường còn dùng được:
+      1. **OWASP ASI01–ASI10:** clone nông kho chính thức `OWASP/www-project-top-10-for-large-language-model-applications`
+         (HEAD `99f4395`, 2026-08-05) và lấy định danh từ tài liệu đang bảo trì `ASI_Agentic_Exploits_Incidents.md`
+         (bảng 46 sự cố thật, mỗi dòng gắn nhãn ASI). **Cả 10 tên trong đặc tả khớp.** Sửa đúng **một** chỗ:
+         ASI05 phải là *Unexpected Code Execution **(RCE)***. Bẫy đáng ghi: thư mục `agentic-top-10/Sprint 1-first-public-draft-expanded/`
+         trong chính kho đó là **bản thảo đã bị thay thế** — gọi ASI01 là *"Agent Behaviour Hijack"* và các file
+         vẫn là template rỗng; ai tra GitHub vội sẽ lấy nhầm tên cũ. Tên đúng là *Agent Goal Hijack*.
+      2. **Phiên bản công nghệ:** `git ls-remote --tags` qua git proxy (rẻ hơn clone) + API PyPI.
+         Kết quả: Python **3.14.7** · PostgreSQL **18.6** + pgvector **0.8.6** · Redis **8.10.1** · OPA **1.20.2** ·
+         gVisor **release-20260831.0** / Kata **4.1.0** / Firecracker **1.17.0**. `temporalio` 1.32.0 và
+         `langgraph` 1.2.11 **đã đúng sẵn**. Chỗ sai thật: đặc tả ghi PostgreSQL "16/17" — **lỗi thời**, 18 mới là major hiện hành.
+
 ## Đang làm
 - **PR #40 (Claude-Agents) — chặn ở người dùng.** Chờ nhập `.github/rulesets/main.json` qua Settings → Rules →
   Rulesets → *Import a ruleset*, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job
@@ -305,9 +319,10 @@
 - **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
   use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
   Có đủ câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chuyển ADR-0002 sang "Đã chấp nhận".
-- **AI Harness — cần xác minh lại:** mở tài liệu gốc OWASP Agentic Top 10 2026 để xác nhận nguyên văn
-  ASI01–ASI10 (phiên viết đặc tả bị egress proxy chặn `genai.owasp.org`, phải đối chiếu nguồn thứ cấp);
-  xác minh phiên bản Python/PostgreSQL/Redis/OPA/sandbox bằng nguồn sống khi khởi tạo.
+- ~~**AI Harness — cần xác minh lại**~~ — **đã làm xong 2026-09-05**, kết quả ở dưới mục "Đã xong".
+  Phần còn hở duy nhất: **mô tả và biện pháp giảm thiểu nguyên văn** của từng mục ASI (chỉ có trên
+  `genai.owasp.org`, vẫn bị egress proxy chặn). Không chặn việc dùng ma trận kiểm soát vì cột biện pháp
+  là thiết kế của chính đặc tả, không phải trích OWASP.
 - Case-study mới chạy phần D (hàng rào cục bộ). Phần Bước 6–8 (branch protection, Supabase, Vercel) cần
   tài khoản thật, chưa kiểm chứng được — nếu có dịp áp khung vào dự án thật, nên kiểm nốt phần này.
 - Dự án đã copy khung bản cũ → dùng bảng ánh xạ trong `docs/framework/README.md` khi cập nhật; chạy lại

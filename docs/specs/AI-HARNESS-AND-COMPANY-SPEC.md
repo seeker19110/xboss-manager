@@ -537,17 +537,30 @@ dẫn tới hành động có hại.
 | **ASI02** | Tool Misuse and Exploitation | Schema nghiêm ngặt + policy engine + hạn mức (C2-FR-02/04/05) |
 | **ASI03** | Identity and Privilege Abuse | Token OBO ngắn hạn, phạm vi hẹp, tách danh tính người ↔ agent (C2-FR-04) |
 | **ASI04** | Agentic Supply Chain Vulnerabilities | Ghim phiên bản + hash máy chủ/mô tả công cụ MCP, chặn khi đổi (C2-FR-07) **và quét tài sản prompt của chính repo (C5-FR-12)** — một chuỗi tấn công nằm trong một skill dùng chung hỏng mọi vai nạp nó, ở mọi lượt |
-| **ASI05** | Unexpected Code Execution | Sandbox microVM/gVisor, egress danh sách trắng, không mạng mặc định (C2-FR-08) |
+| **ASI05** | Unexpected Code Execution (RCE) | Sandbox microVM/gVisor, egress danh sách trắng, không mạng mặc định (C2-FR-08) |
 | **ASI06** | Memory & Context Poisoning | Chính sách ghi trí nhớ + đánh dấu nguồn + không dùng cho quyết định đặc quyền (C1-FR-05/10) |
 | **ASI07** | Insecure Inter-Agent Communication | Bàn giao có schema + xác thực đôi bên + thẻ agent có chữ ký (C3-FR-06/12) |
 | **ASI08** | Cascading Failures | Trần độ sâu/đồng thời, circuit breaker, hạn mức theo bán kính nổ (C3-FR-07/08) |
 | **ASI09** | Human-Agent Trust Exploitation | Màn hình phê duyệt hiển thị **hành động thật + nguồn dữ liệu**, không chỉ tóm tắt của agent (C5-FR-08) |
 | **ASI10** | Rogue Agents | Kill switch, phát hiện trôi hành vi, thu hồi thông tin xác thực tức thời (C5-FR-09, C7-FR-07) |
 
-> **Ghi chú xác thực nguồn:** danh sách ASI01–ASI10 ở trên được đối chiếu từ **nhiều nguồn thứ cấp**
-> (F5, Modulos, Promptfoo, NeuralTrust, Auth0 — truy cập 2026-09-04) vì `genai.owasp.org` bị chặn bởi
-> egress proxy của môi trường phiên này. **Trước khi chốt ma trận kiểm soát, phải mở tài liệu gốc của
-> OWASP GenAI Security Project để xác nhận nguyên văn tiêu đề và nội dung từng mục.**
+> **Ghi chú xác thực nguồn (đã xác minh 2026-09-05, nguồn sơ cấp).** Bản đầu viết theo nguồn thứ cấp
+> vì `genai.owasp.org` **và cả `owasp.org`** đều bị egress proxy chặn (vẫn chặn tới hôm nay). Đã vòng
+> qua bằng chính **kho GitHub của dự án OWASP**: `OWASP/www-project-top-10-for-large-language-model-applications`
+> (HEAD `99f4395`, 2026-08-05), lấy định danh từ tài liệu đang được bảo trì
+> `initiatives/agent_security_initiative/ASI Agentic Exploits & Incidents/ASI_Agentic_Exploits_Incidents.md`
+> — bảng 46 sự cố thật, mỗi dòng gắn nhãn ASI. **Cả mười tên trong bảng trên khớp nguồn sơ cấp.**
+> Ba điểm đáng ghi:
+>
+> 1. **ASI05 đúng ra là "Unexpected Code Execution (RCE)"** — đã bổ sung hậu tố, đây là sai lệch thật duy nhất.
+> 2. **ASI01 = "Agent Goal Hijack"** được xác nhận. Tên **"Agent Behaviour Hijack"** chỉ tồn tại trong thư mục
+>    `agentic-top-10/Sprint 1-first-public-draft-expanded/` — **bản thảo công khai đầu tiên đã bị thay thế**,
+>    và các file ASI trong đó vẫn là template rỗng chưa điền. Ai tra GitHub mà không để ý sẽ lấy nhầm tên cũ.
+> 3. `&` hay `and` (ASI02, ASI03, ASI06) là khác biệt chính tả giữa hai tài liệu của chính OWASP, không phải sai.
+>
+> Còn lại chưa xác minh được: **nội dung mô tả và biện pháp giảm thiểu nguyên văn của từng mục** — chỉ có ở
+> tài liệu chốt trên `genai.owasp.org`, vẫn bị chặn. Ma trận kiểm soát cột phải là **thiết kế của tài liệu này**,
+> không phải trích dẫn OWASP, nên khoảng trống đó không chặn việc dùng bảng.
 
 #### A4.5.3 Bốn vòng phòng thủ
 
@@ -921,7 +934,7 @@ tỉ lệ lỗi > 2× đường cơ sở · vi phạm policy > 0 · chi phí/nhi
 
 | Vai trò | Chọn | Phiên bản (2026-09-04) | Ghi chú |
 |---|---|---|---|
-| Ngôn ngữ harness | Python | 3.12+ *(bản vá mới nhất chưa xác minh trong phiên này)* | Hệ sinh thái agent/eval dày nhất |
+| Ngôn ngữ harness | Python | **3.14.7** (tối thiểu 3.12) | Hệ sinh thái agent/eval dày nhất |
 | API | FastAPI | 0.141.1 | SSE cho luồng sự kiện |
 | Validate | Pydantic | 2.13.5 | Ranh giới dữ liệu (P1) |
 | Vòng trong (agent graph) | LangGraph | 1.2.11 | Checkpoint theo bước, có chu trình |
@@ -933,13 +946,21 @@ tỉ lệ lỗi > 2× đường cơ sở · vi phạm policy > 0 · chi phí/nhi
 | Quan sát | OpenTelemetry SDK | 1.44.0 | Quy ước GenAI **thử nghiệm** — bọc adapter (§A6.3) |
 | Trace + eval | Langfuse **hoặc** Arize Phoenix | 4.15.1 / 20.7.0 | Chọn **một**; cả hai có bản tự host |
 | Chỉ số eval | DeepEval / Ragas | 4.2.1 / 0.4.3 | DeepEval hợp CI kiểu pytest |
-| CSDL | PostgreSQL + pgvector | 16/17 *(chưa xác minh trong phiên này)* | `run_events`, registry, vector |
+| CSDL | PostgreSQL + pgvector | **18.6** + pgvector **0.8.6** | `run_events`, registry, vector. ⚠️ Bản đầu ghi "16/17" — **đã lỗi thời**, 18 mới là major hiện hành |
 | Migration | Alembic | 1.19.1 | Migration có phiên bản, rollback được |
-| Hàng đợi/cache | Redis | *(chưa xác minh)* | Hạn mức, khoá idempotency |
+| Hàng đợi/cache | Redis | **8.10.1** | Hạn mức, khoá idempotency. Cân nhắc Valkey nếu giấy phép Redis là vấn đề |
 | Che PII | Presidio | 2.2.364 | Bộ lọc log/trace |
-| Policy | OPA (Rego) **hoặc** Cedar | *(chưa xác minh)* | Nạp sẵn trong tiến trình để đạt p95 ≤ 20 ms |
-| Sandbox | gVisor / Kata / Firecracker | *(chưa xác minh)* | Cách ly mức nhân hoặc microVM |
+| Policy | OPA (Rego) **hoặc** Cedar | OPA **1.20.2** | Nạp sẵn trong tiến trình để đạt p95 ≤ 20 ms |
+| Sandbox | gVisor / Kata / Firecracker | **release-20260831.0** / **4.1.0** / **1.17.0** | Cách ly mức nhân hoặc microVM |
 | Node (control plane/UI) | Node.js LTS | 24.20.0 | |
+
+> **Xác minh phiên bản (2026-09-05).** Các số in đậm ở trên lấy từ **nguồn sống**, không từ trí nhớ:
+> `git ls-remote --tags` qua git proxy cho CPython, Postgres, Redis, OPA, gVisor, Kata, Firecracker, pgvector;
+> API PyPI cho `temporalio` (1.32.0) và `langgraph` (1.2.11) — hai số này **đã đúng sẵn từ bản đầu**.
+> `endoflife.date`, `owasp.org` và `api.github.com` (repo ngoài phạm vi phiên) đều bị egress proxy chặn,
+> nên đường `ls-remote` là cách rẻ nhất còn dùng được: lấy đúng nhãn phát hành, không tốn một lần clone.
+> Cảnh báo khi đọc lại: một tag tồn tại **không** đồng nghĩa "nên dùng cho production" — chốt phiên bản
+> lúc dựng nền thì kiểm thêm lịch hỗ trợ và ghi vào ADR, đừng lấy thẳng bảng này.
 
 ### A11.2 Model (giá niêm yết theo bảng API chính thức, kiểm tra lại khi ký hợp đồng)
 
@@ -2301,9 +2322,14 @@ Bổ sung cho tầng tổ chức (Phần B) — tick cùng lúc:
 - [OpenTelemetry — GenAI observability](https://opentelemetry.io/blog/2026/genai-observability/) · [quy ước ngữ nghĩa GenAI: hướng dẫn triển khai](https://hidekazu-konishi.com/entry/opentelemetry_genai_semantic_conventions_guide.html)
 
 **Bảo mật**
-- [OWASP Top 10 for Agentic Applications 2026 — trang dự án](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) *(bị chặn trong phiên này — cần mở lại để xác nhận nguyên văn)*
+- [OWASP Top 10 for Agentic Applications 2026 — trang dự án](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) *(vẫn bị egress proxy chặn tính tới 2026-09-05; tên 10 mục đã xác minh bằng kho GitHub của OWASP, phần mô tả nguyên văn thì chưa)*
 - [OWASP GenAI LLM Top 10 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) · [công bố ngày 09/12/2025](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/)
-- Nguồn thứ cấp dùng để đối chiếu ASI01–ASI10: [F5](https://www.f5.com/glossary/owasp-top-10-for-agentic-ai-applications) · [Modulos](https://docs.modulos.ai/frameworks/owasp-top-10-agentic) · [Promptfoo](https://www.promptfoo.dev/docs/red-team/owasp-agentic-ai/) · [NeuralTrust](https://neuraltrust.ai/blog/owasp-top-10-for-agentic-applications-2026) · [Auth0](https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/)
+- **Nguồn sơ cấp đã dùng để xác minh ASI01–ASI10 (2026-09-05):** kho GitHub của dự án OWASP
+  [`OWASP/www-project-top-10-for-large-language-model-applications`](https://github.com/OWASP/www-project-top-10-for-large-language-model-applications)
+  — file `ASI_Agentic_Exploits_Incidents.md` (HEAD `99f4395`, 2026-08-05). Lưu ý thư mục
+  `agentic-top-10/Sprint 1-first-public-draft-expanded/` là **bản thảo đã bị thay thế** (ASI01 mang tên cũ
+  "Agent Behaviour Hijack", các file còn là template rỗng) — đừng trích từ đó.
+- Nguồn thứ cấp dùng ở bản đầu, nay chỉ còn giá trị đối chiếu: [F5](https://www.f5.com/glossary/owasp-top-10-for-agentic-ai-applications) · [Modulos](https://docs.modulos.ai/frameworks/owasp-top-10-agentic) · [Promptfoo](https://www.promptfoo.dev/docs/red-team/owasp-agentic-ai/) · [NeuralTrust](https://neuraltrust.ai/blog/owasp-top-10-for-agentic-applications-2026) · [Auth0](https://auth0.com/blog/owasp-top-10-agentic-applications-lessons/)
 - [Prompt injection is the new SQL injection — guardrails aren't enough (Cisco)](https://blogs.cisco.com/ai/prompt-injection-is-the-new-sql-injection-and-guardrails-arent-enough)
 - [Least privilege for AI agents: identity, access, tool binding (Microsoft)](https://www.microsoft.com/en-us/security/blog/2026/07/16/least-privilege-for-ai-agents-identity-access-and-tool-binding/) · [OAuth on-behalf-of cho agent (IETF draft)](https://www.ietf.org/archive/id/draft-oauth-ai-agents-on-behalf-of-user-01.html) · [giải thích OBO & agent identity](https://blog.christianposta.com/explaining-on-behalf-of-for-ai-agents/)
 
