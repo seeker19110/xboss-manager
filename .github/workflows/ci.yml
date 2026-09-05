@@ -11,6 +11,73 @@ jobs:
   # KHUNG-1 nguyên tắc 6: tiêu chuẩn kiểm được bằng máy thì tự động hóa — áp cho chính template:
   # shell phải đúng cú pháp, JSON cấu hình phải hợp lệ. (Kiểm tra link/tên file cũ trong tài
   # liệu đã có job docs-consistency riêng bên dưới — không lặp lại ở đây.)
+  # Hàng rào cho CHÍNH hàng rào. Hai vế, vế nào hỏng cũng đỏ:
+  #  (1) Ruleset trên nhánh mặc định phải ĐANG có hiệu lực — "đã bật branch protection" trở thành thứ
+  #      máy kiểm được, không phải lời khai. Chưa import ruleset thì mọi PR đỏ; đó là chủ đích.
+  #  (2) Mọi required status check trong ruleset phải trỏ tới một job CÓ THẬT trong .github/workflows/.
+  #      Đây là kiểu hỏng âm thầm và tốn kém nhất: đổi tên một job ⇒ context bắt buộc không bao giờ
+  #      xuất hiện ⇒ `main` bị khoá vĩnh viễn mà CI vẫn xanh. Bắt ở PR đổi tên, trước khi nó merge.
+  protection-guard:
+    name: protection-guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rule đang áp lên nhánh mặc định phải khớp .github/rulesets/main.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          rules=$(curl -sS --fail \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/rules/branches/$BRANCH")
+          has_rule()  { jq -e --arg t "$1" 'map(select(.type == $t)) | length > 0' <<<"$rules" >/dev/null; }
+          fail=0
+          for t in pull_request required_status_checks deletion non_fast_forward; do
+            has_rule "$t" || { echo "::error::Thiếu rule '$t' trên $BRANCH"; fail=1; }
+          done
+          live=$(jq -r '[.[] | select(.type == "required_status_checks")
+                        | .parameters.required_status_checks[].context] | sort | .[]' <<<"$rules")
+          want=$(jq -r '[.rules[] | select(.type == "required_status_checks")
+                        | .parameters.required_status_checks[].context] | sort | .[]' .github/rulesets/main.json)
+          for c in $want; do
+            grep -qx "$c" <<<"$live" || { echo "::error::Status check '$c' chưa được bắt buộc trên $BRANCH"; fail=1; }
+          done
+          if [ "$fail" = 1 ]; then
+            echo "::error::Bảo vệ nhánh CHƯA khớp. Import .github/rulesets/main.json: Settings → Rules → Rulesets → New ruleset → Import a ruleset. Chi tiết: CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "OK — $BRANCH đang được bảo vệ đúng ruleset."
+
+      - name: Mọi required check phải là một job có thật (chặn khoá-nhánh-do-đổi-tên-job)
+        run: |
+          set -euo pipefail
+          jobs=$(python3 - <<'PY'
+          import glob, yaml
+          names = set()
+          for f in glob.glob(".github/workflows/*.yml"):
+              d = yaml.safe_load(open(f)) or {}
+              for key, cfg in (d.get("jobs") or {}).items():
+                  names.add((cfg or {}).get("name") or key)
+          print("\n".join(sorted(names)))
+          PY
+          )
+          fail=0
+          for c in $(jq -r '.rules[] | select(.type == "required_status_checks")
+                            | .parameters.required_status_checks[].context' .github/rulesets/main.json); do
+            grep -qx "$c" <<<"$jobs" || {
+              echo "::error::Required check '$c' trong ruleset KHÔNG khớp job nào trong .github/workflows/."
+              echo "::error::Đổi tên job mà quên sửa ruleset sẽ khoá vĩnh viễn nhánh mặc định. Sửa một trong hai cho khớp."
+              fail=1; }
+          done
+          [ "$fail" = 0 ] || exit 1
+          echo "OK — mọi required check đều trỏ tới một job có thật."
+
   framework-lint:
     runs-on: ubuntu-latest
     steps:
