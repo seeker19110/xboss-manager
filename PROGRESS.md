@@ -297,7 +297,8 @@
   thì tài liệu mô tả thứ chưa tồn tại).
 - **Đề xuất ngược còn lại cho Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): tách `summary` của coder khỏi phần
   reviewer nhận; sửa phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
-  nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
+  ~~nâng ngưỡng coverage của `gateway` (73)~~ — **đã xong bởi PR #48** (`34d7fbd`, không phải tôi):
+  cả bốn package giờ `fail_under = 100`. Đã xác minh bằng `grep fail_under` trên `main`.
 - **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh và ADR-0028 có PR code đầu tiên.
 - **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
   use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
