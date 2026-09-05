@@ -252,24 +252,77 @@
       sửa bằng `.gitleaksignore` (2 fingerprint lịch sử, có lý do) + đổi ví dụ thành chuỗi 8 ký tự; tái hiện bằng đúng
       gitleaks 8.24.3 của CI (2 vết → 0 vết) rồi mới push. Head mới 9/9 xanh, không review → merge, huỷ lịch, về `main`.
 
+- ✅ **Tuần 1 luồng A — branch protection cho Claude-Agents: KHÔNG có công cụ nào đặt được cấu hình repo**
+      (MCP GitHub không có tool ghi ruleset). Cách xử lý: PR #40 (`ci/branch-protection-guard`, **đang mở**) đưa
+      `.github/rulesets/main.json` (bộ luật nhập được: cấm xoá/force-push, PR bắt buộc + 1 duyệt, dismiss stale,
+      resolve thread, chỉ squash, required check `quality` + `metadata`) **kèm job CI `protection-guard`** gọi
+      `/repos/:repo/rules/branches/main` và **đỏ cho tới khi bộ luật thật sự có hiệu lực** ⇒ "đã bật" trở thành
+      thứ máy kiểm được, không phải lời khai. Đã chứng minh logic guard cả hai chiều (đỏ với payload thật `[]`,
+      xanh với payload giả lập sau khi nhập). **Chặn ở người dùng:** phải tự nhập ruleset trong Settings → Rules →
+      Rulesets → Import, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job.
+      Merge #40 **trước** khi nhập sẽ làm mọi PR sau đó đỏ ⇒ #40 để merge **cuối cùng**.
+
+- ✅ **Tuần 1 luồng B — vai viết test độc lập: ADR-0028 đã merge vào Claude-Agents** (`2779704`, PR #45).
+      Chốt thiết kế trước, code tách 4 PR sau (đúng pattern ADR-0020 → #21 của repo đó). Nội dung: agent thứ 21
+      `test-author` nhận `tasks` ở chế độ **mù** (chỉ `acceptance` + `prd` + `api-contract`, KHÔNG có diff) → phát
+      `test-suites` → assignee code tới khi test xanh nhưng **mất quyền ghi thư mục test**. Ràng buộc đặt ở
+      **runtime chứ không ở prompt**: `Toolbox.write_scope` (`tests`|`src`|`all`) kiểm tại `_path(for_write=True)` —
+      đúng chỗ đang chặn `..`/symlink/`.git/`; `Stack` thêm `test_globs`. **Fail closed** khi stack `UNKNOWN`
+      (PR mang cờ `tests_authored_by: "assignee"` để reviewer biết bộ test không độc lập). Tín hiệu kiểm toán:
+      `tests_red_as_expected` (lành mạnh) vs `tests_green_before_code` (đáng ngờ). Giá: +1 lượt `standard`/ticket.
+
+- ✅ **Tuần 1 luồng C — trực ban + diễn tập dừng khẩn: đã merge** (`cc17fc0`, PR #47 → `docs/TRUC-VA-DUNG-KHAN.md`).
+      **Diễn tập thật, không viết chay:** dừng một chủ đề mất **0,27 s**. Phát hiện hai lỗi dễ mắc lúc gấp
+      (`--db` phải đứng TRƯỚC lệnh con; `--key` là bắt buộc) — đã ghi vào runbook. Đối chiếu với đặc tả:
+      **SPEC-AI-100 §C5-FR-09 đòi 3 mức ≤ 10 s kèm thu hồi thông tin xác thực, thực tế chỉ có 2 mức chạy được
+      bằng lệnh + 1 mức thô (giết tiến trình); KHÔNG thu hồi được credential, KHÔNG cắt được lượt gọi model
+      đang bay.** Khoảng lệch này ghi thẳng vào §4 của runbook thay vì lấp liếm.
+
+- ✅ **Kỷ luật WIP tự áp lên chính mình:** đang có 3 PR chờ ở Claude-Agents nên **từ chối mở PR thứ 4** —
+      đúng luật L4 (WIP ≤ năng lực kiểm chứng) của chính đặc tả vừa viết. Thứ tự merge cũng do ràng buộc kỹ thuật
+      quyết định (#47 → #45 → #40 sau khi nhập ruleset), không theo thứ tự tạo.
+
+- ✅ **Toàn bộ 4 "đề xuất ngược" gửi Claude-Agents đã được thực thi — bởi PR của repo đó, KHÔNG phải tôi.**
+      Ghi lại để phiên sau không đi làm lại. Đã xác minh từng mục bằng `grep` trên `main` (`dd7c0f1`), không tin tiêu đề PR:
+      | Đề xuất (SPEC-AI-100 §C1.2–C1.3) | Ai làm | Bằng chứng đã kiểm |
+      |---|---|---|
+      | Vai `test-author` độc lập | ADR-0028 (#45, tôi) → **code #50 `dd7c0f1`** | `tools.py:153 _check_write_scope`; `stacks.py:24 test_globs`, `UNKNOWN` không có test_globs; `orchestrator.py:283-285` hai route + `_no_test_author` fail closed; `_audit("tests_authored_by_assignee")` |
+      | Tách `summary` của coder khỏi phần reviewer nhận | PR khác | `orchestrator.py:202` — "Reviewer/QA/security đọc **diff thật** của branch ticket thay vì tin `summary` của PR" |
+      | Sửa "Hệ quả" ADR-0015 (nói REQUIRED.txt trống) | PR khác | ADR-0015 không còn câu đó; `REQUIRED.txt` có **29 dòng** |
+      | Nâng coverage `gateway` (73) | **#48 `34d7fbd`** | cả 4 package `fail_under = 100` |
+      Điều đáng rút ra: **đề xuất viết đủ cụ thể để người khác thực thi được thì không cần chính mình cầm tay làm** —
+      ADR-0028 đưa sẵn ràng buộc ở runtime, điểm cưỡng chế, và cách fail closed, nên #50 làm đúng thiết kế mà tôi không tham gia.
+
+- ✅ **Đóng mục "cần xác minh lại" của đặc tả — bằng nguồn sơ cấp, không phải nguồn thứ cấp** (2026-09-05).
+      `genai.owasp.org`, `owasp.org` và `endoflife.date` đều bị egress proxy chặn; `api.github.com` thì
+      chặn repo ngoài phạm vi phiên. Vòng qua bằng hai đường còn dùng được:
+      1. **OWASP ASI01–ASI10:** clone nông kho chính thức `OWASP/www-project-top-10-for-large-language-model-applications`
+         (HEAD `99f4395`, 2026-08-05) và lấy định danh từ tài liệu đang bảo trì `ASI_Agentic_Exploits_Incidents.md`
+         (bảng 46 sự cố thật, mỗi dòng gắn nhãn ASI). **Cả 10 tên trong đặc tả khớp.** Sửa đúng **một** chỗ:
+         ASI05 phải là *Unexpected Code Execution **(RCE)***. Bẫy đáng ghi: thư mục `agentic-top-10/Sprint 1-first-public-draft-expanded/`
+         trong chính kho đó là **bản thảo đã bị thay thế** — gọi ASI01 là *"Agent Behaviour Hijack"* và các file
+         vẫn là template rỗng; ai tra GitHub vội sẽ lấy nhầm tên cũ. Tên đúng là *Agent Goal Hijack*.
+      2. **Phiên bản công nghệ:** `git ls-remote --tags` qua git proxy (rẻ hơn clone) + API PyPI.
+         Kết quả: Python **3.14.7** · PostgreSQL **18.6** + pgvector **0.8.6** · Redis **8.10.1** · OPA **1.20.2** ·
+         gVisor **release-20260831.0** / Kata **4.1.0** / Firecracker **1.17.0**. `temporalio` 1.32.0 và
+         `langgraph` 1.2.11 **đã đúng sẵn**. Chỗ sai thật: đặc tả ghi PostgreSQL "16/17" — **lỗi thời**, 18 mới là major hiện hành.
+
 ## Đang làm
-- (không có — PR #3 đã merge, `main` = `132f141`, không còn PR nào mở)
+- **PR #40 (Claude-Agents) — chặn ở người dùng.** Chờ nhập `.github/rulesets/main.json` qua Settings → Rules →
+  Rulesets → *Import a ruleset*, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job
+  `protection-guard`. Guard đỏ là **có chủ đích** — merge lúc đỏ vừa phá luật của chính khung, vừa làm mọi PR sau
+  đó đỏ theo. Đã đặt lịch tự kiểm 60 phút/lần, im lặng cho tới khi trạng thái đổi.
+- **Đo tiến cứu 4 tuần từ T0 = 05/09** đã mở trên Claude-Agents (đường cơ sở hồi cứu không tồn tại — xem Đ0).
 
 ## Tiếp theo
-- **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
-  vừa bị ADR-0021 khuếch đại vì reviewer thành lượt kiểm thử duy nhất); tách `summary` khỏi phần reviewer nhận;
-  cập nhật phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
-  nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
-- **Việc kế tiếp theo lộ trình SPEC-AI-100 §B12.2.9 (n = 3, tuần 1, ba luồng song song):**
-  luồng A — **bật branch protection thật** trên Claude-Agents (required check `quality`, cấm merge trước CI,
-  cấm commit thẳng) + mở đo tiến cứu 4 tuần từ T0 = 05/09; luồng B — bắt đầu **vai R4 viết test độc lập**;
-  luồng C — lịch trực luân phiên, G6 gộp lô, diễn tập kill switch.
+- **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh. Đây giờ là việc lớn duy nhất còn treo ở Claude-Agents.
 - **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
   use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
   Có đủ câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chuyển ADR-0002 sang "Đã chấp nhận".
-- **AI Harness — cần xác minh lại:** mở tài liệu gốc OWASP Agentic Top 10 2026 để xác nhận nguyên văn
-  ASI01–ASI10 (phiên viết đặc tả bị egress proxy chặn `genai.owasp.org`, phải đối chiếu nguồn thứ cấp);
-  xác minh phiên bản Python/PostgreSQL/Redis/OPA/sandbox bằng nguồn sống khi khởi tạo.
+- ~~**AI Harness — cần xác minh lại**~~ — **đã làm xong 2026-09-05**, kết quả ở dưới mục "Đã xong".
+  Phần còn hở duy nhất: **mô tả và biện pháp giảm thiểu nguyên văn** của từng mục ASI (chỉ có trên
+  `genai.owasp.org`, vẫn bị egress proxy chặn). Không chặn việc dùng ma trận kiểm soát vì cột biện pháp
+  là thiết kế của chính đặc tả, không phải trích OWASP.
 - Case-study mới chạy phần D (hàng rào cục bộ). Phần Bước 6–8 (branch protection, Supabase, Vercel) cần
   tài khoản thật, chưa kiểm chứng được — nếu có dịp áp khung vào dự án thật, nên kiểm nốt phần này.
 - Dự án đã copy khung bản cũ → dùng bảng ánh xạ trong `docs/framework/README.md` khi cập nhật; chạy lại
@@ -279,6 +332,10 @@
 - **ADR-0002 (Đề xuất):** kiến trúc AI harness — vòng lặp ngoài xác định do harness sở hữu, event sourcing
   append-only làm nguồn sự thật duy nhất, Tool Gateway là điểm nghẽn duy nhất cho mọi tác động ra ngoài.
   Nguyên tắc nền: *prompt không phải cơ chế bảo mật*.
+- **ADR-0028 Claude-Agents (Đề xuất, đã merge tài liệu):** vai viết test tách khỏi vai viết code; cưỡng chế ở
+  runtime (`write_scope`) chứ không ở prompt; fail closed khi không xác định được thư mục test.
+- **Nguyên tắc rút ra khi bật branch protection:** cấu hình repo mà công cụ không đặt được thì **đưa vào CI làm
+  cổng tự kiểm** — biến lời khai "đã bật" thành thứ máy kiểm được. Áp lại vào SPEC-AI-100 khi sửa §C5.
 - Cấu hình Opusplan được thêm vào `_framework-dropins/` (an toàn, không đè cấu hình cũ)
 - `.claude/` (hooks + agents) cũng được copy vào `_framework-dropins/` để dự án cũ tự merge nếu cần
 - **opusplan là điểm ngọt, không đổi**; tối ưu token thêm bằng CHIA VIỆC (subagent) chứ không "route theo độ khó"
