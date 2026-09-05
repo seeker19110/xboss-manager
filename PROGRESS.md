@@ -252,18 +252,53 @@
       sửa bằng `.gitleaksignore` (2 fingerprint lịch sử, có lý do) + đổi ví dụ thành chuỗi 8 ký tự; tái hiện bằng đúng
       gitleaks 8.24.3 của CI (2 vết → 0 vết) rồi mới push. Head mới 9/9 xanh, không review → merge, huỷ lịch, về `main`.
 
+- ✅ **Tuần 1 luồng A — branch protection cho Claude-Agents: KHÔNG có công cụ nào đặt được cấu hình repo**
+      (MCP GitHub không có tool ghi ruleset). Cách xử lý: PR #40 (`ci/branch-protection-guard`, **đang mở**) đưa
+      `.github/rulesets/main.json` (bộ luật nhập được: cấm xoá/force-push, PR bắt buộc + 1 duyệt, dismiss stale,
+      resolve thread, chỉ squash, required check `quality` + `metadata`) **kèm job CI `protection-guard`** gọi
+      `/repos/:repo/rules/branches/main` và **đỏ cho tới khi bộ luật thật sự có hiệu lực** ⇒ "đã bật" trở thành
+      thứ máy kiểm được, không phải lời khai. Đã chứng minh logic guard cả hai chiều (đỏ với payload thật `[]`,
+      xanh với payload giả lập sau khi nhập). **Chặn ở người dùng:** phải tự nhập ruleset trong Settings → Rules →
+      Rulesets → Import, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job.
+      Merge #40 **trước** khi nhập sẽ làm mọi PR sau đó đỏ ⇒ #40 để merge **cuối cùng**.
+
+- ✅ **Tuần 1 luồng B — vai viết test độc lập: ADR-0028 đã merge vào Claude-Agents** (`2779704`, PR #45).
+      Chốt thiết kế trước, code tách 4 PR sau (đúng pattern ADR-0020 → #21 của repo đó). Nội dung: agent thứ 21
+      `test-author` nhận `tasks` ở chế độ **mù** (chỉ `acceptance` + `prd` + `api-contract`, KHÔNG có diff) → phát
+      `test-suites` → assignee code tới khi test xanh nhưng **mất quyền ghi thư mục test**. Ràng buộc đặt ở
+      **runtime chứ không ở prompt**: `Toolbox.write_scope` (`tests`|`src`|`all`) kiểm tại `_path(for_write=True)` —
+      đúng chỗ đang chặn `..`/symlink/`.git/`; `Stack` thêm `test_globs`. **Fail closed** khi stack `UNKNOWN`
+      (PR mang cờ `tests_authored_by: "assignee"` để reviewer biết bộ test không độc lập). Tín hiệu kiểm toán:
+      `tests_red_as_expected` (lành mạnh) vs `tests_green_before_code` (đáng ngờ). Giá: +1 lượt `standard`/ticket.
+
+- ✅ **Tuần 1 luồng C — trực ban + diễn tập dừng khẩn: đã merge** (`cc17fc0`, PR #47 → `docs/TRUC-VA-DUNG-KHAN.md`).
+      **Diễn tập thật, không viết chay:** dừng một chủ đề mất **0,27 s**. Phát hiện hai lỗi dễ mắc lúc gấp
+      (`--db` phải đứng TRƯỚC lệnh con; `--key` là bắt buộc) — đã ghi vào runbook. Đối chiếu với đặc tả:
+      **SPEC-AI-100 §C5-FR-09 đòi 3 mức ≤ 10 s kèm thu hồi thông tin xác thực, thực tế chỉ có 2 mức chạy được
+      bằng lệnh + 1 mức thô (giết tiến trình); KHÔNG thu hồi được credential, KHÔNG cắt được lượt gọi model
+      đang bay.** Khoảng lệch này ghi thẳng vào §4 của runbook thay vì lấp liếm.
+
+- ✅ **Kỷ luật WIP tự áp lên chính mình:** đang có 3 PR chờ ở Claude-Agents nên **từ chối mở PR thứ 4** —
+      đúng luật L4 (WIP ≤ năng lực kiểm chứng) của chính đặc tả vừa viết. Thứ tự merge cũng do ràng buộc kỹ thuật
+      quyết định (#47 → #45 → #40 sau khi nhập ruleset), không theo thứ tự tạo.
+
 ## Đang làm
-- (không có — PR #3 đã merge, `main` = `132f141`, không còn PR nào mở)
+- **PR #40 (Claude-Agents) — chặn ở người dùng.** Chờ nhập `.github/rulesets/main.json` qua Settings → Rules →
+  Rulesets → *Import a ruleset*, bật *Allow auto-merge* + *Automatically delete head branches*, rồi chạy lại job
+  `protection-guard`. Guard đỏ là **có chủ đích** — merge lúc đỏ vừa phá luật của chính khung, vừa làm mọi PR sau
+  đó đỏ theo. Đã đặt lịch tự kiểm 60 phút/lần, im lặng cho tới khi trạng thái đổi.
+- **Đo tiến cứu 4 tuần từ T0 = 05/09** đã mở trên Claude-Agents (đường cơ sở hồi cứu không tồn tại — xem Đ0).
 
 ## Tiếp theo
-- **Đề xuất ngược cho repo Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): thêm vai `test-author` độc lập (rủi ro lớn nhất còn lại,
-  vừa bị ADR-0021 khuếch đại vì reviewer thành lượt kiểm thử duy nhất); tách `summary` khỏi phần reviewer nhận;
-  cập nhật phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
+- **Thi hành ADR-0028 trên Claude-Agents — 4 PR tách rời** (thiết kế đã chốt, giờ tới code):
+  (1) `Stack.test_globs` + `Toolbox.write_scope` + test cưỡng chế; (2) agent `test-author`, topic `test-suites`
+  + schema, route mới, `make golden`, `make eval-record`; (3) cờ `tests_authored_by` / `test_dispute` + prompt
+  reviewer; (4) cập nhật `docs/architecture.md` và `docs/DIEU-PHOI-MODEL.md` (cố ý để sau cùng — cập nhật trước
+  thì tài liệu mô tả thứ chưa tồn tại).
+- **Đề xuất ngược còn lại cho Claude-Agents** (SPEC-AI-100 §C1.2, §C1.3): tách `summary` của coder khỏi phần
+  reviewer nhận; sửa phần "Hệ quả" của ADR-0015 (nói REQUIRED.txt còn trống — nay đã đủ 20 agent, ghi 2026-09-03);
   nâng ngưỡng coverage của `gateway` (73, thấp nhất, mà lại giữ thông tin xác thực nhiều tài khoản).
-- **Việc kế tiếp theo lộ trình SPEC-AI-100 §B12.2.9 (n = 3, tuần 1, ba luồng song song):**
-  luồng A — **bật branch protection thật** trên Claude-Agents (required check `quality`, cấm merge trước CI,
-  cấm commit thẳng) + mở đo tiến cứu 4 tuần từ T0 = 05/09; luồng B — bắt đầu **vai R4 viết test độc lập**;
-  luồng C — lịch trực luân phiên, G6 gộp lô, diễn tập kill switch.
+- **Tuần 2 theo lộ trình §B12.2.9** — mở sau khi #40 xanh và ADR-0028 có PR code đầu tiên.
 - **AI Harness — câu hỏi còn mở ở §C2.4** (đã chốt câu 4 = 3 người, câu 5 = không có đường cơ sở hồi cứu):
   use case đầu tiên · Python hay TS · cloud/on-prem · đa tenant · phạm vi tuân thủ · kênh HITL · chế độ chi phí.
   Có đủ câu trả lời ⇒ thu hẹp đặc tả về đúng bối cảnh, chuyển ADR-0002 sang "Đã chấp nhận".
@@ -279,6 +314,10 @@
 - **ADR-0002 (Đề xuất):** kiến trúc AI harness — vòng lặp ngoài xác định do harness sở hữu, event sourcing
   append-only làm nguồn sự thật duy nhất, Tool Gateway là điểm nghẽn duy nhất cho mọi tác động ra ngoài.
   Nguyên tắc nền: *prompt không phải cơ chế bảo mật*.
+- **ADR-0028 Claude-Agents (Đề xuất, đã merge tài liệu):** vai viết test tách khỏi vai viết code; cưỡng chế ở
+  runtime (`write_scope`) chứ không ở prompt; fail closed khi không xác định được thư mục test.
+- **Nguyên tắc rút ra khi bật branch protection:** cấu hình repo mà công cụ không đặt được thì **đưa vào CI làm
+  cổng tự kiểm** — biến lời khai "đã bật" thành thứ máy kiểm được. Áp lại vào SPEC-AI-100 khi sửa §C5.
 - Cấu hình Opusplan được thêm vào `_framework-dropins/` (an toàn, không đè cấu hình cũ)
 - `.claude/` (hooks + agents) cũng được copy vào `_framework-dropins/` để dự án cũ tự merge nếu cần
 - **opusplan là điểm ngọt, không đổi**; tối ưu token thêm bằng CHIA VIỆC (subagent) chứ không "route theo độ khó"
